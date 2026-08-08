@@ -7,6 +7,7 @@ import {
   createProduct,
   listProducts,
 } from '@/data/repositories/productRepo';
+import { useNameSuggestion } from '@/hooks/useNameSuggestion';
 import { productName, unitLabel, useT } from '@/i18n/useT';
 import type { Product, Unit } from '@/domain/types';
 
@@ -38,10 +39,12 @@ export const NewProductSheet: React.FC<{
   const { t, lang } = useT();
   const [mode, setMode] = useState<'new' | 'link'>('new');
 
-  const [nameEn, setNameEn] = useState('');
+  // English and Tamil names stay in step as the shopkeeper types, including
+  // when they type Tanglish.
+  const { fields, setEnglish, setTamil, reset } = useNameSuggestion();
+  const { nameEn, nameTa, suggestion } = fields;
   const [price, setPrice] = useState('');
   const [showMore, setShowMore] = useState(false);
-  const [nameTa, setNameTa] = useState('');
   const [unit, setUnit] = useState<Unit>('piece');
   const [category, setCategory] = useState('');
   const [stock, setStock] = useState('');
@@ -54,16 +57,15 @@ export const NewProductSheet: React.FC<{
   useEffect(() => {
     if (!barcode) return;
     setMode('new');
-    setNameEn('');
+    reset();
     setPrice('');
     setShowMore(false);
-    setNameTa('');
     setUnit('piece');
     setCategory('');
     setStock('');
     setTrackStock(false);
     setLinkSearch('');
-  }, [barcode]);
+  }, [barcode, reset]);
 
   const linkMatches = useMemo(() => {
     const q = linkSearch.trim().toLowerCase();
@@ -147,11 +149,34 @@ export const NewProductSheet: React.FC<{
             <Field label={t('inv.name')}>
               <Input
                 value={nameEn}
-                onChange={(e) => setNameEn(e.target.value)}
+                onChange={(e) => setEnglish(e.target.value)}
                 autoFocus
                 className="text-lg"
               />
             </Field>
+
+            {/* The Tamil name appears only once there is something to show,
+                so an empty form stays down to two fields. */}
+            {(nameTa || fields.tamilEdited) && (
+              <Field
+                label={t('inv.nameTa')}
+                hint={
+                  suggestion && suggestion.confidence === 'low'
+                    ? t('inv.autoTamilCheck')
+                    : t('inv.autoTamil')
+                }
+              >
+                <Input
+                  value={nameTa}
+                  onChange={(e) => setTamil(e.target.value)}
+                  className={
+                    suggestion && suggestion.confidence === 'low'
+                      ? 'border-amber-400 dark:border-amber-600'
+                      : ''
+                  }
+                />
+              </Field>
+            )}
             <Field label={t('inv.price')}>
               <Input
                 inputMode="decimal"
@@ -173,9 +198,6 @@ export const NewProductSheet: React.FC<{
             {showMore && (
               <div className="space-y-3 pl-1 border-l-2 border-slate-200 dark:border-slate-700">
                 <div className="pl-3 space-y-3">
-                  <Field label={t('inv.nameTa')}>
-                    <Input value={nameTa} onChange={(e) => setNameTa(e.target.value)} />
-                  </Field>
                   <div className="grid grid-cols-2 gap-3">
                     <Field label={t('inv.unit')}>
                       <Select value={unit} onChange={(e) => setUnit(e.target.value as Unit)}>

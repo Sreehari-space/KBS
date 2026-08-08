@@ -185,3 +185,53 @@ on the Phase 4 list if multi-device restore is ever wanted.
 - Warn if `navigator.storage.estimate()` shows the quota running low.
 - Settings shows **"Last backup: 3 days ago"** in plain sight, because a backup system nobody
   can see is one nobody trusts.
+
+## Automatic Tamil names (English / Tanglish / Tamil)
+
+Product names fill themselves in as the shopkeeper types, in all three
+directions:
+
+| Typed | English field | Tamil field |
+|---|---|---|
+| `Tomato` | Tomato | தக்காளி |
+| `thakkali` | **Tomato** | தக்காளி |
+| `தக்காளி` | **Tomato** | தக்காளி |
+| `Britannia` | Britannia | பிரிடணிய *(sound-alike)* |
+
+### Why not a translation API
+
+A cloud translator cannot sit on this path. The item is added mid-bill with a
+customer waiting, and the whole app is built to work with no signal — an
+offline call would just fail at the worst moment. So this is done locally, in
+two layers:
+
+1. **Lexicon** (`domain/tamil/lexicon.ts`) — ~130 kirana terms with their Tamil
+   spellings and the Tanglish spellings a shopkeeper is likely to type. This is
+   real translation, and it covers what a provision store actually sells.
+   Matching is loose: doubled letters and vowel length are folded away, so
+   `thakkali`, `takkali` and `thakkaali` all resolve to தக்காளி.
+2. **Transliteration** (`domain/tamil/transliterate.ts`) — a phonetic Latin →
+   Tamil renderer for anything the lexicon does not know, mostly brand names.
+
+Multi-word names are resolved word by word and rejoined, so `Aachi rice`
+becomes `ஆசி அரிசி` even though that phrase is not listed. Sizes and units
+(`500ml`, `1kg`) pass through untouched.
+
+### The limitation, stated plainly
+
+Layer 2 converts **sound, not meaning**. `Britannia` becomes பிரிடணிய, which
+reads correctly aloud but is not a translation — there is nothing to translate.
+That is exactly what shops write on their own labels for brand names, so it is
+useful, but it is a suggestion rather than an answer. Those cases are flagged
+with an amber border and "Sound-alike only. Please check the Tamil name."
+
+Two rules stop it becoming annoying:
+
+- **Manual edits win.** Once the Tamil field is typed in by hand, nothing
+  overwrites it. A wrong Tamil name on a printed bill is worse than a blank one.
+- **English is only rewritten for Tanglish.** Typing `Tomato` must not have the
+  field rewritten under the cursor; typing `thakkali` should resolve to
+  `Tomato`, because that is plainly what was meant.
+
+If a shop wants proper translation of arbitrary text, that needs a network call
+and belongs behind the optional Gemini key — never on the billing path.

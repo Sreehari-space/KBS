@@ -9,6 +9,8 @@ import {
   listProducts,
   updateProduct,
 } from '@/data/repositories/productRepo';
+import { isTanglish, suggestNames } from '@/domain/tamil/suggest';
+import { detectScript } from '@/domain/tamil/transliterate';
 import { productName, unitLabel, useT } from '@/i18n/useT';
 import type { Product, Unit } from '@/domain/types';
 
@@ -55,6 +57,8 @@ export const InventoryScreen: React.FC = () => {
   const [filter, setFilter] = useState('all');
   const [draft, setDraft] = useState<Draft | null>(null);
   const [showMore, setShowMore] = useState(false);
+  // Once the Tamil name is typed by hand, auto-fill stops overwriting it.
+  const [tamilEdited, setTamilEdited] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<Product | null>(null);
 
   const visible = useMemo(() => {
@@ -77,6 +81,7 @@ export const InventoryScreen: React.FC = () => {
 
   const openEdit = (p: Product) => {
     setShowMore(false);
+    setTamilEdited(Boolean(p.nameTa.trim()));
     setDraft({
       id: p.id,
       nameEn: p.nameEn,
@@ -132,6 +137,7 @@ export const InventoryScreen: React.FC = () => {
           <Button
             onClick={() => {
               setShowMore(false);
+              setTamilEdited(false);
               setDraft(emptyDraft);
             }}
             className="px-4"
@@ -211,11 +217,41 @@ export const InventoryScreen: React.FC = () => {
             <Field label={t('inv.name')}>
               <Input
                 value={draft.nameEn}
-                onChange={(e) => setDraft({ ...draft, nameEn: e.target.value })}
+                onChange={(e) => {
+                  const typed = e.target.value;
+                  const suggestion = suggestNames(typed);
+                  const typedTamil = detectScript(typed) === 'tamil';
+                  setDraft({
+                    ...draft,
+                    // Tanglish and Tamil script both resolve to a real English
+                    // name; plain English is left exactly as typed.
+                    nameEn:
+                      (isTanglish(typed) || typedTamil) && suggestion.nameEn
+                        ? suggestion.nameEn
+                        : typed,
+                    nameTa: tamilEdited
+                      ? draft.nameTa
+                      : typedTamil
+                        ? typed
+                        : suggestion.nameTa,
+                  });
+                }}
                 autoFocus
                 className="text-lg"
               />
             </Field>
+
+            {(draft.nameTa || tamilEdited) && (
+              <Field label={t('inv.nameTa')} hint={tamilEdited ? undefined : t('inv.autoTamil')}>
+                <Input
+                  value={draft.nameTa}
+                  onChange={(e) => {
+                    setTamilEdited(true);
+                    setDraft({ ...draft, nameTa: e.target.value });
+                  }}
+                />
+              </Field>
+            )}
             <Field label={t('inv.price')}>
               <Input
                 inputMode="decimal"
@@ -244,12 +280,6 @@ export const InventoryScreen: React.FC = () => {
 
             {showMore && (
               <div className="space-y-3 pl-3 border-l-2 border-slate-200 dark:border-slate-700">
-                <Field label={t('inv.nameTa')}>
-                  <Input
-                    value={draft.nameTa}
-                    onChange={(e) => setDraft({ ...draft, nameTa: e.target.value })}
-                  />
-                </Field>
                 <div className="grid grid-cols-2 gap-3">
                   <Field label={t('inv.category')}>
                     <Input

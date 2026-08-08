@@ -146,6 +146,8 @@ export const en = {
   'inv.linkHint': 'Pick the item this barcode belongs to. It will be recognised from next time.',
   'inv.linkSearch': 'Search your items…',
   'inv.linked': 'Barcode added to',
+  'inv.autoTamil': 'Tamil name filled automatically — tap to edit',
+  'inv.autoTamilCheck': 'Sound-alike only. Please check the Tamil name.',
 
   // Customers & ledger
   'cust.title': 'Customers',
