@@ -35,5 +35,8 @@
     "vite-plugin-pwa": "^1.3.0",
     "vitest": "^4.1.10"
   },
-  "description": "Offline-first POS for Tamil Nadu small stores"
+  "description": "Offline-first POS for Tamil Nadu small stores",
+  "engines": {
+    "node": ">=20"
+  }
 }

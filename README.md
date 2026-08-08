@@ -63,6 +63,15 @@ Gemini key the shop owner enters in Settings, stored on their own device.
 > **The camera needs HTTPS.** Scanning works on `localhost` in development, but a deployment
 > must be served over HTTPS or the scanner will silently fail.
 
+## Deploy
+
+Configured for **Vercel** — import the GitHub repo and it builds; everything else is in
+[`vercel.json`](vercel.json). No environment variables are required.
+
+⚠️ **Pick the production domain before a shop starts billing.** IndexedDB is origin-scoped, so
+moving from `kbs-xyz.vercel.app` to a custom domain later leaves every shop's bills and credit
+ledger stranded on the old origin. Full notes in [doc 08](docs/08-deployment.md).
+
 ## Architecture
 
 ```
@@ -88,6 +97,7 @@ Start at **[docs/README.md](docs/README.md)** for the index and the decision log
 | [05 — Ledger, Tamil, day close](docs/05-ledger-tamil-dayclose.md) | Credit ledger (கடன்), i18n, day close, backup |
 | [06 — Roadmap](docs/06-roadmap.md) | Delivery status, what was left out and why, risks |
 | [07 — Auto-save & durability](docs/07-autosave-durability.md) | Auto-save guarantees, commit protocol, storage budget |
+| [08 — Deployment](docs/08-deployment.md) | Vercel setup, cache headers, installing on a phone, rollback |
 
 ## Known limits
 

@@ -16,6 +16,7 @@ Nothing here is implemented yet. This is the plan to review before any code chan
 | [05-ledger-tamil-dayclose.md](05-ledger-tamil-dayclose.md) | Credit ledger (கடன்), Tamil/English i18n, day close, backup/restore |
 | [06-roadmap.md](06-roadmap.md) | Phased delivery, PR-sized tasks, acceptance criteria, risks |
 | [07-autosave-durability.md](07-autosave-durability.md) | **Auto-save guarantees**, commit protocol, draft recovery, storage budget |
+| [08-deployment.md](08-deployment.md) | Deploying to Vercel, cache headers, installing on a phone, rollback |
 
 ## Scope decisions (agreed)
 
