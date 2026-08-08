@@ -233,14 +233,17 @@ export const BillingScreen: React.FC<{ onBilled: (sale: Sale) => void }> = ({ on
             {visibleProducts.map((p) => {
               const out = p.trackStock && p.stockQty <= 0;
               return (
+                // Out of stock WARNS but never blocks. The shopkeeper is
+                // holding the packet; the app is not in a position to argue,
+                // and a stale count must not stop a sale. This also matches
+                // the scan path, which never checked stock.
                 <button
                   key={p.id}
-                  onClick={() => !out && handleProductTap(p)}
-                  disabled={out}
-                  className={`text-left p-3 rounded-xl border transition-colors ${
+                  onClick={() => handleProductTap(p)}
+                  className={`text-left p-3 rounded-xl border transition-colors bg-light-surface dark:bg-dark-surface hover:border-brand-primary active:bg-slate-100 dark:active:bg-slate-700 ${
                     out
-                      ? 'opacity-40 border-slate-200 dark:border-slate-700'
-                      : 'bg-light-surface dark:bg-dark-surface border-slate-200 dark:border-slate-700 hover:border-brand-primary active:bg-slate-100 dark:active:bg-slate-700'
+                      ? 'border-amber-400 dark:border-amber-600'
+                      : 'border-slate-200 dark:border-slate-700'
                   }`}
                 >
                   <p className="font-semibold text-sm leading-snug line-clamp-2 min-h-[2.6em]">
@@ -257,9 +260,11 @@ export const BillingScreen: React.FC<{ onBilled: (sale: Sale) => void }> = ({ on
                   {p.trackStock && (
                     <p
                       className={`text-[11px] mt-0.5 tnum ${
-                        p.stockQty <= p.lowStockThreshold
-                          ? 'text-red-500 font-semibold'
-                          : 'text-light-text-secondary dark:text-dark-text-secondary'
+                        out
+                          ? 'text-amber-600 dark:text-amber-400 font-semibold'
+                          : p.stockQty <= p.lowStockThreshold
+                            ? 'text-red-500 font-semibold'
+                            : 'text-light-text-secondary dark:text-dark-text-secondary'
                       }`}
                     >
                       {out ? t('billing.outOfStock') : `${p.stockQty} ${t('billing.inStock')}`}

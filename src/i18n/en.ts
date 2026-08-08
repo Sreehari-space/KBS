@@ -139,7 +139,13 @@ export const en = {
   'inv.save': 'Save',
   'inv.delete': 'Delete',
   'inv.newFromScan': 'New item',
-  'inv.newFromScanHint': 'This barcode is not in your list yet. Add it once and it will be recognised from now on.',
+  'inv.newFromScanHint': 'New barcode. Add the name and price once — after that it goes straight into the bill.',
+  'inv.moreDetails': 'More details',
+  'inv.createNew': 'New item',
+  'inv.linkExisting': 'Already have it',
+  'inv.linkHint': 'Pick the item this barcode belongs to. It will be recognised from next time.',
+  'inv.linkSearch': 'Search your items…',
+  'inv.linked': 'Barcode added to',
 
   // Customers & ledger
   'cust.title': 'Customers',

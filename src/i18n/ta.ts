@@ -142,7 +142,13 @@ export const ta: Record<TranslationKey, string> = {
   'inv.save': 'சேமி',
   'inv.delete': 'நீக்கு',
   'inv.newFromScan': 'புதிய பொருள்',
-  'inv.newFromScanHint': 'இந்த பார்கோடு இன்னும் பட்டியலில் இல்லை. ஒருமுறை சேர்த்தால் இனி தானாகவே தெரியும்.',
+  'inv.newFromScanHint': 'புதிய பார்கோடு. பெயரும் விலையும் ஒருமுறை சேர்த்தால், அடுத்த முறை நேரடியாக பில்லில் சேரும்.',
+  'inv.moreDetails': 'மேலும் விவரங்கள்',
+  'inv.createNew': 'புதிய பொருள்',
+  'inv.linkExisting': 'ஏற்கனவே உள்ளது',
+  'inv.linkHint': 'இந்த பார்கோடு எந்த பொருளுக்கு என்று தேர்வு செய்யவும். அடுத்த முறையிலிருந்து தானாகவே தெரியும்.',
+  'inv.linkSearch': 'உங்கள் பொருட்களைத் தேடு…',
+  'inv.linked': 'பார்கோடு சேர்க்கப்பட்டது',
 
   // Customers & ledger
   'cust.title': 'வாடிக்கையாளர்',

@@ -29,6 +29,9 @@ type Draft = {
   isQuickTile: boolean;
 };
 
+// Stock tracking is OFF by default: saving with tracking on and no quantity
+// used to create a product that was instantly "out of stock". Turn it on
+// deliberately, from More details.
 const emptyDraft: Draft = {
   nameEn: '',
   nameTa: '',
@@ -39,7 +42,7 @@ const emptyDraft: Draft = {
   cost: '',
   stock: '0',
   low: '0',
-  trackStock: true,
+  trackStock: false,
   isQuickTile: false,
 };
 
@@ -51,6 +54,7 @@ export const InventoryScreen: React.FC = () => {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const [draft, setDraft] = useState<Draft | null>(null);
+  const [showMore, setShowMore] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<Product | null>(null);
 
   const visible = useMemo(() => {
@@ -71,7 +75,8 @@ export const InventoryScreen: React.FC = () => {
       });
   }, [products, search, filter]);
 
-  const openEdit = (p: Product) =>
+  const openEdit = (p: Product) => {
+    setShowMore(false);
     setDraft({
       id: p.id,
       nameEn: p.nameEn,
@@ -86,6 +91,7 @@ export const InventoryScreen: React.FC = () => {
       trackStock: p.trackStock,
       isQuickTile: p.isQuickTile,
     });
+  };
 
   const save = async () => {
     if (!draft) return;
@@ -123,7 +129,13 @@ export const InventoryScreen: React.FC = () => {
             onChange={(e) => setSearch(e.target.value)}
             className="flex-1"
           />
-          <Button onClick={() => setDraft(emptyDraft)} className="px-4">
+          <Button
+            onClick={() => {
+              setShowMore(false);
+              setDraft(emptyDraft);
+            }}
+            className="px-4"
+          >
             +
           </Button>
         </div>
@@ -194,17 +206,23 @@ export const InventoryScreen: React.FC = () => {
       >
         {draft && (
           <div className="space-y-3">
+            {/* Name and price are all that is required; everything else has a
+                working default and lives under More details. */}
             <Field label={t('inv.name')}>
               <Input
                 value={draft.nameEn}
                 onChange={(e) => setDraft({ ...draft, nameEn: e.target.value })}
                 autoFocus
+                className="text-lg"
               />
             </Field>
-            <Field label={t('inv.nameTa')}>
+            <Field label={t('inv.price')}>
               <Input
-                value={draft.nameTa}
-                onChange={(e) => setDraft({ ...draft, nameTa: e.target.value })}
+                inputMode="decimal"
+                value={draft.price}
+                onChange={(e) => setDraft({ ...draft, price: e.target.value })}
+                placeholder="0"
+                className="text-lg tnum"
               />
             </Field>
             <Field label={`${t('inv.barcode')} (${t('common.optional')})`}>
@@ -212,75 +230,90 @@ export const InventoryScreen: React.FC = () => {
                 inputMode="numeric"
                 value={draft.barcode}
                 onChange={(e) => setDraft({ ...draft, barcode: e.target.value })}
+                className="tnum"
               />
             </Field>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label={t('inv.category')}>
-                <Input
-                  list="kbs-categories"
-                  value={draft.category}
-                  onChange={(e) => setDraft({ ...draft, category: e.target.value })}
-                />
-                <datalist id="kbs-categories">
-                  {(categories ?? []).map((c) => (
-                    <option key={c} value={c} />
-                  ))}
-                </datalist>
-              </Field>
-              <Field label={t('inv.unit')}>
-                <Select
-                  value={draft.unit}
-                  onChange={(e) => setDraft({ ...draft, unit: e.target.value as Unit })}
-                >
-                  {UNITS.map((u) => (
-                    <option key={u} value={u}>
-                      {unitLabel(u, lang)}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-              <Field label={t('inv.price')}>
-                <Input
-                  inputMode="decimal"
-                  value={draft.price}
-                  onChange={(e) => setDraft({ ...draft, price: e.target.value })}
-                />
-              </Field>
-              <Field label={`${t('inv.cost')} (${t('common.optional')})`}>
-                <Input
-                  inputMode="decimal"
-                  value={draft.cost}
-                  onChange={(e) => setDraft({ ...draft, cost: e.target.value })}
-                />
-              </Field>
-              <Field label={t('inv.stock')}>
-                <Input
-                  inputMode="decimal"
-                  value={draft.stock}
-                  onChange={(e) => setDraft({ ...draft, stock: e.target.value })}
-                  disabled={!draft.trackStock}
-                />
-              </Field>
-              <Field label={t('inv.lowStockAt')}>
-                <Input
-                  inputMode="decimal"
-                  value={draft.low}
-                  onChange={(e) => setDraft({ ...draft, low: e.target.value })}
-                  disabled={!draft.trackStock}
-                />
-              </Field>
-            </div>
 
-            <Toggle
-              checked={draft.trackStock}
-              onChange={(v) => setDraft({ ...draft, trackStock: v })}
-              label={t('inv.trackStock')}
-            />
-            <Toggle
-              checked={draft.isQuickTile}
-              onChange={(v) => setDraft({ ...draft, isQuickTile: v })}
-              label={t('inv.quickTile')}
-            />
+            <button
+              type="button"
+              onClick={() => setShowMore((v) => !v)}
+              className="w-full text-left text-sm font-medium text-brand-primary py-1"
+            >
+              {showMore ? '▾' : '▸'} {t('inv.moreDetails')}
+            </button>
+
+            {showMore && (
+              <div className="space-y-3 pl-3 border-l-2 border-slate-200 dark:border-slate-700">
+                <Field label={t('inv.nameTa')}>
+                  <Input
+                    value={draft.nameTa}
+                    onChange={(e) => setDraft({ ...draft, nameTa: e.target.value })}
+                  />
+                </Field>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label={t('inv.category')}>
+                    <Input
+                      list="kbs-categories"
+                      value={draft.category}
+                      onChange={(e) => setDraft({ ...draft, category: e.target.value })}
+                    />
+                    <datalist id="kbs-categories">
+                      {(categories ?? []).map((c) => (
+                        <option key={c} value={c} />
+                      ))}
+                    </datalist>
+                  </Field>
+                  <Field label={t('inv.unit')}>
+                    <Select
+                      value={draft.unit}
+                      onChange={(e) => setDraft({ ...draft, unit: e.target.value as Unit })}
+                    >
+                      {UNITS.map((u) => (
+                        <option key={u} value={u}>
+                          {unitLabel(u, lang)}
+                        </option>
+                      ))}
+                    </Select>
+                  </Field>
+                  <Field label={`${t('inv.cost')} (${t('common.optional')})`}>
+                    <Input
+                      inputMode="decimal"
+                      value={draft.cost}
+                      onChange={(e) => setDraft({ ...draft, cost: e.target.value })}
+                    />
+                  </Field>
+                </div>
+
+                <Toggle
+                  checked={draft.trackStock}
+                  onChange={(v) => setDraft({ ...draft, trackStock: v })}
+                  label={t('inv.trackStock')}
+                />
+                {draft.trackStock && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <Field label={t('inv.stock')}>
+                      <Input
+                        inputMode="decimal"
+                        value={draft.stock}
+                        onChange={(e) => setDraft({ ...draft, stock: e.target.value })}
+                      />
+                    </Field>
+                    <Field label={t('inv.lowStockAt')}>
+                      <Input
+                        inputMode="decimal"
+                        value={draft.low}
+                        onChange={(e) => setDraft({ ...draft, low: e.target.value })}
+                      />
+                    </Field>
+                  </div>
+                )}
+                <Toggle
+                  checked={draft.isQuickTile}
+                  onChange={(v) => setDraft({ ...draft, isQuickTile: v })}
+                  label={t('inv.quickTile')}
+                />
+              </div>
+            )}
 
             <div className="flex gap-3 pt-2">
               {draft.id && (

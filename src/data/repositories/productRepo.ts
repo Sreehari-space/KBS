@@ -95,6 +95,24 @@ export async function deleteProduct(id: Id): Promise<void> {
   await db.products.update(id, { deletedAt: nowIso(), updatedAt: nowIso(), isQuickTile: false });
 }
 
+/**
+ * Attach another barcode to a product that already exists.
+ *
+ * Covers the everyday cases: the item was added by hand without a barcode,
+ * the brand changed packaging so there are now two codes, or a wrong code was
+ * captured and the right one needs adding.
+ */
+export async function addBarcodeToProduct(id: Id, barcode: string): Promise<void> {
+  const product = await db.products.get(id);
+  if (!product) throw new Error('Product not found');
+  const code = normaliseBarcode(barcode);
+  if (!code || product.barcodes.includes(code)) return;
+  await db.products.update(id, {
+    barcodes: [...product.barcodes, code],
+    updatedAt: nowIso(),
+  });
+}
+
 export async function listCategories(): Promise<string[]> {
   const all = await listProducts();
   return [...new Set(all.map((p) => p.category))].filter(Boolean).sort();
