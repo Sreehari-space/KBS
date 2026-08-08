@@ -1,20 +1,34 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# KBS — Retail POS for Tamil Nadu small stores
 
-# Run and deploy your AI Studio app
+A point-of-sale and billing app aimed at **kirana / provision stores in Tamil Nadu**:
+Tamil-first, works with no internet, barcode + QR scanning, clean 58mm thermal bills, and
+WhatsApp bill delivery.
 
-This contains everything you need to run your app locally.
+> **Status:** the current code is an early demo — data lives in memory and is lost on refresh.
+> A full technical design for the upgrade is in [`docs/`](docs/README.md) and is awaiting review
+> before implementation starts.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1Ic11mWUtu7ip_v21DFT6_qB37xZrU53T
+## Design docs
 
-## Run Locally
+Start at **[docs/README.md](docs/README.md)** for the index and the decision log.
 
-**Prerequisites:**  Node.js
+| Doc | Covers |
+|---|---|
+| [01 — Architecture](docs/01-architecture.md) | Offline-first client design, PWA, repository layer, file structure |
+| [02 — Data model](docs/02-data-model.md) | Schema, IndexedDB stores, money as integer paise |
+| [03 — Billing & scanning](docs/03-billing-scanner.md) | Barcode + QR, learn-as-you-scan, kg/gram selling |
+| [04 — Bill, print & WhatsApp](docs/04-bill-print-whatsapp.md) | 58mm thermal bill, WhatsApp text + image, UPI QR |
+| [05 — Ledger, Tamil, day close](docs/05-ledger-tamil-dayclose.md) | Credit ledger (கடன்), i18n, day close, backup |
+| [06 — Roadmap](docs/06-roadmap.md) | Phased delivery, risks, open questions |
 
+## Run locally
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+**Prerequisites:** Node.js
+
+```bash
+npm install
+npm run dev
+```
+
+AI features currently read `GEMINI_API_KEY` from `.env.local`. Note that this key is compiled
+into the client bundle — see [D8](docs/README.md#decision-log) for the planned fix.
