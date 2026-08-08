@@ -5,6 +5,7 @@ import {
   isPlausibleBarcode,
   isValidEan13,
   isValidEan8,
+  looksLikeMarketingQr,
   normaliseBarcode,
   parseProductQrPayload,
   parseWeightBarcode,
@@ -107,5 +108,33 @@ describe('parseWeightBarcode', () => {
 
   it('rejects a zero weight', () => {
     expect(parseWeightBarcode('2001230000008', '2')).toBeNull();
+  });
+});
+
+describe('looksLikeMarketingQr', () => {
+  it('flags campaign URLs printed on FMCG packs', () => {
+    // The Britannia case: the QR on the wrapper is a website, not a product id.
+    expect(looksLikeMarketingQr('https://britannia.co.in/promo')).toBe(true);
+    expect(looksLikeMarketingQr('http://example.com')).toBe(true);
+    expect(looksLikeMarketingQr('www.example.com')).toBe(true);
+  });
+
+  it('flags long payloads, which are data rather than an identifier', () => {
+    // Batch/serial QR codes differ on every packet; keying a product to one
+    // would create a new product per packet and never match again.
+    expect(looksLikeMarketingQr('01089012345678901721123110ABCD1234')).toBe(true);
+  });
+
+  it('does NOT flag real retail barcodes', () => {
+    expect(looksLikeMarketingQr('8901058000023')).toBe(false);
+    expect(looksLikeMarketingQr('96385074')).toBe(false);
+  });
+
+  it('does NOT flag the shop\'s own printed labels', () => {
+    expect(looksLikeMarketingQr(buildProductQrPayload('prod-42'))).toBe(false);
+  });
+
+  it('does not flag a short in-house code', () => {
+    expect(looksLikeMarketingQr('LOOSE-RICE-01')).toBe(false);
   });
 });

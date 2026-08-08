@@ -19,7 +19,9 @@ export const NewProductSheet: React.FC<{
   barcode: string | null;
   onClose: () => void;
   onCreated: (product: Product) => void;
-}> = ({ barcode, onClose, onCreated }) => {
+  /** Shown when the scanned payload looks like a marketing QR, not a barcode. */
+  warning?: string | undefined;
+}> = ({ barcode, onClose, onCreated, warning }) => {
   const { t, lang } = useT();
   const [nameEn, setNameEn] = useState('');
   const [nameTa, setNameTa] = useState('');
@@ -68,10 +70,20 @@ export const NewProductSheet: React.FC<{
   return (
     <Sheet open={barcode !== null} onClose={onClose} title={t('inv.newFromScan')} persistent>
       <div className="space-y-3">
-        <Banner tone="info">{t('inv.newFromScanHint')}</Banner>
+        {/* The warning replaces the normal hint: adding a product keyed to a
+            campaign URL would look like it worked and then never match again. */}
+        {warning ? (
+          <Banner tone="danger">{warning}</Banner>
+        ) : (
+          <Banner tone="info">{t('inv.newFromScanHint')}</Banner>
+        )}
 
         <Field label={t('inv.barcode')}>
-          <Input value={barcode ?? ''} readOnly className="tnum opacity-70" />
+          <Input
+            value={barcode ?? ''}
+            readOnly
+            className={warning ? 'opacity-70 text-xs break-all' : 'tnum opacity-70'}
+          />
         </Field>
 
         <Field label={t('inv.name')}>

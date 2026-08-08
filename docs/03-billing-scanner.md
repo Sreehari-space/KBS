@@ -54,6 +54,22 @@ have manufacturer barcodes. Inventory can print a sheet of QR labels encoding
 `kbs:p:<productId>`, which the shop sticks on bins or bags. This is where QR genuinely earns
 its place, and it's why we scan both formats.
 
+### The QR-on-the-packet trap
+
+Most Indian FMCG packs now carry a QR *next to* the striped barcode — and it is almost never a
+product identifier. It is usually a campaign URL, and increasingly it is **batch- or
+packet-specific**, meaning a different payload on every single packet.
+
+Scanning one of those decodes perfectly well, so learn-as-you-scan would happily create a
+catalogue entry keyed to it. That entry would look like it worked, then never match again — and
+on a serialised pack it would create a fresh product for *every packet sold*.
+
+So `looksLikeMarketingQr()` flags payloads that are `http(s)://`, `upi://`, `www.`-prefixed, or
+longer than 20 characters (real retail barcodes are shorter). When an unknown code trips it, the
+new-item sheet shows a **red warning** instead of the usual hint, telling the shopkeeper to scan
+the striped barcode instead. It is a warning, not a block — the shopkeeper may have a reason —
+but it should never happen silently. Our own `kbs:p:` labels are exempt.
+
 ## Scanner implementation
 
 ```

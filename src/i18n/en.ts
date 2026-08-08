@@ -213,6 +213,7 @@ export const en = {
   'scan.permissionDenied': 'Camera blocked. Tap the lock icon in the address bar to allow it.',
   'scan.notSupported': 'This browser cannot scan. Use search or type the barcode.',
   'scan.scanned': 'Added',
+  'scan.marketingQr': 'This looks like a website QR code, not the product barcode. Scan the striped barcode instead — the QR is often different on every packet.',
 
   // Day close
   'day.title': 'Day close',

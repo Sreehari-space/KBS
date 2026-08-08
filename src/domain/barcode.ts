@@ -7,6 +7,9 @@
 
 export type BarcodeKind = 'ean13' | 'ean8' | 'upca' | 'code128' | 'qr' | 'unknown';
 
+/** Prefix for labels this shop prints itself (doc 03). */
+const QR_PRODUCT_PREFIX = 'kbs:p:';
+
 /** Shared EAN/UPC check digit: weights alternate 1,3 from the right. */
 function checkDigit(digits: string): number {
   let sum = 0;
@@ -61,6 +64,28 @@ export function isPlausibleBarcode(code: string): boolean {
   }
 }
 
+/**
+ * Detect a QR payload that is marketing/traceability rather than a product id.
+ *
+ * Most Indian FMCG packs now carry a QR alongside the striped barcode, and it
+ * almost never identifies the product. It is usually a campaign URL, and is
+ * often **batch- or packet-specific** — meaning a different payload on every
+ * single packet. Keying a catalogue entry to one of those would create a new
+ * product per packet and never match again.
+ *
+ * Our own shop-printed labels use the `kbs:p:` prefix and are excluded.
+ */
+export function looksLikeMarketingQr(code: string): boolean {
+  const trimmed = code.trim();
+  if (trimmed.startsWith(QR_PRODUCT_PREFIX)) return false;
+  if (/^(https?|upi):\/\//i.test(trimmed)) return true;
+  if (/^www\./i.test(trimmed)) return true;
+  // Real retail barcodes are at most ~20 characters; long payloads are data,
+  // not an identifier.
+  if (trimmed.length > 20) return true;
+  return false;
+}
+
 /** UPC-A is EAN-13 with a leading zero; normalise so one lookup finds both. */
 export function normaliseBarcode(code: string): string {
   const trimmed = code.trim();
@@ -69,8 +94,6 @@ export function normaliseBarcode(code: string): string {
 }
 
 // ─── Shop-printed QR labels for loose goods ─────────────────────────────────
-
-const QR_PRODUCT_PREFIX = 'kbs:p:';
 
 export const buildProductQrPayload = (productId: string): string =>
   `${QR_PRODUCT_PREFIX}${productId}`;

@@ -8,7 +8,7 @@ import { ScannerSheet, type ScanHit } from '@/features/scanner/ScannerSheet';
 import { NewProductSheet } from '@/features/inventory/NewProductSheet';
 import { addToCart, computeTotals, recalcLine } from '@/domain/cart';
 import { formatINR } from '@/domain/money';
-import { normaliseBarcode, parseWeightBarcode } from '@/domain/barcode';
+import { looksLikeMarketingQr, normaliseBarcode, parseWeightBarcode } from '@/domain/barcode';
 import { isFractionalUnit, type Payment, type Product, type Sale } from '@/domain/types';
 import { findByBarcode, listProducts, quickTiles } from '@/data/repositories/productRepo';
 import {
@@ -378,6 +378,11 @@ export const BillingScreen: React.FC<{ onBilled: (sale: Sale) => void }> = ({ on
 
       <NewProductSheet
         barcode={unknownBarcode}
+        warning={
+          unknownBarcode && looksLikeMarketingQr(unknownBarcode)
+            ? t('scan.marketingQr')
+            : undefined
+        }
         onClose={() => setUnknownBarcode(null)}
         onCreated={(product) => {
           setUnknownBarcode(null);
