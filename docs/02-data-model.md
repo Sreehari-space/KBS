@@ -300,6 +300,9 @@ Roughly 60 items a TN provision store actually stocks, with Tamil names and corr
 | Beverages | tea powder, coffee powder, soft drinks | g / piece |
 | Household | soap, detergent, agarbatti, matchbox | piece |
 
-Packaged items ship with **real EAN-13 barcodes** where they're stable, so scanning works out
-of the box for common brands. Loose items get no barcode and are found by Tamil search or
-quick tiles.
+**Barcodes in seed data — revised during implementation.** This section originally said
+packaged items would ship with real EAN-13 codes. They ship with **no barcodes** instead.
+Real codes cannot be verified offline, and an invented one is worse than none: it would never
+match the packet in the shop's hand, and could collide with a genuine code belonging to a
+different product. Learn-as-you-scan (D4) fills them in correctly on first scan, which is the
+mechanism the design relies on anyway. Loose items are found by Tamil search or quick tiles.

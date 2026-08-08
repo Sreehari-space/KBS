@@ -4,7 +4,12 @@ Each task below is meant to be one reviewable commit or PR. Phases are ordered b
 not by excitement — the scanner and WhatsApp bill are the visible wins, but they sit on top of
 persistence and offline, and they're worth nothing without them.
 
-## Phase 1 — Foundation
+> **Status: Phase 1 is built.** All tasks below are implemented, with 65 unit tests and a
+> browser run verifying offline boot, offline billing, draft recovery after a reload, and
+> atomic commit. Phase 2 (scanner + bill/WhatsApp) is next; the Scan button is present but
+> disabled.
+
+## Phase 1 — Foundation ✅
 
 **Goal: a sale survives a page refresh, and the app opens with no internet.**
 

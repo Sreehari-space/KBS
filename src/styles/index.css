@@ -1,0 +1,112 @@
+/* Self-hosted Noto Sans Tamil. These MUST be local files — a Google Fonts
+   link would render boxes offline, which is the normal state for this app. */
+@font-face {
+  font-family: 'Noto Sans Tamil';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/noto-sans-tamil-latin-400-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+20B9, U+2212;
+}
+@font-face {
+  font-family: 'Noto Sans Tamil';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/noto-sans-tamil-tamil-400-normal.woff2') format('woff2');
+  unicode-range: U+0964-0965, U+0B82-0BFA, U+200C-200D, U+20B9, U+25CC;
+}
+@font-face {
+  font-family: 'Noto Sans Tamil';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/noto-sans-tamil-latin-700-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+20B9, U+2212;
+}
+@font-face {
+  font-family: 'Noto Sans Tamil';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/noto-sans-tamil-tamil-700-normal.woff2') format('woff2');
+  unicode-range: U+0964-0965, U+0B82-0BFA, U+200C-200D, U+20B9, U+25CC;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    /* Stops iOS Safari zooming the page when an input is focused. */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text;
+    /* Tamil glyphs are taller than Latin; a roomier line-height keeps
+       mixed-script rows from looking cramped. */
+    line-height: 1.55;
+    overscroll-behavior-y: none;
+  }
+
+  /* Counter staff tap fast and repeatedly — text selection and the iOS
+     tap highlight both get in the way. */
+  button {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  /* Numeric fields on the billing path should never show spinners; the
+     app supplies its own keypad. */
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+}
+
+@layer utilities {
+  .pb-safe {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  }
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ── Thermal bill printing (doc 04) ───────────────────────────────────────
+   Replaces the old popup-window printer. Width is driven by a CSS variable
+   so 58mm and 80mm share one stylesheet. */
+@media print {
+  @page {
+    size: var(--bill-width, 58mm) auto;
+    margin: 0;
+  }
+  body * {
+    visibility: hidden;
+  }
+  .bill-print,
+  .bill-print * {
+    visibility: visible;
+  }
+  .bill-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--bill-width, 58mm);
+    padding: 2mm;
+    color: #000;
+    background: #fff;
+    font-family: 'Noto Sans Tamil', monospace;
+    font-size: 9pt;
+    line-height: 1.25;
+  }
+  .no-print {
+    display: none !important;
+  }
+}

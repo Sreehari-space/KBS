@@ -1,66 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ta">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="theme-color" content="#4f46e5" />
+    <meta name="description" content="KBS — offline billing for small stores" />
+    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>KBS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              'brand-primary': '#4f46e5',
-              'brand-secondary': '#10b981',
-              'light-bg': '#f8fafc',
-              'dark-bg': '#0f172a',
-              'light-surface': '#ffffff',
-              'dark-surface': '#1e293b',
-              'light-text': '#0f172a',
-              'dark-text': '#f8fafc',
-              'light-text-secondary': '#64748b',
-              'dark-text-secondary': '#94a3b8',
-            },
-          }
+      // Applied before first paint so the app doesn't flash white on a dark
+      // device. This is the ONE thing localStorage is used for (doc 07, D10) —
+      // it must be synchronous, and IndexedDB is not.
+      try {
+        if (localStorage.getItem('kbs-theme') === 'dark') {
+          document.documentElement.classList.add('dark');
         }
+      } catch (_) {
+        /* private mode with storage disabled — ignore, the app warns later */
       }
     </script>
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.28.0",
-    "recharts": "https://aistudiocdn.com/recharts@^3.3.0"
-  }
-}
-</script>
-<style>
-  @media print {
-    body * {
-      visibility: hidden;
-    }
-    .printable-receipt, .printable-receipt * {
-      visibility: visible;
-    }
-    .printable-receipt {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      padding: 2rem;
-      color: #000;
-    }
-    .no-print {
-      display: none;
-    }
-  }
-</style>
-</head>
-  <body class="bg-light-bg dark:bg-dark-bg">
+  </head>
+  <body>
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

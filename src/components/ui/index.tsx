@@ -1,0 +1,190 @@
+import React from 'react';
+
+/** Shared primitives. Deliberately small — this app has few widget types. */
+
+export const Card: React.FC<{ children: React.ReactNode; className?: string }> = ({
+  children,
+  className = '',
+}) => (
+  <div
+    className={`bg-light-surface dark:bg-dark-surface rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 ${className}`}
+  >
+    {children}
+  </div>
+);
+
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+
+const VARIANTS: Record<ButtonVariant, string> = {
+  primary: 'bg-brand-primary text-white hover:bg-indigo-700 active:bg-indigo-800',
+  secondary: 'bg-brand-secondary text-white hover:bg-green-600 active:bg-green-700',
+  ghost:
+    'bg-slate-100 dark:bg-slate-700 text-light-text dark:text-dark-text hover:bg-slate-200 dark:hover:bg-slate-600',
+  danger: 'bg-red-600 text-white hover:bg-red-700',
+};
+
+export const Button: React.FC<
+  React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: ButtonVariant; full?: boolean }
+> = ({ variant = 'primary', full, className = '', children, ...rest }) => (
+  <button
+    {...rest}
+    className={`px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+      VARIANTS[variant]
+    } ${full ? 'w-full' : ''} ${className}`}
+  >
+    {children}
+  </button>
+);
+
+export const Field: React.FC<{
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+  className?: string;
+}> = ({ label, hint, children, className = '' }) => (
+  <label className={`block ${className}`}>
+    <span className="block text-sm font-medium mb-1 text-light-text-secondary dark:text-dark-text-secondary">
+      {label}
+    </span>
+    {children}
+    {hint && (
+      <span className="block text-xs mt-1 text-light-text-secondary dark:text-dark-text-secondary">
+        {hint}
+      </span>
+    )}
+  </label>
+);
+
+export const Input: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = ({
+  className = '',
+  ...rest
+}) => (
+  <input
+    {...rest}
+    className={`w-full px-3 py-2.5 rounded-lg bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-primary ${className}`}
+  />
+);
+
+export const Select: React.FC<React.SelectHTMLAttributes<HTMLSelectElement>> = ({
+  className = '',
+  children,
+  ...rest
+}) => (
+  <select
+    {...rest}
+    className={`w-full px-3 py-2.5 rounded-lg bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-primary ${className}`}
+  >
+    {children}
+  </select>
+);
+
+export const Toggle: React.FC<{
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+  hint?: string;
+}> = ({ checked, onChange, label, hint }) => (
+  <button
+    type="button"
+    role="switch"
+    aria-checked={checked}
+    onClick={() => onChange(!checked)}
+    className="flex items-start gap-3 w-full text-left py-2"
+  >
+    <span
+      className={`mt-0.5 flex-shrink-0 w-11 h-6 rounded-full transition-colors relative ${
+        checked ? 'bg-brand-primary' : 'bg-slate-300 dark:bg-slate-600'
+      }`}
+    >
+      <span
+        className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+          checked ? 'translate-x-[22px]' : 'translate-x-0.5'
+        }`}
+      />
+    </span>
+    <span>
+      <span className="block font-medium">{label}</span>
+      {hint && (
+        <span className="block text-xs text-light-text-secondary dark:text-dark-text-secondary">
+          {hint}
+        </span>
+      )}
+    </span>
+  </button>
+);
+
+/** Bottom sheet on phones, centred dialog on wide screens. */
+export const Sheet: React.FC<{
+  open: boolean;
+  onClose: () => void;
+  title?: string;
+  children: React.ReactNode;
+  /** Blocks backdrop dismissal — used where a stray tap would lose work. */
+  persistent?: boolean;
+}> = ({ open, onClose, title, children, persistent }) => {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center no-print">
+      <div
+        className="absolute inset-0 bg-black/50"
+        onClick={persistent ? undefined : onClose}
+        aria-hidden
+      />
+      <div className="relative w-full sm:max-w-lg max-h-[92vh] overflow-y-auto bg-light-surface dark:bg-dark-surface rounded-t-2xl sm:rounded-2xl shadow-2xl">
+        {title && (
+          <div className="sticky top-0 bg-light-surface dark:bg-dark-surface px-5 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+            <h2 className="text-lg font-bold">{title}</h2>
+            <button
+              onClick={onClose}
+              className="p-2 -mr-2 text-light-text-secondary dark:text-dark-text-secondary"
+              aria-label="Close"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+        )}
+        <div className="p-5 pb-safe">{children}</div>
+      </div>
+    </div>
+  );
+};
+
+export const Banner: React.FC<{
+  tone: 'warning' | 'danger' | 'info';
+  children: React.ReactNode;
+  onDismiss?: () => void;
+}> = ({ tone, children, onDismiss }) => {
+  const tones = {
+    warning: 'bg-amber-50 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-100',
+    danger: 'bg-red-50 dark:bg-red-900/30 border-red-300 dark:border-red-700 text-red-900 dark:text-red-100',
+    info: 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-700 text-indigo-900 dark:text-indigo-100',
+  };
+  return (
+    <div className={`border rounded-lg px-4 py-3 text-sm flex items-start gap-3 ${tones[tone]}`}>
+      <div className="flex-1">{children}</div>
+      {onDismiss && (
+        <button onClick={onDismiss} className="font-bold opacity-60 hover:opacity-100" aria-label="Dismiss">
+          ✕
+        </button>
+      )}
+    </div>
+  );
+};
+
+export const EmptyState: React.FC<{ title: string; hint?: string; icon?: React.ReactNode }> = ({
+  title,
+  hint,
+  icon,
+}) => (
+  <div className="text-center py-12 px-6 text-light-text-secondary dark:text-dark-text-secondary">
+    {icon && <div className="flex justify-center mb-3 opacity-40">{icon}</div>}
+    <p className="font-medium">{title}</p>
+    {hint && <p className="text-sm mt-1">{hint}</p>}
+  </div>
+);
