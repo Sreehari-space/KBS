@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Banner, Button, Sheet } from '@/components/ui';
+import { IconPrint, IconShare, IconWhatsApp } from '@/components/icons';
 import { BillPreview } from './BillPreview';
 import { billToText, whatsAppLink, whatsAppShareLink } from './billToText';
 import { billToCanvas, shareBillImage } from './billToCanvas';
@@ -98,14 +99,31 @@ export const ReceiptSheet: React.FC<{ sale: Sale | null; onClose: () => void }> 
       <BillPreview bill={bill} widthMm={settings.printer.widthMm} />
 
       <div className="mt-4 grid grid-cols-2 gap-2 no-print">
-        <Button variant="ghost" onClick={() => void print()} disabled={busy === 'print'}>
-          🖨 {t('bill.print')}
+        <Button
+          variant="ghost"
+          onClick={() => void print()}
+          disabled={busy === 'print'}
+          className="flex items-center justify-center gap-2"
+        >
+          <IconPrint className="w-5 h-5" />
+          {t('bill.print')}
         </Button>
-        <Button variant="secondary" onClick={sendText}>
-          💬 {t('bill.whatsapp')}
+        <Button
+          variant="secondary"
+          onClick={sendText}
+          className="flex items-center justify-center gap-2"
+        >
+          <IconWhatsApp className="w-5 h-5" />
+          {t('bill.whatsapp')}
         </Button>
-        <Button variant="ghost" onClick={() => void sendImage()} disabled={busy === 'image'}>
-          🖼 {busy === 'image' ? '…' : t('bill.share')}
+        <Button
+          variant="ghost"
+          onClick={() => void sendImage()}
+          disabled={busy === 'image'}
+          className="flex items-center justify-center gap-2"
+        >
+          <IconShare className="w-5 h-5" />
+          {busy === 'image' ? '…' : t('bill.share')}
         </Button>
         <Button onClick={onClose}>{t('bill.newSale')}</Button>
       </div>

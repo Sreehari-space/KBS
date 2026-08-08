@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Input } from '@/components/ui';
+import { IconClose, IconKeyboard, IconTorch } from '@/components/icons';
 import { useBarcodeScanner } from './useBarcodeScanner';
 import { beepSuccess, beepUnknown, primeAudio } from './beep';
 import { useT } from '@/i18n/useT';
@@ -59,8 +60,8 @@ export const ScannerSheet: React.FC<{
     <div className="fixed inset-0 z-[60] bg-black flex flex-col no-print">
       <div className="flex items-center justify-between px-4 py-3 text-white flex-shrink-0">
         <span className="font-semibold">{t('scan.title')}</span>
-        <button onClick={onClose} className="px-3 py-1 text-2xl leading-none" aria-label="Close">
-          ✕
+        <button onClick={onClose} className="p-2 -mr-2" aria-label="Close">
+          <IconClose className="w-6 h-6" />
         </button>
       </div>
 
@@ -120,12 +121,26 @@ export const ScannerSheet: React.FC<{
 
       <div className="flex-shrink-0 p-4 pb-safe bg-black flex gap-3">
         {torchAvailable && (
-          <Button variant="ghost" onClick={() => void toggleTorch()} className="flex-1">
-            {torchOn ? '🔦 ON' : '🔦'} {t('scan.torch')}
+          <Button
+            variant="ghost"
+            onClick={() => void toggleTorch()}
+            aria-pressed={torchOn}
+            className={`flex-1 flex items-center justify-center gap-2 ${
+              torchOn ? '!bg-white !text-black' : ''
+            }`}
+          >
+            <IconTorch className="w-5 h-5" />
+            {t('scan.torch')}
+            <span className="text-xs font-bold">{torchOn ? 'ON' : 'OFF'}</span>
           </Button>
         )}
-        <Button variant="ghost" onClick={() => setShowManual((s) => !s)} className="flex-1">
-          ⌨ {t('scan.manual')}
+        <Button
+          variant="ghost"
+          onClick={() => setShowManual((s) => !s)}
+          className="flex-1 flex items-center justify-center gap-2"
+        >
+          <IconKeyboard className="w-5 h-5" />
+          {t('scan.manual')}
         </Button>
         <Button onClick={onClose} className="flex-1">
           {t('common.close')}

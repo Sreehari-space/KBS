@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Field, Input } from '@/components/ui';
+import { IconCheck, IconWhatsApp } from '@/components/icons';
 import { buildDayClose, dayCloseText, type DayCloseSummary } from './dayClose';
 import { exportBackup } from '@/features/backup/backupService';
 import { formatINR, parseRupeeInput } from '@/domain/money';
@@ -90,8 +91,14 @@ export const DayCloseScreen: React.FC = () => {
       </div>
 
       <div className="space-y-2">
-        <Button full variant="secondary" onClick={send}>
-          💬 {t('day.sendSummary')}
+        <Button
+          full
+          variant="secondary"
+          onClick={send}
+          className="flex items-center justify-center gap-2"
+        >
+          <IconWhatsApp className="w-5 h-5" />
+          {t('day.sendSummary')}
         </Button>
         {/* Backup rides on a ritual the owner already performs daily, rather
             than a reminder they will dismiss (doc 07). */}
@@ -102,7 +109,10 @@ export const DayCloseScreen: React.FC = () => {
             setBackupDone(true);
           }}
         >
-          {backupDone ? `✓ ${t('backup.exported')}` : t('backup.backupNow')}
+          <span className="flex items-center justify-center gap-2">
+            {backupDone && <IconCheck className="w-5 h-5" />}
+            {backupDone ? t('backup.exported') : t('backup.backupNow')}
+          </span>
         </Button>
       </div>
     </div>

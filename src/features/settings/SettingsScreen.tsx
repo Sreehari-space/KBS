@@ -215,7 +215,7 @@ export const SettingsScreen: React.FC = () => {
                 onClick={() => setLang(l)}
                 className={`flex-1 py-2.5 rounded-lg border-2 font-medium ${
                   lang === l
-                    ? 'border-brand-primary bg-brand-primary/10 text-brand-primary'
+                    ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
                     : 'border-slate-300 dark:border-slate-600'
                 }`}
               >
@@ -232,7 +232,7 @@ export const SettingsScreen: React.FC = () => {
                 onClick={() => void updateSettings('ui', { theme: th })}
                 className={`flex-1 py-2.5 rounded-lg border-2 font-medium ${
                   settings.ui.theme === th
-                    ? 'border-brand-primary bg-brand-primary/10 text-brand-primary'
+                    ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
                     : 'border-slate-300 dark:border-slate-600'
                 }`}
               >

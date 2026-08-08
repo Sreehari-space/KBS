@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Button, EmptyState, Field, Input, Sheet } from '@/components/ui';
+import { IconPlus } from '@/components/icons';
 import { formatINR, paiseToRupees, parseRupeeInput } from '@/domain/money';
 import {
   createCustomer,
@@ -92,8 +93,12 @@ export const CustomersScreen: React.FC = () => {
             onChange={(e) => setSearch(e.target.value)}
             className="flex-1"
           />
-          <Button onClick={() => setDraft(emptyDraft)} className="px-4">
-            +
+          <Button
+            onClick={() => setDraft(emptyDraft)}
+            className="px-4"
+            aria-label={t('cust.add')}
+          >
+            <IconPlus className="w-5 h-5" />
           </Button>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Banner, Button, Field, Input, Select, Sheet, Toggle } from '@/components/ui';
+import { IconChevronDown, IconChevronRight } from '@/components/icons';
 import { formatINR, parseRupeeInput } from '@/domain/money';
 import {
   addBarcodeToProduct,
@@ -134,7 +135,7 @@ export const NewProductSheet: React.FC<{
               onClick={() => setMode(m)}
               className={`py-2.5 rounded-lg border-2 text-sm font-semibold ${
                 mode === m
-                  ? 'border-brand-primary bg-brand-primary/10 text-brand-primary'
+                  ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
                   : 'border-slate-300 dark:border-slate-600'
               }`}
             >
@@ -190,9 +191,14 @@ export const NewProductSheet: React.FC<{
             <button
               type="button"
               onClick={() => setShowMore((s) => !s)}
-              className="w-full text-left text-sm font-medium text-brand-primary py-1"
+              className="w-full flex items-center gap-1.5 text-sm font-medium text-brand-primary dark:text-brand-on-dark py-1"
             >
-              {showMore ? '▾' : '▸'} {t('inv.moreDetails')}
+              {showMore ? (
+                <IconChevronDown className="w-4 h-4" />
+              ) : (
+                <IconChevronRight className="w-4 h-4" />
+              )}
+              {t('inv.moreDetails')}
             </button>
 
             {showMore && (

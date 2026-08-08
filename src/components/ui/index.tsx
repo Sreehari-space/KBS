@@ -1,4 +1,5 @@
 import React from 'react';
+import { IconClose } from '@/components/icons';
 
 /** Shared primitives. Deliberately small — this app has few widget types. */
 
@@ -7,7 +8,7 @@ export const Card: React.FC<{ children: React.ReactNode; className?: string }> =
   className = '',
 }) => (
   <div
-    className={`bg-light-surface dark:bg-dark-surface rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 ${className}`}
+    className={`bg-light-surface dark:bg-dark-surface rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 ${className}`}
   >
     {children}
   </div>
@@ -16,11 +17,12 @@ export const Card: React.FC<{ children: React.ReactNode; className?: string }> =
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: 'bg-brand-primary text-white hover:bg-indigo-700 active:bg-indigo-800',
-  secondary: 'bg-brand-secondary text-white hover:bg-green-600 active:bg-green-700',
+  primary: 'bg-brand-primary text-white hover:bg-brand-primary-hover active:bg-brand-primary-hover',
+  secondary:
+    'bg-brand-secondary text-white hover:bg-brand-secondary-hover active:bg-brand-secondary-hover',
   ghost:
     'bg-slate-100 dark:bg-slate-700 text-light-text dark:text-dark-text hover:bg-slate-200 dark:hover:bg-slate-600',
-  danger: 'bg-red-600 text-white hover:bg-red-700',
+  danger: 'bg-red-700 text-white hover:bg-red-800',
 };
 
 export const Button: React.FC<
@@ -28,7 +30,7 @@ export const Button: React.FC<
 > = ({ variant = 'primary', full, className = '', children, ...rest }) => (
   <button
     {...rest}
-    className={`px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+    className={`px-4 py-3 rounded-md font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
       VARIANTS[variant]
     } ${full ? 'w-full' : ''} ${className}`}
   >
@@ -61,7 +63,7 @@ export const Input: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = ({
 }) => (
   <input
     {...rest}
-    className={`w-full px-3 py-2.5 rounded-lg bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-primary ${className}`}
+    className={`w-full px-3 py-2.5 rounded-md bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary ${className}`}
   />
 );
 
@@ -72,7 +74,7 @@ export const Select: React.FC<React.SelectHTMLAttributes<HTMLSelectElement>> = (
 }) => (
   <select
     {...rest}
-    className={`w-full px-3 py-2.5 rounded-lg bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-primary ${className}`}
+    className={`w-full px-3 py-2.5 rounded-md bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary ${className}`}
   >
     {children}
   </select>
@@ -130,7 +132,7 @@ export const Sheet: React.FC<{
         onClick={persistent ? undefined : onClose}
         aria-hidden
       />
-      <div className="relative w-full sm:max-w-lg max-h-[92vh] overflow-y-auto bg-light-surface dark:bg-dark-surface rounded-t-2xl sm:rounded-2xl shadow-2xl">
+      <div className="relative w-full sm:max-w-lg max-h-[92vh] overflow-y-auto bg-light-surface dark:bg-dark-surface rounded-t-xl sm:rounded-xl shadow-2xl">
         {title && (
           <div className="sticky top-0 bg-light-surface dark:bg-dark-surface px-5 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
             <h2 className="text-lg font-bold">{title}</h2>
@@ -139,13 +141,7 @@ export const Sheet: React.FC<{
               className="p-2 -mr-2 text-light-text-secondary dark:text-dark-text-secondary"
               aria-label="Close"
             >
-              <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <IconClose className="w-5 h-5" />
             </button>
           </div>
         )}
@@ -163,14 +159,18 @@ export const Banner: React.FC<{
   const tones = {
     warning: 'bg-amber-50 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-100',
     danger: 'bg-red-50 dark:bg-red-900/30 border-red-300 dark:border-red-700 text-red-900 dark:text-red-100',
-    info: 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-700 text-indigo-900 dark:text-indigo-100',
+    info: 'bg-blue-50 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-100',
   };
   return (
-    <div className={`border rounded-lg px-4 py-3 text-sm flex items-start gap-3 ${tones[tone]}`}>
+    <div className={`border rounded-md px-4 py-3 text-sm flex items-start gap-3 ${tones[tone]}`}>
       <div className="flex-1">{children}</div>
       {onDismiss && (
-        <button onClick={onDismiss} className="font-bold opacity-60 hover:opacity-100" aria-label="Dismiss">
-          ✕
+        <button
+          onClick={onDismiss}
+          className="opacity-60 hover:opacity-100 flex-shrink-0"
+          aria-label="Dismiss"
+        >
+          <IconClose className="w-4 h-4" />
         </button>
       )}
     </div>

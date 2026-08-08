@@ -188,7 +188,7 @@ const ReturnSheet: React.FC<{
             onClick={() => setMode(m)}
             className={`flex-1 py-2 rounded-lg border-2 text-sm font-medium ${
               mode === m
-                ? 'border-brand-primary bg-brand-primary/10 text-brand-primary'
+                ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
                 : 'border-slate-300 dark:border-slate-600'
             }`}
           >

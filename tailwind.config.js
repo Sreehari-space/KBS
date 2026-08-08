@@ -5,16 +5,25 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Ported verbatim from the old index.html CDN config.
-        'brand-primary': '#4f46e5',
-        'brand-secondary': '#10b981',
-        'light-bg': '#f8fafc',
-        'dark-bg': '#0f172a',
+        // Deliberately restrained. A till is a tool, not a consumer app:
+        // ONE confident action colour (the BILL button, the active tab) and a
+        // deeper green reserved for confirmation. The old indigo/emerald pair
+        // read as a startup landing page.
+        'brand-primary': '#1d4ed8',
+        'brand-primary-hover': '#1e40af',
+        // The primary is too dark to read as TEXT on the dark surface
+        // (#1d4ed8 on #151f32 is ~2.5:1). This is the same role, lightened
+        // for dark mode only.
+        'brand-on-dark': '#93c5fd',
+        'brand-secondary': '#047857',
+        'brand-secondary-hover': '#065f46',
+        'light-bg': '#f1f5f9',
+        'dark-bg': '#0b1220',
         'light-surface': '#ffffff',
-        'dark-surface': '#1e293b',
+        'dark-surface': '#151f32',
         'light-text': '#0f172a',
-        'dark-text': '#f8fafc',
-        'light-text-secondary': '#64748b',
+        'dark-text': '#f1f5f9',
+        'light-text-secondary': '#5b6b82',
         'dark-text-secondary': '#94a3b8',
       },
       fontFamily: {

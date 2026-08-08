@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Banner, Button, EmptyState, Input, Sheet } from '@/components/ui';
+import { IconMic, IconScan, IconSearch } from '@/components/icons';
 import { QuantitySheet } from './QuantitySheet';
 import { PaymentSheet } from './PaymentSheet';
 import { CartPanel } from './CartPanel';
@@ -180,30 +181,30 @@ export const BillingScreen: React.FC<{ onBilled: (sale: Sale) => void }> = ({ on
 
       {/* Search + scan */}
       <div className="px-4 pt-4 flex gap-2 flex-shrink-0">
-        <Input
-          type="search"
-          placeholder={t('billing.search')}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="flex-1"
-        />
+        <div className="relative flex-1">
+          <IconSearch className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-light-text-secondary dark:text-dark-text-secondary pointer-events-none" />
+          <Input
+            type="search"
+            placeholder={t('billing.search')}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
         <button
           onClick={() => setScannerOpen(true)}
-          className="flex-shrink-0 px-4 rounded-lg bg-brand-secondary text-white font-semibold hover:bg-green-600 active:bg-green-700 flex items-center gap-1.5"
+          className="flex-shrink-0 px-4 rounded-md border border-slate-300 dark:border-slate-600 bg-light-surface dark:bg-dark-surface font-medium hover:border-brand-primary hover:text-brand-primary dark:hover:text-brand-on-dark transition-colors flex items-center gap-2"
         >
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" d="M4 7V5a1 1 0 011-1h2M4 17v2a1 1 0 001 1h2M20 7V5a1 1 0 00-1-1h-2M20 17v2a1 1 0 01-1 1h-2" />
-            <path strokeLinecap="round" d="M7 8v8M10 8v8M13 8v8M16 8v8" />
-          </svg>
+          <IconScan className="w-5 h-5" />
           {t('billing.scan')}
         </button>
         {isVoiceAvailable() && (
           <button
             onClick={() => setVoiceOpen(true)}
-            className="flex-shrink-0 px-3 rounded-lg bg-slate-100 dark:bg-slate-700 text-xl"
+            className="flex-shrink-0 px-3 rounded-md border border-slate-300 dark:border-slate-600 bg-light-surface dark:bg-dark-surface hover:border-brand-primary hover:text-brand-primary dark:hover:text-brand-on-dark transition-colors flex items-center justify-center text-light-text-secondary dark:text-dark-text-secondary"
             aria-label={t('voice.title')}
           >
-            🎤
+            <IconMic className="w-5 h-5" />
           </button>
         )}
       </div>
@@ -240,7 +241,7 @@ export const BillingScreen: React.FC<{ onBilled: (sale: Sale) => void }> = ({ on
                 <button
                   key={p.id}
                   onClick={() => handleProductTap(p)}
-                  className={`text-left p-3 rounded-xl border transition-colors bg-light-surface dark:bg-dark-surface hover:border-brand-primary active:bg-slate-100 dark:active:bg-slate-700 ${
+                  className={`text-left p-3 rounded-md border transition-colors bg-light-surface dark:bg-dark-surface hover:border-brand-primary active:bg-slate-100 dark:active:bg-slate-700 ${
                     out
                       ? 'border-amber-400 dark:border-amber-600'
                       : 'border-slate-200 dark:border-slate-700'
@@ -250,7 +251,7 @@ export const BillingScreen: React.FC<{ onBilled: (sale: Sale) => void }> = ({ on
                     {productName(p, lang)}
                   </p>
                   <div className="mt-2 flex items-baseline justify-between gap-1">
-                    <span className="font-bold text-brand-primary tnum">
+                    <span className="font-bold text-brand-primary dark:text-brand-on-dark tnum">
                       {formatINR(p.sellPricePaise)}
                     </span>
                     <span className="text-[11px] text-light-text-secondary dark:text-dark-text-secondary">

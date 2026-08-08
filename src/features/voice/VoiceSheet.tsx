@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Banner, Button, Sheet } from '@/components/ui';
+import { IconMic } from '@/components/icons';
 import { parseUtterance, scoreProduct } from './tamilNumbers';
 import { listProducts } from '@/data/repositories/productRepo';
 import { productName, useT } from '@/i18n/useT';
@@ -123,11 +124,13 @@ export const VoiceSheet: React.FC<{
         <>
           <div className="text-center py-6">
             <div
-              className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl ${
-                listening ? 'bg-brand-primary/20 animate-pulse' : 'bg-slate-100 dark:bg-slate-700'
+              className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center ${
+                listening
+                  ? 'bg-brand-primary/15 text-brand-primary dark:text-brand-on-dark animate-pulse'
+                  : 'bg-slate-100 dark:bg-slate-700 text-light-text-secondary dark:text-dark-text-secondary'
               }`}
             >
-              🎤
+              <IconMic className="w-9 h-9" />
             </div>
             <p className="mt-3 font-medium">
               {listening ? t('voice.listening') : t('voice.hint')}
@@ -162,7 +165,7 @@ export const VoiceSheet: React.FC<{
           <Button
             full
             variant="ghost"
-            className="mt-4"
+            className="mt-4 flex items-center justify-center gap-2"
             onClick={() => {
               recognition.current?.stop();
               try {
@@ -175,7 +178,8 @@ export const VoiceSheet: React.FC<{
               }
             }}
           >
-            🎤 {t('common.retry')}
+            <IconMic className="w-5 h-5" />
+            {t('common.retry')}
           </Button>
         </>
       )}

@@ -1,5 +1,18 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Banner, Sheet } from '@/components/ui';
+import {
+  IconBilling,
+  IconBills,
+  IconCustomers,
+  IconDayClose,
+  IconInventory,
+  IconLabels,
+  IconLedger,
+  IconLowStock,
+  IconMore,
+  IconReports,
+  IconSettings,
+} from '@/components/icons';
 import { BillingScreen } from '@/features/billing/BillingScreen';
 import { CartProvider } from '@/features/billing/CartContext';
 import { InventoryScreen } from '@/features/inventory/InventoryScreen';
@@ -38,21 +51,27 @@ export type Screen =
   | 'labels'
   | 'settings';
 
+type NavItem = {
+  id: Screen;
+  key: TranslationKey;
+  Icon: React.FC<{ className?: string }>;
+};
+
 /** Five thumb-reachable primaries; the rest live behind "More". */
-const PRIMARY: { id: Screen; key: TranslationKey; icon: string }[] = [
-  { id: 'billing', key: 'nav.billing', icon: '🧾' },
-  { id: 'inventory', key: 'nav.inventory', icon: '📦' },
-  { id: 'ledger', key: 'nav.ledger', icon: '📒' },
-  { id: 'reports', key: 'nav.reports', icon: '📊' },
+const PRIMARY: NavItem[] = [
+  { id: 'billing', key: 'nav.billing', Icon: IconBilling },
+  { id: 'inventory', key: 'nav.inventory', Icon: IconInventory },
+  { id: 'ledger', key: 'nav.ledger', Icon: IconLedger },
+  { id: 'reports', key: 'nav.reports', Icon: IconReports },
 ];
 
-const MORE: { id: Screen; key: TranslationKey; icon: string }[] = [
-  { id: 'bills', key: 'nav.bills', icon: '🧾' },
-  { id: 'customers', key: 'nav.customers', icon: '👥' },
-  { id: 'dayclose', key: 'nav.dayClose', icon: '🌙' },
-  { id: 'reorder', key: 'reorder.title', icon: '⚠️' },
-  { id: 'labels', key: 'labels.title', icon: '🏷️' },
-  { id: 'settings', key: 'nav.settings', icon: '⚙️' },
+const MORE: NavItem[] = [
+  { id: 'bills', key: 'nav.bills', Icon: IconBills },
+  { id: 'customers', key: 'nav.customers', Icon: IconCustomers },
+  { id: 'dayclose', key: 'nav.dayClose', Icon: IconDayClose },
+  { id: 'reorder', key: 'reorder.title', Icon: IconLowStock },
+  { id: 'labels', key: 'labels.title', Icon: IconLabels },
+  { id: 'settings', key: 'nav.settings', Icon: IconSettings },
 ];
 
 const App: React.FC = () => {
@@ -129,7 +148,11 @@ const Shell: React.FC<{
   onBilled: (sale: Sale) => void;
 }> = ({ screen, setScreen, storage, ephemeral, quotaDismissed, onDismissQuota, onBilled }) => {
   const { t, lang, setLang } = useT();
+  const settings = useSettings();
   const [moreOpen, setMoreOpen] = useState(false);
+
+  const shopName =
+    (lang === 'ta' && settings.shop.nameTa.trim()) || settings.shop.nameEn || 'KBS';
 
   const quotaLow = storage !== null && storage.usedFraction > 0.8;
   const inMore = MORE.some((item) => item.id === screen);
@@ -137,15 +160,19 @@ const Shell: React.FC<{
 
   return (
     <div className="flex flex-col h-[100dvh] bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text">
-      <header className="flex-shrink-0 flex items-center justify-between px-4 py-3 bg-light-surface dark:bg-dark-surface border-b border-slate-200 dark:border-slate-700 no-print">
-        <h1 className="font-bold text-lg">
-          {screen === 'billing' ? 'KBS' : title ? t(title.key) : 'KBS'}
-        </h1>
+      <header className="flex-shrink-0 flex items-center justify-between gap-3 px-4 py-2.5 bg-light-surface dark:bg-dark-surface border-b border-slate-200 dark:border-slate-700 no-print">
+        <div className="min-w-0">
+          {/* The shop's own name, the way a till identifies itself. */}
+          <h1 className="font-semibold leading-tight truncate">{shopName}</h1>
+          <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary truncate">
+            {title ? t(title.key) : ''}
+          </p>
+        </div>
         {/* Language toggle lives in the header, not buried in Settings —
             staff switch mid-shift. */}
         <button
           onClick={() => setLang(lang === 'ta' ? 'en' : 'ta')}
-          className="px-3 py-1.5 text-sm font-semibold rounded-lg bg-slate-100 dark:bg-slate-700"
+          className="flex-shrink-0 px-3 py-1.5 text-sm font-medium rounded-md border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
         >
           {lang === 'ta' ? 'English' : 'தமிழ்'}
         </button>
@@ -180,14 +207,14 @@ const Shell: React.FC<{
         {PRIMARY.map((item) => (
           <NavButton
             key={item.id}
-            icon={item.icon}
+            Icon={item.Icon}
             label={t(item.key)}
             active={screen === item.id}
             onClick={() => setScreen(item.id)}
           />
         ))}
         <NavButton
-          icon="⋯"
+          Icon={IconMore}
           label={t('nav.more')}
           active={inMore}
           onClick={() => setMoreOpen(true)}
@@ -203,14 +230,14 @@ const Shell: React.FC<{
                 setScreen(item.id);
                 setMoreOpen(false);
               }}
-              className={`flex flex-col items-center gap-1 p-4 rounded-xl border ${
+              className={`flex flex-col items-center gap-2 p-4 rounded-lg border transition-colors ${
                 screen === item.id
-                  ? 'border-brand-primary bg-brand-primary/10'
-                  : 'border-slate-200 dark:border-slate-700'
+                  ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
+                  : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
               }`}
             >
-              <span className="text-2xl">{item.icon}</span>
-              <span className="text-xs text-center leading-tight">{t(item.key)}</span>
+              <item.Icon className="w-6 h-6" />
+              <span className="text-xs text-center leading-tight font-medium">{t(item.key)}</span>
             </button>
           ))}
         </div>
@@ -220,18 +247,23 @@ const Shell: React.FC<{
 };
 
 const NavButton: React.FC<{
-  icon: string;
+  Icon: React.FC<{ className?: string }>;
   label: string;
   active: boolean;
   onClick: () => void;
-}> = ({ icon, label, active, onClick }) => (
+}> = ({ Icon, label, active, onClick }) => (
   <button
     onClick={onClick}
-    className={`flex-1 flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium transition-colors ${
-      active ? 'text-brand-primary' : 'text-light-text-secondary dark:text-dark-text-secondary'
+    aria-current={active ? 'page' : undefined}
+    className={`relative flex-1 flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium transition-colors ${
+      active
+        ? 'text-brand-primary dark:text-brand-on-dark'
+        : 'text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text dark:hover:text-dark-text'
     }`}
   >
-    <span className="text-xl leading-none">{icon}</span>
+    {/* A rule above the active tab reads as a tab bar rather than a toy. */}
+    {active && <span className="absolute top-0 inset-x-3 h-0.5 bg-brand-primary rounded-full" />}
+    <Icon className="w-[22px] h-[22px]" />
     <span className="truncate max-w-full px-1">{label}</span>
   </button>
 );

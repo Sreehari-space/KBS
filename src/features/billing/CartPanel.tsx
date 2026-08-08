@@ -1,5 +1,6 @@
 import React from 'react';
 import { EmptyState } from '@/components/ui';
+import { IconMinus, IconPlus, IconTrash } from '@/components/icons';
 import { formatINR, formatQty } from '@/domain/money';
 import type { CartTotals } from '@/domain/cart';
 import { unitLabel, useT } from '@/i18n/useT';
@@ -40,20 +41,20 @@ export const CartPanel: React.FC<{
               <div className="flex items-center gap-1 flex-shrink-0">
                 <button
                   onClick={() => onChangeQty(index, Math.max(0, line.qty - step))}
-                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 font-bold"
+                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center"
                   aria-label="Decrease"
                 >
-                  −
+                  <IconMinus className="w-4 h-4" />
                 </button>
                 <span className="w-12 text-center text-sm font-medium tnum">
                   {formatQty(line.qty)}
                 </span>
                 <button
                   onClick={() => onChangeQty(index, line.qty + step)}
-                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 font-bold"
+                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center"
                   aria-label="Increase"
                 >
-                  +
+                  <IconPlus className="w-4 h-4" />
                 </button>
               </div>
 
@@ -61,8 +62,9 @@ export const CartPanel: React.FC<{
                 <p className="font-bold tnum">{formatINR(line.lineTotalPaise)}</p>
                 <button
                   onClick={() => onRemove(index)}
-                  className="text-xs text-red-500 hover:text-red-700"
+                  className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-700"
                 >
+                  <IconTrash className="w-3.5 h-3.5" />
                   {t('common.delete')}
                 </button>
               </div>

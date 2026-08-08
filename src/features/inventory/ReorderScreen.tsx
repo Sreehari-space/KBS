@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Button, EmptyState } from '@/components/ui';
+import { IconWhatsApp } from '@/components/icons';
 import { formatQty } from '@/domain/money';
 import { lowStock } from '@/data/repositories/productRepo';
 import { useSettings } from '@/hooks/useSettings';
@@ -56,8 +57,14 @@ export const ReorderScreen: React.FC = () => {
 
       {(items ?? []).length > 0 && (
         <div className="flex-shrink-0 p-4 pb-safe border-t border-slate-200 dark:border-slate-700">
-          <Button full variant="secondary" onClick={send}>
-            💬 {t('reorder.send')}
+          <Button
+            full
+            variant="secondary"
+            onClick={send}
+            className="flex items-center justify-center gap-2"
+          >
+            <IconWhatsApp className="w-5 h-5" />
+            {t('reorder.send')}
           </Button>
         </div>
       )}

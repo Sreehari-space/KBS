@@ -1,6 +1,7 @@
 import React from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { Button } from '@/components/ui';
+import { IconClose } from '@/components/icons';
 import { useT } from '@/i18n/useT';
 
 /**
@@ -27,10 +28,10 @@ export const UpdatePrompt: React.FC = () => {
         </Button>
         <button
           onClick={() => setNeedRefresh(false)}
-          className="text-light-text-secondary dark:text-dark-text-secondary px-1"
+          className="text-light-text-secondary dark:text-dark-text-secondary p-1"
           aria-label="Dismiss"
         >
-          ✕
+          <IconClose className="w-4 h-4" />
         </button>
       </div>
     </div>

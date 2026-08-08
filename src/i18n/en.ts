@@ -253,6 +253,7 @@ export const en = {
   'common.retry': 'Retry',
   'common.error': 'Something went wrong',
   'common.none': 'None',
+  'common.backspace': 'Backspace',
   'common.optional': 'optional',
   'common.update': 'Update available',
   'common.updateNow': 'Update',

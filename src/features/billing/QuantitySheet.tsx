@@ -98,7 +98,7 @@ export const QuantitySheet: React.FC<{
               }}
               className={`py-2 rounded-lg border-2 font-medium text-sm ${
                 mode === m
-                  ? 'border-brand-primary bg-brand-primary/10 text-brand-primary'
+                  ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
                   : 'border-slate-300 dark:border-slate-600'
               }`}
             >

@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Button, Input, Sheet } from '@/components/ui';
+import { IconClose, IconLowStock } from '@/components/icons';
 import { changeDue, creditRemaining } from '@/domain/cart';
 import { formatINR, parseRupeeInput, sumPaise } from '@/domain/money';
 import { listCustomers } from '@/data/repositories/customerRepo';
@@ -89,7 +90,7 @@ export const PaymentSheet: React.FC<{
             onClick={() => payFull(mode)}
             className={`py-3 rounded-lg border-2 text-sm font-medium ${
               payments.length === 1 && payments[0]!.mode === mode
-                ? 'border-brand-primary bg-brand-primary/10 text-brand-primary'
+                ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
                 : 'border-slate-300 dark:border-slate-600'
             }`}
           >
@@ -139,10 +140,10 @@ export const PaymentSheet: React.FC<{
                 <span className="tnum font-medium">{formatINR(p.amountPaise)}</span>
                 <button
                   onClick={() => setPayments((all) => all.filter((_, idx) => idx !== i))}
-                  className="text-red-500 font-bold"
+                  className="text-red-500 hover:text-red-600"
                   aria-label="Remove"
                 >
-                  ✕
+                  <IconClose className="w-4 h-4" />
                 </button>
               </span>
             </div>
@@ -169,7 +170,7 @@ export const PaymentSheet: React.FC<{
       {remaining > 0 && (
         <div className="mb-5 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/30 p-4">
           <p className="font-semibold text-amber-900 dark:text-amber-100 tnum">
-            {t('pay.remaining')}: {formatINR(remaining)} → {t('pay.credit')}
+            {t('pay.remaining')}: {formatINR(remaining)} &rarr; {t('pay.credit')}
           </p>
           <p className="text-sm mt-1 mb-2 text-amber-800 dark:text-amber-200">
             {t('pay.selectCustomer')}
@@ -193,8 +194,9 @@ export const PaymentSheet: React.FC<{
                 selectedCustomer.balancePaise + remaining > selectedCustomer.creditLimitPaise && (
                   // A warning, never a block — the shopkeeper knows their
                   // customers better than the app does.
-                  <span className="block font-semibold text-red-700 dark:text-red-300">
-                    ⚠ {t('pay.overLimit')}
+                  <span className="flex items-center gap-1.5 font-semibold text-red-700 dark:text-red-300">
+                    <IconLowStock className="w-4 h-4 flex-shrink-0" />
+                    {t('pay.overLimit')}
                   </span>
                 )}
             </p>

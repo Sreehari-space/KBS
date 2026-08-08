@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Button, EmptyState, Field, Input, Select, Sheet, Toggle } from '@/components/ui';
+import { IconChevronDown, IconChevronRight, IconPlus } from '@/components/icons';
 import { formatINR, formatQty, parseRupeeInput, paiseToRupees } from '@/domain/money';
 import {
   createProduct,
@@ -141,8 +142,9 @@ export const InventoryScreen: React.FC = () => {
               setDraft(emptyDraft);
             }}
             className="px-4"
+            aria-label={t('inv.add')}
           >
-            +
+            <IconPlus className="w-5 h-5" />
           </Button>
         </div>
         <div className="flex gap-2 overflow-x-auto pb-1">
@@ -273,9 +275,14 @@ export const InventoryScreen: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowMore((v) => !v)}
-              className="w-full text-left text-sm font-medium text-brand-primary py-1"
+              className="w-full flex items-center gap-1.5 text-sm font-medium text-brand-primary dark:text-brand-on-dark py-1"
             >
-              {showMore ? '▾' : '▸'} {t('inv.moreDetails')}
+              {showMore ? (
+                <IconChevronDown className="w-4 h-4" />
+              ) : (
+                <IconChevronRight className="w-4 h-4" />
+              )}
+              {t('inv.moreDetails')}
             </button>
 
             {showMore && (

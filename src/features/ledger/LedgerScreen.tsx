@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Button, EmptyState, Field, Input, Sheet } from '@/components/ui';
+import { IconWhatsApp } from '@/components/icons';
 import { formatINR, parseRupeeInput } from '@/domain/money';
 import { db } from '@/data/db';
 import {
@@ -158,8 +159,13 @@ const StatementSheet: React.FC<{
         <Button className="flex-1" onClick={() => setCollecting((c) => !c)}>
           {t('ledger.collect')}
         </Button>
-        <Button variant="secondary" className="flex-1" onClick={remind}>
-          💬 {t('ledger.remind')}
+        <Button
+          variant="secondary"
+          className="flex-1 flex items-center justify-center gap-2"
+          onClick={remind}
+        >
+          <IconWhatsApp className="w-5 h-5 flex-shrink-0" />
+          {t('ledger.remind')}
         </Button>
       </div>
 
@@ -182,7 +188,7 @@ const StatementSheet: React.FC<{
                 onClick={() => setMode(m)}
                 className={`flex-1 py-2 rounded-lg border-2 text-sm font-medium ${
                   mode === m
-                    ? 'border-brand-primary bg-brand-primary/10 text-brand-primary'
+                    ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
                     : 'border-slate-300 dark:border-slate-600'
                 }`}
               >

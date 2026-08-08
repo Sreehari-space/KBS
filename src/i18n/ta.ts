@@ -256,6 +256,7 @@ export const ta: Record<TranslationKey, string> = {
   'common.retry': 'மீண்டும் முயற்சி',
   'common.error': 'ஏதோ தவறு நடந்தது',
   'common.none': 'இல்லை',
+  'common.backspace': 'அழி',
   'common.optional': 'விருப்பம்',
   'common.update': 'புதிய பதிப்பு',
   'common.updateNow': 'புதுப்பி',
