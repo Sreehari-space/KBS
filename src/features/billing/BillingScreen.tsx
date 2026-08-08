@@ -1,21 +1,27 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Banner, Button, Card, EmptyState, Input, Sheet } from '@/components/ui';
+import { Banner, Button, EmptyState, Input, Sheet } from '@/components/ui';
 import { QuantitySheet } from './QuantitySheet';
 import { PaymentSheet } from './PaymentSheet';
 import { CartPanel } from './CartPanel';
+import { ScannerSheet, type ScanHit } from '@/features/scanner/ScannerSheet';
+import { NewProductSheet } from '@/features/inventory/NewProductSheet';
 import { addToCart, computeTotals, recalcLine } from '@/domain/cart';
 import { formatINR } from '@/domain/money';
-import { isFractionalUnit, type Payment, type Product, type SaleLine, type Sale } from '@/domain/types';
-import { listProducts, quickTiles } from '@/data/repositories/productRepo';
+import { normaliseBarcode, parseWeightBarcode } from '@/domain/barcode';
+import { isFractionalUnit, type Payment, type Product, type Sale } from '@/domain/types';
+import { findByBarcode, listProducts, quickTiles } from '@/data/repositories/productRepo';
 import {
   ACTIVE_DRAFT_ID,
-  commitSale,
-  getActiveDraft,
   clearActiveDraft,
-  saveDraft,
+  commitSale,
+  holdCurrentCart,
+  listHeldBills,
+  resumeHeldBill,
 } from '@/data/repositories/saleRepo';
-import { useDebouncedEffect } from '@/hooks/useDebouncedEffect';
+import { VoiceSheet, isVoiceAvailable } from '@/features/voice/VoiceSheet';
+import type { CartDraft } from '@/domain/types';
+import { useCart } from './CartContext';
 import { useSettings } from '@/hooks/useSettings';
 import { productName, unitLabel, useT } from '@/i18n/useT';
 
@@ -26,17 +32,20 @@ export const BillingScreen: React.FC<{ onBilled: (sale: Sale) => void }> = ({ on
   const products = useLiveQuery(() => listProducts(), [], [] as Product[]);
   const tiles = useLiveQuery(() => quickTiles(), [], [] as Product[]);
 
-  const [lines, setLines] = useState<SaleLine[]>([]);
+  const { lines, setLines, pendingDraft, resumeDraft, discardDraft } = useCart();
   const [search, setSearch] = useState('');
   const [qtyProduct, setQtyProduct] = useState<Product | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
   const [payOpen, setPayOpen] = useState(false);
   const [committing, setCommitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [unknownBarcode, setUnknownBarcode] = useState<string | null>(null);
+  const [voiceOpen, setVoiceOpen] = useState(false);
+  const [heldOpen, setHeldOpen] = useState(false);
 
-  // Draft recovery — see below.
-  const [pendingDraft, setPendingDraft] = useState<SaleLine[] | null>(null);
-  const [draftChecked, setDraftChecked] = useState(false);
+  const heldBills = useLiveQuery(() => listHeldBills(), [], [] as CartDraft[]);
+
 
   const totals = useMemo(
     () =>
@@ -47,41 +56,6 @@ export const BillingScreen: React.FC<{ onBilled: (sale: Sale) => void }> = ({ on
         roundOffEnabled: settings.billing.roundOffEnabled,
       }),
     [lines, settings.gst.enabled, settings.gst.pricesIncludeTax, settings.billing.roundOffEnabled],
-  );
-
-  /**
-   * On boot, offer to restore an unfinished cart.
-   *
-   * This is what survives Android killing a backgrounded tab — routine on
-   * low-RAM phones, and the reason draft auto-save exists (doc 07).
-   */
-  useEffect(() => {
-    let cancelled = false;
-    getActiveDraft().then((draft) => {
-      if (cancelled) return;
-      if (draft && draft.lines.length > 0) setPendingDraft(draft.lines);
-      setDraftChecked(true);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  /**
-   * Auto-save the in-progress cart, debounced so a burst of "+" taps doesn't
-   * cause one write per tap. No Save button exists anywhere in this app.
-   */
-  useDebouncedEffect(
-    () => {
-      if (!draftChecked || pendingDraft) return; // don't overwrite a draft awaiting a decision
-      if (lines.length === 0) {
-        void clearActiveDraft();
-        return;
-      }
-      void saveDraft({ id: ACTIVE_DRAFT_ID, kind: 'active', lines, billDiscountPaise: 0 });
-    },
-    [lines, draftChecked, pendingDraft],
-    300,
   );
 
   const visibleProducts = useMemo(() => {
@@ -104,6 +78,46 @@ export const BillingScreen: React.FC<{ onBilled: (sale: Sale) => void }> = ({ on
     } else {
       setLines((cur) => addToCart(cur, product, 1));
     }
+  };
+
+  /**
+   * Learn-as-you-scan (D4). Known code -> straight into the cart. Unknown code
+   * -> a prefilled new-product sheet, after which every future scan of that
+   * packet is instant. The shop's catalogue builds itself during normal
+   * billing, with no data-entry session up front.
+   */
+  const handleScan = async (rawCode: string): Promise<ScanHit> => {
+    const code = normaliseBarcode(rawCode);
+
+    // Scale-printed labels carry the weight in the barcode itself.
+    const weight = parseWeightBarcode(code, settings.scanner.weightBarcodePrefix);
+    if (weight) {
+      const byItem = await findByBarcode(weight.itemCode);
+      if (byItem) {
+        setLines((cur) => addToCart(cur, byItem, weight.qtyKg));
+        return {
+          code,
+          label: `${productName(byItem, lang)} · ${weight.qtyKg}kg`,
+          known: true,
+        };
+      }
+    }
+
+    const product = await findByBarcode(code);
+    if (product) {
+      if (isFractionalUnit(product.unit)) {
+        // Weight items still need a quantity, so pause scanning and ask.
+        setScannerOpen(false);
+        setQtyProduct(product);
+      } else {
+        setLines((cur) => addToCart(cur, product, 1));
+      }
+      return { code, label: productName(product, lang), known: true };
+    }
+
+    setScannerOpen(false);
+    setUnknownBarcode(code);
+    return { code, label: t('inv.newFromScan'), known: false };
   };
 
   const handleCommit = async (payments: Payment[], creditPaise: number, customerId?: string) => {
@@ -144,23 +158,10 @@ export const BillingScreen: React.FC<{ onBilled: (sale: Sale) => void }> = ({ on
             <p className="font-semibold">{t('draft.title')}</p>
             <p className="mb-2">{t('draft.body')}</p>
             <div className="flex gap-2">
-              <Button
-                className="py-2 text-sm"
-                onClick={() => {
-                  setLines(pendingDraft);
-                  setPendingDraft(null);
-                }}
-              >
+              <Button className="py-2 text-sm" onClick={resumeDraft}>
                 {t('draft.resume')}
               </Button>
-              <Button
-                variant="ghost"
-                className="py-2 text-sm"
-                onClick={() => {
-                  void clearActiveDraft();
-                  setPendingDraft(null);
-                }}
-              >
+              <Button variant="ghost" className="py-2 text-sm" onClick={discardDraft}>
                 {t('draft.discard')}
               </Button>
             </div>
@@ -187,13 +188,36 @@ export const BillingScreen: React.FC<{ onBilled: (sale: Sale) => void }> = ({ on
           className="flex-1"
         />
         <button
-          disabled
-          title="Phase 2"
-          className="flex-shrink-0 px-4 rounded-lg bg-brand-secondary/40 text-white font-semibold cursor-not-allowed"
+          onClick={() => setScannerOpen(true)}
+          className="flex-shrink-0 px-4 rounded-lg bg-brand-secondary text-white font-semibold hover:bg-green-600 active:bg-green-700 flex items-center gap-1.5"
         >
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" d="M4 7V5a1 1 0 011-1h2M4 17v2a1 1 0 001 1h2M20 7V5a1 1 0 00-1-1h-2M20 17v2a1 1 0 01-1 1h-2" />
+            <path strokeLinecap="round" d="M7 8v8M10 8v8M13 8v8M16 8v8" />
+          </svg>
           {t('billing.scan')}
         </button>
+        {isVoiceAvailable() && (
+          <button
+            onClick={() => setVoiceOpen(true)}
+            className="flex-shrink-0 px-3 rounded-lg bg-slate-100 dark:bg-slate-700 text-xl"
+            aria-label={t('voice.title')}
+          >
+            🎤
+          </button>
+        )}
       </div>
+
+      {(heldBills ?? []).length > 0 && (
+        <div className="px-4 pt-2 flex-shrink-0">
+          <button
+            onClick={() => setHeldOpen(true)}
+            className="w-full text-sm py-2 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 font-medium"
+          >
+            {t('billing.heldBills')}: {(heldBills ?? []).length}
+          </button>
+        </div>
+      )}
 
       {/* Product grid */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
@@ -281,6 +305,37 @@ export const BillingScreen: React.FC<{ onBilled: (sale: Sale) => void }> = ({ on
       />
 
       <Sheet open={cartOpen} onClose={() => setCartOpen(false)} title={t('billing.cart')}>
+        {/* Customer forgot something and walked back to the aisle; the next
+            person is waiting. Park the bill and serve them. */}
+        {lines.length > 0 && (
+          <div className="flex gap-2 mb-3">
+            <Button
+              variant="ghost"
+              className="flex-1 py-2 text-sm"
+              onClick={async () => {
+                await holdCurrentCart(
+                  { id: ACTIVE_DRAFT_ID, kind: 'active', lines, billDiscountPaise: 0, updatedAt: '' },
+                  new Date().toLocaleTimeString(),
+                );
+                setLines([]);
+                setCartOpen(false);
+              }}
+            >
+              {t('billing.hold')}
+            </Button>
+            <Button
+              variant="ghost"
+              className="flex-1 py-2 text-sm"
+              onClick={() => {
+                setLines([]);
+                void clearActiveDraft();
+                setCartOpen(false);
+              }}
+            >
+              {t('billing.clear')}
+            </Button>
+          </div>
+        )}
         <CartPanel
           lines={lines}
           totals={totals}
@@ -313,11 +368,50 @@ export const BillingScreen: React.FC<{ onBilled: (sale: Sale) => void }> = ({ on
         onComplete={handleCommit}
         busy={committing}
       />
+
+      <ScannerSheet
+        open={scannerOpen}
+        continuous={settings.scanner.continuousMode}
+        onClose={() => setScannerOpen(false)}
+        onScan={handleScan}
+      />
+
+      <NewProductSheet
+        barcode={unknownBarcode}
+        onClose={() => setUnknownBarcode(null)}
+        onCreated={(product) => {
+          setUnknownBarcode(null);
+          if (isFractionalUnit(product.unit)) setQtyProduct(product);
+          else setLines((cur) => addToCart(cur, product, 1));
+        }}
+      />
+
+      <VoiceSheet
+        open={voiceOpen}
+        onClose={() => setVoiceOpen(false)}
+        onPick={(product, qty) => setLines((cur) => addToCart(cur, product, qty))}
+      />
+
+      <Sheet open={heldOpen} onClose={() => setHeldOpen(false)} title={t('billing.heldBills')}>
+        <div className="space-y-2">
+          {(heldBills ?? []).map((held) => (
+            <button
+              key={held.id}
+              onClick={async () => {
+                const resumed = await resumeHeldBill(held.id);
+                if (resumed) setLines(resumed.lines);
+                setHeldOpen(false);
+              }}
+              className="w-full flex items-center justify-between gap-3 p-3 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700"
+            >
+              <span className="font-medium">{held.label}</span>
+              <span className="text-sm tnum">
+                {held.lines.length} {t('billing.items')}
+              </span>
+            </button>
+          ))}
+        </div>
+      </Sheet>
     </div>
   );
 };
-
-/** Re-exported for the shell's cart badge. */
-export const useCartCount = (lines: SaleLine[]) => lines.length;
-
-export { Card };

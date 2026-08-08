@@ -13,6 +13,44 @@ export const en = {
   'nav.reports': 'Reports',
   'nav.settings': 'Settings',
   'nav.dayClose': 'Day Close',
+  'nav.more': 'More',
+  'nav.bills': 'Bills',
+
+  // Sales history & returns
+  'bills.title': 'Past bills',
+  'bills.none': 'No bills yet',
+  'bills.return': 'Return items',
+  'bills.returned': 'Returned',
+  'bills.selectItems': 'Select items to return',
+  'bills.refund': 'Refund',
+  'bills.confirmReturn': 'Confirm return',
+  'bills.reprint': 'Reprint',
+
+  // Reorder
+  'reorder.title': 'Low stock',
+  'reorder.none': 'Nothing running low',
+  'reorder.send': 'Send order on WhatsApp',
+  'reorder.heading': 'Please send the following',
+
+  // QR labels
+  'labels.title': 'Print shelf labels',
+  'labels.hint': 'For loose goods with no manufacturer barcode. Stick these on bins or bags, then scan them like any product.',
+  'labels.select': 'Select items',
+  'labels.print': 'Print labels',
+
+  // Voice
+  'voice.title': 'Say the item',
+  'voice.listening': 'Listening…',
+  'voice.hint': 'Say e.g. "two kilo rice"',
+  'voice.notSupported': 'Voice input is not available on this browser',
+  'voice.noMatch': 'Could not find that item',
+
+  // Lock
+  'lock.title': 'Enter PIN',
+  'lock.wrong': 'Wrong PIN',
+  'lock.set': 'Staff PIN',
+  'lock.setHint': 'Optional. Locks the app when reopened. Leave blank to disable.',
+  'lock.unlock': 'Unlock',
 
   // Billing
   'billing.search': 'Search items…',
@@ -179,7 +217,7 @@ export const en = {
   // Day close
   'day.title': 'Day close',
   'day.sales': 'Sales',
-  'day.bills': 'bills',
+  'day.bills': 'Bills',
   'day.expectedCash': 'Expected cash',
   'day.countedCash': 'Counted cash',
   'day.difference': 'Difference',

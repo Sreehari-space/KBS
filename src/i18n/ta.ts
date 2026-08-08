@@ -16,6 +16,44 @@ export const ta: Record<TranslationKey, string> = {
   'nav.reports': 'அறிக்கை',
   'nav.settings': 'அமைப்புகள்',
   'nav.dayClose': 'கடை சாத்து',
+  'nav.more': 'மேலும்',
+  'nav.bills': 'பில்கள்',
+
+  // Sales history & returns
+  'bills.title': 'பழைய பில்கள்',
+  'bills.none': 'பில்கள் இல்லை',
+  'bills.return': 'பொருள் திருப்பி',
+  'bills.returned': 'திருப்பியது',
+  'bills.selectItems': 'திருப்ப வேண்டிய பொருட்களை தேர்வு செய்',
+  'bills.refund': 'பணம் திருப்பி',
+  'bills.confirmReturn': 'திருப்புதலை உறுதி செய்',
+  'bills.reprint': 'மீண்டும் அச்சிடு',
+
+  // Reorder
+  'reorder.title': 'குறைந்த இருப்பு',
+  'reorder.none': 'எதுவும் குறையவில்லை',
+  'reorder.send': 'வாட்ஸ்அப்பில் ஆர்டர் அனுப்பு',
+  'reorder.heading': 'கீழ்கண்டவற்றை அனுப்பவும்',
+
+  // QR labels
+  'labels.title': 'லேபிள் அச்சிடு',
+  'labels.hint': 'பார்கோடு இல்லாத தளர்வான பொருட்களுக்கு. இதை டப்பா அல்லது பையில் ஒட்டி, மற்ற பொருட்களைப் போல ஸ்கேன் செய்யலாம்.',
+  'labels.select': 'பொருட்களைத் தேர்வு செய்',
+  'labels.print': 'லேபிள் அச்சிடு',
+
+  // Voice
+  'voice.title': 'பொருளைச் சொல்லுங்கள்',
+  'voice.listening': 'கேட்கிறது…',
+  'voice.hint': 'உதா. "இரண்டு கிலோ அரிசி"',
+  'voice.notSupported': 'இந்த browser-ல் குரல் வசதி இல்லை',
+  'voice.noMatch': 'அந்த பொருள் கிடைக்கவில்லை',
+
+  // Lock
+  'lock.title': 'பின் எண்ணை உள்ளிடவும்',
+  'lock.wrong': 'தவறான பின்',
+  'lock.set': 'ஊழியர் பின்',
+  'lock.setHint': 'விருப்பமானது. மீண்டும் திறக்கும்போது பூட்டப்படும். காலியாக விட்டால் செயலிழக்கும்.',
+  'lock.unlock': 'திற',
 
   // Billing
   'billing.search': 'பொருள் தேடு…',

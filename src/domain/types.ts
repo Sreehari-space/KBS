@@ -186,6 +186,8 @@ export interface Settings {
     language: Language;
     theme: 'light' | 'dark';
     billingLayout: 'grid' | 'list';
+    /** Optional staff PIN. Keeps casual hands out; it is not encryption. */
+    staffPin?: string;
   };
 
   ai: {

@@ -20,7 +20,7 @@
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": false,
 
-    "types": ["vite/client", "vite-plugin-pwa/client", "node"],
+    "types": ["vite/client", "vite-plugin-pwa/client", "node", "web-bluetooth"],
     "baseUrl": ".",
     "paths": { "@/*": ["src/*"] }
   },

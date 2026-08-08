@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Banner, Button, Field, Input, Select, Sheet, Toggle } from '@/components/ui';
 import { getStorageStatus, type StorageStatus } from '@/data/db';
+import { isBluetoothPrintingAvailable } from '@/features/bill/escpos';
 import { recalculateAllBalances } from '@/data/repositories/ledgerRepo';
 import {
   daysSinceBackup,
@@ -156,6 +157,52 @@ export const SettingsScreen: React.FC = () => {
             <option value="80">80 mm</option>
           </Select>
         </Field>
+        {/* Web Bluetooth is Android-Chrome only; browser printing always
+            remains the fallback, so this is only offered where it can work. */}
+        {isBluetoothPrintingAvailable() && (
+          <Field label={t('set.printer')}>
+            <Select
+              value={settings.printer.mode}
+              onChange={(e) =>
+                void updateSettings('printer', {
+                  mode: e.target.value as 'browser' | 'bluetooth',
+                })
+              }
+            >
+              <option value="browser">Browser print</option>
+              <option value="bluetooth">Bluetooth (ESC/POS)</option>
+            </Select>
+          </Field>
+        )}
+      </Section>
+
+      {/* ── Scanner ── */}
+      <Section title={t('billing.scan')}>
+        <Toggle
+          checked={settings.scanner.continuousMode}
+          onChange={(v) => void updateSettings('scanner', { continuousMode: v })}
+          label={t('billing.scan')}
+          hint="Keep the camera open after each item"
+        />
+        <Toggle
+          checked={settings.scanner.beepOnScan}
+          onChange={(v) => void updateSettings('scanner', { beepOnScan: v })}
+          label="Beep"
+        />
+        <Field
+          label="Weight barcode prefix"
+          hint="Only set this if your scale prints weight into the barcode. Usually 2."
+        >
+          <Input
+            inputMode="numeric"
+            maxLength={2}
+            value={settings.scanner.weightBarcodePrefix}
+            onChange={(e) =>
+              void updateSettings('scanner', { weightBarcodePrefix: e.target.value })
+            }
+            placeholder={t('common.none')}
+          />
+        </Field>
       </Section>
 
       {/* ── Appearance ── */}
@@ -266,6 +313,22 @@ export const SettingsScreen: React.FC = () => {
             </Button>
           )}
         </div>
+      </Section>
+
+      {/* ── Staff PIN ── */}
+      <Section title={t('lock.set')}>
+        <Field label={t('lock.set')} hint={t('lock.setHint')}>
+          <Input
+            inputMode="numeric"
+            maxLength={6}
+            value={settings.ui.staffPin ?? ''}
+            onChange={(e) =>
+              void updateSettings('ui', { staffPin: e.target.value.replace(/\D/g, '') })
+            }
+            placeholder="––––"
+            className="tnum"
+          />
+        </Field>
       </Section>
 
       {/* ── AI (optional, user-supplied key) ── */}

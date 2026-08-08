@@ -4,10 +4,13 @@ Each task below is meant to be one reviewable commit or PR. Phases are ordered b
 not by excitement — the scanner and WhatsApp bill are the visible wins, but they sit on top of
 persistence and offline, and they're worth nothing without them.
 
-> **Status: Phase 1 is built.** All tasks below are implemented, with 65 unit tests and a
-> browser run verifying offline boot, offline billing, draft recovery after a reload, and
-> atomic commit. Phase 2 (scanner + bill/WhatsApp) is next; the Scan button is present but
-> disabled.
+> **Status: Phases 1–3 are built, and most of Phase 4.** 93 unit tests plus browser runs
+> verifying offline boot, offline billing, draft recovery, atomic commit and rollback, unique
+> bill numbers under concurrency, learn-as-you-scan, credit sales into the ledger, collections,
+> and returns.
+>
+> **Not built, deliberately** — see "What was left out" at the end of this doc:
+> expiry/batch tracking (4.5), AI features (4.6), and Google Drive sync (4.8).
 
 ## Phase 1 — Foundation ✅
 
@@ -23,7 +26,7 @@ persistence and offline, and they're worth nothing without them.
 | **1.4b** | **Draft auto-save** — debounced cart persistence + restore-on-boot banner | `features/billing/` |
 | **1.4c** | **Storage protection** — `persist()`, quota monitoring + 80% warning, incognito detection, non-silent write failures | `src/data/db.ts` |
 | 1.5 | Replace `useState` data with `useLiveQuery`; delete prop-drilling from `App.tsx` | `App.tsx`, all screens |
-| 1.6 | TN kirana seed data with Tamil names, units, real barcodes | `src/data/seed/` |
+| 1.6 | TN kirana seed data with Tamil names and units (no barcodes — see doc 02) | `src/data/seed/` |
 | 1.7 | i18n scaffolding + Tamil strings + header language toggle | `src/i18n/` |
 | 1.8 | Settings persisted via `settingsRepo`; **wire tax/GSTIN/UPI into billing** (currently dead) | `features/settings/` |
 | 1.9 | PWA: manifest, service worker, install prompt, update toast | `vite.config.ts` |
@@ -34,7 +37,7 @@ persistence and offline, and they're worth nothing without them.
 [doc 07](07-autosave-durability.md#acceptance-criteria) pass on a real Android phone — including
 force-stopping the browser straight after billing, and having Android kill the tab mid-cart.
 
-## Phase 2 — Scanning & the bill
+## Phase 2 — Scanning & the bill ✅
 
 **Goal: the two features originally asked for.**
 
@@ -55,7 +58,7 @@ force-stopping the browser straight after billing, and having Android kill the t
 **Done when:** scan four packaged items with the camera, print a clean 58mm bill, and send the
 same bill to WhatsApp as both text and image — all offline except the WhatsApp send itself.
 
-## Phase 3 — What makes it indispensable
+## Phase 3 — What makes it indispensable ✅
 
 | # | Task |
 |---|---|
@@ -74,7 +77,7 @@ same bill to WhatsApp as both text and image — all offline except the WhatsApp
 **Done when:** a shop can run a full month — credit sales, collections, daily closes — without
 touching the paper notebook.
 
-## Phase 4 — Delight
+## Phase 4 — Delight (4.1–4.4, 4.7 ✅)
 
 | # | Task |
 |---|---|
@@ -82,10 +85,10 @@ touching the paper notebook.
 | 4.2 | Tamil voice billing — Web Speech API `ta-IN`, "இரண்டு கிலோ அரிசி" → cart |
 | 4.3 | Shop-printed QR labels for loose goods |
 | 4.4 | Weight-embedded barcode parsing |
-| 4.5 | Expiry & batch tracking (opens up medical shops) |
-| 4.6 | AI: Tamil name normalisation, daily business summary — all behind the user's own key |
+| 4.5 | Expiry & batch tracking (opens up medical shops) — **not built**, see below |
+| 4.6 | AI: Tamil name normalisation, daily business summary — **not built**, key field ships |
 | 4.7 | Staff PIN lock |
-| 4.8 | Optional Google Drive API sync |
+| 4.8 | Optional Google Drive API sync — **not built**, see D7 |
 
 ## Sequencing note
 
@@ -126,3 +129,38 @@ Worth settling before Phase 1 starts, though none of them block it:
    can be tested against real hardware early rather than written blind.
 5. **How many products in their current catalogue?** Over ~200 and the opening bulk-import
    flow needs more thought than learn-as-you-scan alone.
+
+## What was left out, and why
+
+Three Phase 4 items were deliberately not built. Each is a scope judgement, not an oversight.
+
+**4.5 — Expiry and batch tracking.** This exists to open up *medical shops*, which was
+explicitly not the target: the agreed focus is kirana/provision stores ([README](README.md)).
+Doing it properly means batch-level stock, per-batch expiry, FEFO picking on the billing path,
+and a drug licence number on the bill — a different data model, not a field. Building it half
+way would be worse than not having it, because a pharmacy would trust stock numbers that aren't
+batch-aware. Worth doing as its own phase if a medical shop actually wants to pilot.
+
+**4.6 — AI features.** The plumbing is in place — Settings takes a Gemini key, stored on the
+shop's own device (D8) — but no feature consumes it yet. The reason is the constraint that
+shaped everything else: this app must work with no internet. Every AI call fails offline, so AI
+can only ever be a garnish on screens the shop doesn't depend on. That is real work for
+marginal value next to, say, expiry tracking. The key field ships so the capability is there
+when a specific, genuinely useful AI feature is identified.
+
+**4.8 — Google Drive API sync.** Argued against in D7 and that reasoning still holds: a GCP
+project, an OAuth consent screen, a client ID in public JavaScript, and internet at backup
+time. Backup instead exports JSON through the OS share sheet, which reaches Drive in two taps
+because the Drive app is already signed in. The day-close screen ends with a one-tap backup so
+it rides on a daily ritual rather than a reminder.
+
+### The gap that remains
+
+Auto-save fully covers crashes, forgetting to save, and Android killing a backgrounded tab. It
+does **not** cover the phone being lost, stolen or wiped — the data lives in one browser
+profile on one device, and off-device backup still depends on the owner tapping the button.
+
+The credit ledger is the part whose loss is unrecoverable: it is money owed that no customer
+will volunteer. If this is ever rolled out beyond a pilot shop, automatic off-device backup
+(option 3 from the durability discussion — a daily encrypted blob to a tiny endpoint) is the
+one thing I would add before real money depends on it.

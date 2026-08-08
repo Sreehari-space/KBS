@@ -1,17 +1,21 @@
-import React from 'react';
-import { Button, Sheet } from '@/components/ui';
-import { formatAmount, formatINR, formatQty } from '@/domain/money';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Banner, Button, Sheet } from '@/components/ui';
+import { BillPreview } from './BillPreview';
+import { billToText, whatsAppLink, whatsAppShareLink } from './billToText';
+import { billToCanvas, shareBillImage } from './billToCanvas';
+import { printViaBluetooth, isBluetoothPrintingAvailable } from './escpos';
+import { buildBill } from '@/domain/bill';
+import { getCustomer } from '@/data/repositories/customerRepo';
+import { toWhatsAppNumber } from '@/data/repositories/customerRepo';
 import { useSettings } from '@/hooks/useSettings';
-import { unitLabel, useT } from '@/i18n/useT';
-import type { Sale } from '@/domain/types';
+import { useT } from '@/i18n/useT';
+import type { Customer, Sale } from '@/domain/types';
 
 /**
- * Post-sale receipt.
+ * Post-sale bill: preview, print, and send.
  *
- * Phase 1 scope: confirm the sale landed and allow a print. The full bill
- * model with four renderers, WhatsApp text/image and the UPI QR is Phase 2
- * (docs/04-bill-print-whatsapp.md) — this uses the same `.bill-print`
- * stylesheet so the paper output is already 58mm rather than A4.
+ * All four outputs come from the same Bill model (docs/04), so the printed
+ * paper, the WhatsApp text and the WhatsApp image always agree.
  */
 export const ReceiptSheet: React.FC<{ sale: Sale | null; onClose: () => void }> = ({
   sale,
@@ -19,105 +23,92 @@ export const ReceiptSheet: React.FC<{ sale: Sale | null; onClose: () => void }> 
 }) => {
   const { t, lang } = useT();
   const settings = useSettings();
-  if (!sale) return null;
+  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [note, setNote] = useState<string | null>(null);
 
-  const shopName =
-    lang === 'ta' && settings.shop.nameTa.trim() ? settings.shop.nameTa : settings.shop.nameEn;
+  useEffect(() => {
+    setNote(null);
+    if (!sale?.customerId) {
+      setCustomer(null);
+      return;
+    }
+    void getCustomer(sale.customerId).then((c) => setCustomer(c ?? null));
+  }, [sale]);
+
+  const bill = useMemo(() => {
+    if (!sale) return null;
+    return buildBill(sale, settings, {
+      lang,
+      customer: customer
+        ? { name: customer.name, phone: customer.phone, balancePaise: customer.balancePaise }
+        : undefined,
+    });
+  }, [sale, settings, lang, customer]);
+
+  if (!sale || !bill) return null;
+
+  const sendText = () => {
+    const text = billToText(bill);
+    const url = customer?.phone
+      ? whatsAppLink(toWhatsAppNumber(customer.phone), text)
+      : whatsAppShareLink(text);
+    window.open(url, '_blank');
+  };
+
+  const sendImage = async () => {
+    setBusy('image');
+    try {
+      const blob = await billToCanvas(bill, { widthMm: settings.printer.widthMm });
+      await shareBillImage(bill, blob);
+    } catch (err) {
+      setNote((err as Error).message);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const print = async () => {
+    if (settings.printer.mode === 'bluetooth' && isBluetoothPrintingAvailable()) {
+      setBusy('print');
+      try {
+        await printViaBluetooth(bill, settings.printer.widthMm, settings.printer.copies);
+      } catch (err) {
+        // Browser printing always remains available as the fallback.
+        setNote(`${(err as Error).message} — ${t('bill.print')}`);
+        window.print();
+      } finally {
+        setBusy(null);
+      }
+      return;
+    }
+    window.print();
+  };
 
   return (
     <Sheet open onClose={onClose} title={t('bill.title')}>
-      <div
-        className="bill-print font-mono text-sm bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700"
-        style={{ ['--bill-width' as string]: `${settings.printer.widthMm}mm` }}
-      >
-        <div className="text-center">
-          <p className="font-bold text-base">{shopName}</p>
-          {settings.shop.addressLines.map((line, i) => (
-            <p key={i} className="text-xs">
-              {line}
-            </p>
-          ))}
-          {settings.shop.phone && <p className="text-xs">{settings.shop.phone}</p>}
-          {settings.gst.enabled && settings.gst.gstin && (
-            <p className="text-xs">GSTIN: {settings.gst.gstin}</p>
-          )}
+      {note && (
+        <div className="mb-3 no-print">
+          <Banner tone="warning" onDismiss={() => setNote(null)}>
+            {note}
+          </Banner>
         </div>
+      )}
 
-        <div className="my-2 border-t border-dashed border-slate-400" />
+      <BillPreview bill={bill} widthMm={settings.printer.widthMm} />
 
-        <p className="text-xs">
-          {t('bill.no')}: {sale.billNo}
-        </p>
-        <p className="text-xs">{new Date(sale.createdAt).toLocaleString()}</p>
-
-        <div className="my-2 border-t border-dashed border-slate-400" />
-
-        {sale.lines.map((line, i) => {
-          const name = lang === 'ta' && line.nameTa.trim() ? line.nameTa : line.nameEn;
-          return (
-            <div key={i} className="mb-1">
-              <p className="leading-tight">{name}</p>
-              <div className="flex justify-between text-xs tnum">
-                <span>
-                  {formatQty(line.qty)} {unitLabel(line.unit, lang)} × {formatAmount(line.unitPricePaise)}
-                </span>
-                <span>{formatAmount(line.lineTotalPaise)}</span>
-              </div>
-            </div>
-          );
-        })}
-
-        <div className="my-2 border-t border-dashed border-slate-400" />
-
-        <Row label={t('billing.subtotal')} value={formatAmount(sale.subtotalPaise)} />
-        {sale.billDiscountPaise > 0 && (
-          <Row label={t('billing.discount')} value={`-${formatAmount(sale.billDiscountPaise)}`} />
-        )}
-        {sale.taxPaise > 0 && <Row label={t('billing.tax')} value={formatAmount(sale.taxPaise)} />}
-        {sale.roundOffPaise !== 0 && (
-          <Row
-            label={t('billing.roundOff')}
-            value={`${sale.roundOffPaise > 0 ? '+' : '-'}${formatAmount(Math.abs(sale.roundOffPaise))}`}
-          />
-        )}
-
-        <div className="flex justify-between font-bold text-base mt-1 tnum">
-          <span>{t('billing.total')}</span>
-          <span>{formatAmount(sale.totalPaise)}</span>
-        </div>
-
-        <div className="my-2 border-t border-dashed border-slate-400" />
-
-        {sale.payments.map((p, i) => (
-          <Row key={i} label={t(`pay.${p.mode}` as 'pay.cash')} value={formatAmount(p.amountPaise)} />
-        ))}
-        {sale.creditPaise > 0 && (
-          <Row label={t('pay.credit')} value={formatAmount(sale.creditPaise)} />
-        )}
-
-        <p className="text-center text-xs mt-3">
-          {lang === 'ta' ? settings.billing.footerLineTa : settings.billing.footerLineEn}
-        </p>
-      </div>
-
-      <div className="mt-4 flex gap-3 no-print">
-        <Button variant="ghost" className="flex-1" onClick={() => window.print()}>
-          {t('bill.print')}
+      <div className="mt-4 grid grid-cols-2 gap-2 no-print">
+        <Button variant="ghost" onClick={() => void print()} disabled={busy === 'print'}>
+          🖨 {t('bill.print')}
         </Button>
-        <Button className="flex-1" onClick={onClose}>
-          {t('bill.newSale')}
+        <Button variant="secondary" onClick={sendText}>
+          💬 {t('bill.whatsapp')}
         </Button>
+        <Button variant="ghost" onClick={() => void sendImage()} disabled={busy === 'image'}>
+          🖼 {busy === 'image' ? '…' : t('bill.share')}
+        </Button>
+        <Button onClick={onClose}>{t('bill.newSale')}</Button>
       </div>
-      <p className="mt-3 text-xs text-center text-light-text-secondary dark:text-dark-text-secondary no-print tnum">
-        {t('billing.total')} {formatINR(sale.totalPaise)} · {sale.billNo}
-      </p>
     </Sheet>
   );
 };
-
-const Row: React.FC<{ label: string; value: string }> = ({ label, value }) => (
-  <div className="flex justify-between text-xs tnum">
-    <span>{label}</span>
-    <span>{value}</span>
-  </div>
-);
