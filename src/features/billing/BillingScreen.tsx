@@ -241,26 +241,35 @@ export const BillingScreen: React.FC<{ onBilled: (sale: Sale) => void }> = ({ on
                 <button
                   key={p.id}
                   onClick={() => handleProductTap(p)}
-                  className={`text-left p-3 rounded-md border transition-colors bg-light-surface dark:bg-dark-surface hover:border-brand-primary active:bg-slate-100 dark:active:bg-slate-700 ${
+                  className={`flex flex-col text-left p-3 rounded-md border transition-colors bg-light-surface dark:bg-dark-surface hover:border-brand-primary active:bg-slate-100 dark:active:bg-slate-700 ${
                     out
                       ? 'border-amber-400 dark:border-amber-600'
                       : 'border-slate-200 dark:border-slate-700'
                   }`}
                 >
-                  <p className="font-semibold text-sm leading-snug line-clamp-2 min-h-[2.6em]">
+                  {/* min-h reserves exactly two lines at leading-snug. The
+                      price AND the stock line share one bottom-pinned block,
+                      and the stock line's height is always reserved — pinning
+                      the price alone left it above the stock line on tracked
+                      items but at the floor on untracked ones, so prices in a
+                      row sat ~19px apart. */}
+                  <p className="font-semibold text-sm leading-snug line-clamp-2 min-h-[3.1em]">
                     {productName(p, lang)}
                   </p>
-                  <div className="mt-2 flex items-baseline justify-between gap-1">
-                    <span className="font-bold text-brand-primary dark:text-brand-on-dark tnum">
-                      {formatINR(p.sellPricePaise)}
-                    </span>
-                    <span className="text-[11px] text-light-text-secondary dark:text-dark-text-secondary">
-                      /{unitLabel(p.unit, lang)}
-                    </span>
-                  </div>
-                  {p.trackStock && (
+                  <div className="mt-auto pt-2">
+                    <div className="flex items-baseline justify-between gap-1">
+                      <span className="font-bold text-brand-primary dark:text-brand-on-dark tnum">
+                        {formatINR(p.sellPricePaise)}
+                      </span>
+                      <span className="text-[11px] text-light-text-secondary dark:text-dark-text-secondary">
+                        /{unitLabel(p.unit, lang)}
+                      </span>
+                    </div>
                     <p
-                      className={`text-[11px] mt-0.5 tnum ${
+                      // Fixed 16px slot with a matching line-box: a min-height
+                      // in `em` did not equal the height of a rendered line,
+                      // so empty and filled slots still differed by ~4px.
+                      className={`text-[11px] mt-0.5 tnum h-4 leading-4 ${
                         out
                           ? 'text-amber-600 dark:text-amber-400 font-semibold'
                           : p.stockQty <= p.lowStockThreshold
@@ -268,9 +277,13 @@ export const BillingScreen: React.FC<{ onBilled: (sale: Sale) => void }> = ({ on
                             : 'text-light-text-secondary dark:text-dark-text-secondary'
                       }`}
                     >
-                      {out ? t('billing.outOfStock') : `${p.stockQty} ${t('billing.inStock')}`}
+                      {!p.trackStock
+                        ? ''
+                        : out
+                          ? t('billing.outOfStock')
+                          : `${p.stockQty} ${t('billing.inStock')}`}
                     </p>
-                  )}
+                  </div>
                 </button>
               );
             })}
@@ -313,35 +326,6 @@ export const BillingScreen: React.FC<{ onBilled: (sale: Sale) => void }> = ({ on
       <Sheet open={cartOpen} onClose={() => setCartOpen(false)} title={t('billing.cart')}>
         {/* Customer forgot something and walked back to the aisle; the next
             person is waiting. Park the bill and serve them. */}
-        {lines.length > 0 && (
-          <div className="flex gap-2 mb-3">
-            <Button
-              variant="ghost"
-              className="flex-1 py-2 text-sm"
-              onClick={async () => {
-                await holdCurrentCart(
-                  { id: ACTIVE_DRAFT_ID, kind: 'active', lines, billDiscountPaise: 0, updatedAt: '' },
-                  new Date().toLocaleTimeString(),
-                );
-                setLines([]);
-                setCartOpen(false);
-              }}
-            >
-              {t('billing.hold')}
-            </Button>
-            <Button
-              variant="ghost"
-              className="flex-1 py-2 text-sm"
-              onClick={() => {
-                setLines([]);
-                void clearActiveDraft();
-                setCartOpen(false);
-              }}
-            >
-              {t('billing.clear')}
-            </Button>
-          </div>
-        )}
         <CartPanel
           lines={lines}
           totals={totals}
@@ -365,6 +349,37 @@ export const BillingScreen: React.FC<{ onBilled: (sale: Sale) => void }> = ({ on
         >
           {t('billing.bill')} · {formatINR(totals.totalPaise)}
         </Button>
+
+        {/* Secondary actions sit BELOW the bill button, and the destructive
+            one is a text link — it should not carry the same weight as Hold. */}
+        {lines.length > 0 && (
+          <div className="mt-3 flex items-center justify-between">
+            <Button
+              variant="ghost"
+              className="py-2 text-sm"
+              onClick={async () => {
+                await holdCurrentCart(
+                  { id: ACTIVE_DRAFT_ID, kind: 'active', lines, billDiscountPaise: 0, updatedAt: '' },
+                  new Date().toLocaleTimeString(),
+                );
+                setLines([]);
+                setCartOpen(false);
+              }}
+            >
+              {t('billing.hold')}
+            </Button>
+            <button
+              onClick={() => {
+                setLines([]);
+                void clearActiveDraft();
+                setCartOpen(false);
+              }}
+              className="text-sm text-light-text-secondary dark:text-dark-text-secondary hover:text-red-600 px-2 py-2"
+            >
+              {t('billing.clear')}
+            </button>
+          </div>
+        )}
       </Sheet>
 
       <PaymentSheet

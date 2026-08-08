@@ -124,7 +124,7 @@ export const QuantitySheet: React.FC<{
             <button
               key={p.label}
               onClick={() => setEntry(String(p.qty))}
-              className="px-3 py-1.5 text-sm rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600"
+              className="px-3 py-1.5 text-sm rounded-full bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600"
             >
               {p.label}
             </button>

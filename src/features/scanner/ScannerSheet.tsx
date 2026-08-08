@@ -142,7 +142,9 @@ export const ScannerSheet: React.FC<{
           <IconKeyboard className="w-5 h-5" />
           {t('scan.manual')}
         </Button>
-        <Button onClick={onClose} className="flex-1">
+        {/* Ghost, not primary: an operator reaches for "Type barcode" far
+            more often than Cancel, and the header already has an ✕. */}
+        <Button variant="ghost" onClick={onClose} className="flex-1">
           {t('common.close')}
         </Button>
       </div>

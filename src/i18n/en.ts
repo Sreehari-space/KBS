@@ -104,6 +104,7 @@ export const en = {
   'pay.selectCustomer': 'Select customer for credit',
   'pay.currentBalance': 'Current balance',
   'pay.overLimit': 'Over credit limit',
+  'pay.choosePrompt': 'Choose how the customer is paying',
 
   // Bill / receipt
   'bill.title': 'Bill',
@@ -157,6 +158,8 @@ export const en = {
   'cust.address': 'Address',
   'cust.balance': 'Balance',
   'cust.creditLimit': 'Credit limit',
+  'cust.empty': 'No customers yet',
+  'cust.emptyHint': 'Add a customer to give credit or send bills on WhatsApp.',
   'ledger.title': 'Credit',
   'ledger.outstanding': 'Total outstanding',
   'ledger.customers': 'customers',
@@ -222,6 +225,17 @@ export const en = {
   'scan.notSupported': 'This browser cannot scan. Use search or type the barcode.',
   'scan.scanned': 'Added',
   'scan.marketingQr': 'This looks like a website QR code, not the product barcode. Scan the striped barcode instead — the QR is often different on every packet.',
+
+  // Reports
+  'reports.revenue': 'Sales',
+  'reports.bills': 'Bills',
+  'reports.avgBill': 'Average bill',
+  'reports.creditGiven': 'On credit',
+  'reports.byMode': 'How customers paid',
+  'reports.daily': 'Day by day',
+  'reports.topItems': 'Best sellers',
+  'reports.empty': 'No sales in this period',
+  'reports.emptyHint': 'Completed bills will appear here.',
 
   // Day close
   'day.title': 'Day close',

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Button, EmptyState, Field, Input, Sheet } from '@/components/ui';
-import { IconWhatsApp } from '@/components/icons';
+import { IconLedger, IconWhatsApp } from '@/components/icons';
 import { formatINR, parseRupeeInput } from '@/domain/money';
 import { db } from '@/data/db';
 import {
@@ -12,6 +12,7 @@ import {
 import { toWhatsAppNumber } from '@/data/repositories/customerRepo';
 import { useSettings } from '@/hooks/useSettings';
 import { useT } from '@/i18n/useT';
+import { formatDate } from '@/domain/datetime';
 import type { Customer, LedgerEntry, PaymentMode } from '@/domain/types';
 
 /**
@@ -41,12 +42,38 @@ export const LedgerScreen: React.FC = () => {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-shrink-0 px-4 pt-4">
-        <div className="rounded-xl bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 px-4 py-3">
-          <p className="text-sm text-amber-800 dark:text-amber-200">{t('ledger.outstanding')}</p>
-          <p className="text-3xl font-bold tnum text-amber-900 dark:text-amber-100">
+        {/* Amber means "money is owed". At zero there is nothing to warn
+            about, so the panel goes neutral. */}
+        <div
+          className={`rounded-lg border px-4 py-3 ${
+            total > 0
+              ? 'bg-amber-50 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700'
+              : 'bg-light-surface dark:bg-dark-surface border-slate-200 dark:border-slate-700'
+          }`}
+        >
+          <p
+            className={`text-sm ${
+              total > 0
+                ? 'text-amber-800 dark:text-amber-200'
+                : 'text-light-text-secondary dark:text-dark-text-secondary'
+            }`}
+          >
+            {t('ledger.outstanding')}
+          </p>
+          <p
+            className={`text-3xl font-bold tnum ${
+              total > 0 ? 'text-amber-900 dark:text-amber-100' : ''
+            }`}
+          >
             {formatINR(total)}
           </p>
-          <p className="text-xs text-amber-800 dark:text-amber-200 mt-0.5">
+          <p
+            className={`text-xs mt-0.5 ${
+              total > 0
+                ? 'text-amber-800 dark:text-amber-200'
+                : 'text-light-text-secondary dark:text-dark-text-secondary'
+            }`}
+          >
             {(customers ?? []).length} {t('ledger.customers')}
           </p>
         </div>
@@ -54,7 +81,7 @@ export const LedgerScreen: React.FC = () => {
 
       <div className="flex-1 overflow-y-auto px-4 py-3">
         {(customers ?? []).length === 0 ? (
-          <EmptyState title={t('ledger.noDues')} />
+          <EmptyState title={t('ledger.noDues')} icon={<IconLedger className="w-10 h-10" />} />
         ) : (
           <div className="space-y-2">
             {(customers ?? []).map((c) => (
@@ -92,7 +119,7 @@ const StatementSheet: React.FC<{
   onClose: () => void;
   shopName: string;
 }> = ({ customer, onClose, shopName }) => {
-  const { t } = useT();
+  const { t, lang } = useT();
   const [collecting, setCollecting] = useState(false);
   const [amount, setAmount] = useState('');
   const [mode, setMode] = useState<PaymentMode>('cash');
@@ -212,7 +239,7 @@ const StatementSheet: React.FC<{
             <div className="min-w-0">
               <p className="text-sm font-medium">{typeLabel[entry.type]}</p>
               <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
-                {new Date(entry.at).toLocaleDateString()}
+                {formatDate(entry.at, lang)}
                 {entry.note ? ` · ${entry.note}` : ''}
               </p>
             </div>

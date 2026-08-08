@@ -6,6 +6,7 @@ import { exportBackup } from '@/features/backup/backupService';
 import { formatINR, parseRupeeInput } from '@/domain/money';
 import { useSettings } from '@/hooks/useSettings';
 import { useT } from '@/i18n/useT';
+import { formatDate } from '@/domain/datetime';
 
 export const DayCloseScreen: React.FC = () => {
   const { t, lang } = useT();
@@ -44,15 +45,15 @@ export const DayCloseScreen: React.FC = () => {
 
   return (
     <div className="h-full overflow-y-auto px-4 py-4 space-y-4">
-      <div className="rounded-xl bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 p-4">
+      <div className="rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 p-3">
         <h2 className="font-semibold mb-3">
-          {t('day.title')} — {summary.date.toLocaleDateString()}
+          {t('day.title')} — {formatDate(summary.date.toISOString(), lang)}
         </h2>
         <Row label={t('day.bills')} value={String(summary.billCount)} />
         <Row label={t('day.sales')} value={formatINR(summary.salesTotalPaise)} bold />
       </div>
 
-      <div className="rounded-xl bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 p-4">
+      <div className="rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 p-3">
         <Row label={t('pay.cash')} value={formatINR(summary.byMode.cash)} />
         <Row label={t('pay.upi')} value={formatINR(summary.byMode.upi)} />
         <Row label={t('pay.card')} value={formatINR(summary.byMode.card)} />
@@ -60,7 +61,7 @@ export const DayCloseScreen: React.FC = () => {
         <Row label={t('day.creditCollected')} value={formatINR(summary.creditCollectedPaise)} />
       </div>
 
-      <div className="rounded-xl bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 p-4 space-y-3">
+      <div className="rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 p-3 space-y-3">
         {/* Expected cash is takings PLUS cash collected against old credit —
             not just the day's sales. */}
         <Row label={t('day.expectedCash')} value={formatINR(summary.expectedCashPaise)} bold />
@@ -104,6 +105,7 @@ export const DayCloseScreen: React.FC = () => {
             than a reminder they will dismiss (doc 07). */}
         <Button
           full
+          variant="ghost"
           onClick={async () => {
             await exportBackup();
             setBackupDone(true);

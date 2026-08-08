@@ -391,7 +391,7 @@ export const SettingsScreen: React.FC = () => {
 };
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-  <div className="rounded-xl bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 p-4 space-y-3">
+  <div className="rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 p-3 space-y-3">
     <h2 className="font-semibold">{title}</h2>
     {children}
   </div>

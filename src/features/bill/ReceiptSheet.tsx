@@ -98,34 +98,40 @@ export const ReceiptSheet: React.FC<{ sale: Sale | null; onClose: () => void }> 
 
       <BillPreview bill={bill} widthMm={settings.printer.widthMm} />
 
-      <div className="mt-4 grid grid-cols-2 gap-2 no-print">
-        <Button
-          variant="ghost"
-          onClick={() => void print()}
-          disabled={busy === 'print'}
-          className="flex items-center justify-center gap-2"
-        >
-          <IconPrint className="w-5 h-5" />
-          {t('bill.print')}
+      <div className="mt-4 space-y-2 no-print">
+        {/* Delivery options are peers; "New sale" is the one action that
+            clears the counter, so it alone gets the primary weight. */}
+        <div className="grid grid-cols-3 gap-2">
+          <Button
+            variant="ghost"
+            onClick={() => void print()}
+            disabled={busy === 'print'}
+            className="flex flex-col items-center justify-center gap-1 py-2.5 text-xs"
+          >
+            <IconPrint className="w-5 h-5" />
+            {t('bill.print')}
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={sendText}
+            className="flex flex-col items-center justify-center gap-1 py-2.5 text-xs"
+          >
+            <IconWhatsApp className="w-5 h-5" />
+            {t('bill.whatsapp')}
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => void sendImage()}
+            disabled={busy === 'image'}
+            className="flex flex-col items-center justify-center gap-1 py-2.5 text-xs"
+          >
+            <IconShare className="w-5 h-5" />
+            {busy === 'image' ? '…' : t('bill.share')}
+          </Button>
+        </div>
+        <Button full onClick={onClose}>
+          {t('bill.newSale')}
         </Button>
-        <Button
-          variant="secondary"
-          onClick={sendText}
-          className="flex items-center justify-center gap-2"
-        >
-          <IconWhatsApp className="w-5 h-5" />
-          {t('bill.whatsapp')}
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={() => void sendImage()}
-          disabled={busy === 'image'}
-          className="flex items-center justify-center gap-2"
-        >
-          <IconShare className="w-5 h-5" />
-          {busy === 'image' ? '…' : t('bill.share')}
-        </Button>
-        <Button onClick={onClose}>{t('bill.newSale')}</Button>
       </div>
     </Sheet>
   );

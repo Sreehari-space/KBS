@@ -26,7 +26,7 @@ export const NumericKeypad: React.FC<{
             type="button"
             onClick={() => (isBackspace ? onBackspace() : onDigit(key))}
             aria-label={isBackspace ? t('common.backspace') : key}
-            className="py-4 text-xl font-semibold rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 active:bg-slate-300 dark:active:bg-slate-500 tnum flex items-center justify-center"
+            className="py-4 text-xl font-semibold rounded-md bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600 active:bg-slate-300 dark:active:bg-slate-500 tnum flex items-center justify-center"
           >
             {isBackspace ? <IconBackspace className="w-6 h-6" /> : key}
           </button>

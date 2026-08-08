@@ -56,17 +56,20 @@ export const CartPanel: React.FC<{
                 >
                   <IconPlus className="w-4 h-4" />
                 </button>
+                {/* Remove lives with the quantity controls, not in the amount
+                    column — red repeated beside every total drowns out the
+                    numbers the operator is actually checking. */}
+                <button
+                  onClick={() => onRemove(index)}
+                  className="w-8 h-8 rounded-full text-light-text-secondary dark:text-dark-text-secondary hover:text-red-600 flex items-center justify-center"
+                  aria-label={t('common.delete')}
+                >
+                  <IconTrash className="w-4 h-4" />
+                </button>
               </div>
 
               <div className="text-right flex-shrink-0 w-20">
                 <p className="font-bold tnum">{formatINR(line.lineTotalPaise)}</p>
-                <button
-                  onClick={() => onRemove(index)}
-                  className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-700"
-                >
-                  <IconTrash className="w-3.5 h-3.5" />
-                  {t('common.delete')}
-                </button>
               </div>
             </div>
           );

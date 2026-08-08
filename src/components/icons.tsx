@@ -71,9 +71,10 @@ export const IconMore: React.FC<IconProps> = (p) => (
 
 export const IconCustomers: React.FC<IconProps> = (p) => (
   <Svg {...p}>
-    <path d="M16 20v-1.5a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4V20" />
-    <circle cx="9" cy="7" r="3.2" />
-    <path d="M22 20v-1.5a4 4 0 0 0-3-3.87M16.5 4.2a3.2 3.2 0 0 1 0 6.2" />
+    <path d="M15 20.5v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+    <circle cx="8.5" cy="7" r="3.5" />
+    <circle cx="17.5" cy="8.5" r="2.5" />
+    <path d="M22 20.5v-1.6a3.4 3.4 0 0 0-2.8-3.3" />
   </Svg>
 );
 
@@ -116,10 +117,12 @@ export const IconBills: React.FC<IconProps> = (p) => (
 
 // ─── Actions ────────────────────────────────────────────────────────────────
 
+/** Three evenly spaced bars, centred in the frame — four read as a smudge
+ *  at the 20px size this is actually rendered at. */
 export const IconScan: React.FC<IconProps> = (p) => (
   <Svg {...p}>
     <path d="M4 7V5a1 1 0 0 1 1-1h2M4 17v2a1 1 0 0 0 1 1h2M20 7V5a1 1 0 0 0-1-1h-2M20 17v2a1 1 0 0 1-1 1h-2" />
-    <path d="M7.5 8v8M11 8v8M14.5 8v8M17.5 8v8" />
+    <path d="M8 8v8M12 8v8M16 8v8" />
   </Svg>
 );
 

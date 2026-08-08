@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Banner, Button, EmptyState, Sheet } from '@/components/ui';
+import { IconBills, IconPrint } from '@/components/icons';
 import { formatINR, formatQty } from '@/domain/money';
 import { listSales } from '@/data/repositories/saleRepo';
 import { commitReturn } from '@/data/repositories/returnRepo';
 import { ReceiptSheet } from '@/features/bill/ReceiptSheet';
 import { unitLabel, useT } from '@/i18n/useT';
+import { formatDateTime } from '@/domain/datetime';
 import type { Sale } from '@/domain/types';
 
 /** Past bills: reprint, resend, and return items. */
@@ -19,7 +21,7 @@ export const BillsScreen: React.FC = () => {
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto px-4 py-4">
         {(sales ?? []).length === 0 ? (
-          <EmptyState title={t('bills.none')} />
+          <EmptyState title={t('bills.none')} icon={<IconBills className="w-10 h-10" />} />
         ) : (
           <div className="space-y-2">
             {(sales ?? []).map((sale) => (
@@ -31,7 +33,7 @@ export const BillsScreen: React.FC = () => {
                   <div className="flex-1 min-w-0">
                     <p className="font-medium tnum">{sale.billNo}</p>
                     <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
-                      {new Date(sale.createdAt).toLocaleString()} · {sale.lines.length}{' '}
+                      {formatDateTime(sale.createdAt, lang)} · {sale.lines.length}{' '}
                       {t('billing.items')}
                     </p>
                     {sale.status !== 'completed' && (
@@ -41,25 +43,32 @@ export const BillsScreen: React.FC = () => {
                     )}
                   </div>
                   <p
-                    className={`font-bold tnum flex-shrink-0 ${
-                      sale.totalPaise < 0 ? 'text-red-500' : ''
+                    className={`text-xl font-bold tnum flex-shrink-0 ${
+                      sale.totalPaise < 0 ? 'text-red-600 dark:text-red-400' : ''
                     }`}
                   >
                     {formatINR(sale.totalPaise)}
                   </p>
                 </div>
-                <div className="flex gap-2 mt-2">
-                  <Button variant="ghost" className="flex-1 py-1.5 text-sm" onClick={() => setViewing(sale)}>
+                {/* The amount is what an operator scans this list for, so the
+                    actions stay subordinate: reprint is a small button, and
+                    the semi-destructive return is a plain link. */}
+                <div className="flex items-center gap-3 mt-2">
+                  <Button
+                    variant="ghost"
+                    className="py-1.5 px-3 text-sm flex items-center gap-1.5"
+                    onClick={() => setViewing(sale)}
+                  >
+                    <IconPrint className="w-4 h-4" />
                     {t('bills.reprint')}
                   </Button>
                   {sale.totalPaise > 0 && sale.status === 'completed' && (
-                    <Button
-                      variant="ghost"
-                      className="flex-1 py-1.5 text-sm"
+                    <button
                       onClick={() => setReturning(sale)}
+                      className="text-sm text-light-text-secondary dark:text-dark-text-secondary hover:text-brand-primary dark:hover:text-brand-on-dark"
                     >
                       {t('bills.return')}
-                    </Button>
+                    </button>
                   )}
                 </div>
               </div>

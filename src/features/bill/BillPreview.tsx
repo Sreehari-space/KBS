@@ -31,7 +31,7 @@ export const BillPreview: React.FC<{ bill: Bill; widthMm: 58 | 80 }> = ({ bill, 
 
   return (
     <div
-      className="bill-print bg-white text-black rounded-lg p-3 mx-auto"
+      className="bill-print bg-white text-black rounded-md p-3 mx-auto border border-slate-300 shadow-sm"
       style={{
         ['--bill-width' as string]: `${widthMm}mm`,
         width: widthMm === 80 ? 300 : 240,

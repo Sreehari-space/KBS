@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { EmptyState } from '@/components/ui';
+import { Card, EmptyState } from '@/components/ui';
+import { IconReports } from '@/components/icons';
+import { formatDate } from '@/domain/datetime';
 import { formatINR } from '@/domain/money';
 import { db } from '@/data/db';
 import { useT } from '@/i18n/useT';
@@ -49,7 +51,7 @@ export const ReportsScreen: React.FC = () => {
 
     const byDay = new Map<string, number>();
     for (const sale of all) {
-      const key = new Date(sale.createdAt).toLocaleDateString();
+      const key = formatDate(sale.createdAt, lang);
       byDay.set(key, (byDay.get(key) ?? 0) + sale.totalPaise);
     }
 
@@ -73,8 +75,10 @@ export const ReportsScreen: React.FC = () => {
           <button
             key={d}
             onClick={() => setDays(d)}
-            className={`px-4 py-1.5 text-sm rounded-full ${
-              days === d ? 'bg-brand-primary text-white' : 'bg-slate-100 dark:bg-slate-700'
+            className={`px-4 py-1.5 text-sm rounded-full border transition-colors ${
+              days === d
+                ? 'bg-brand-primary border-brand-primary text-white'
+                : 'bg-light-surface dark:bg-dark-surface border-slate-300 dark:border-slate-600 hover:border-brand-primary'
             }`}
           >
             {d}d
@@ -83,17 +87,21 @@ export const ReportsScreen: React.FC = () => {
       </div>
 
       {stats.billCount === 0 ? (
-        <EmptyState title={t('day.sales')} hint={t('billing.cartEmptyHint')} />
+        <EmptyState
+          title={t('reports.empty')}
+          hint={t('reports.emptyHint')}
+          icon={<IconReports className="w-10 h-10" />}
+        />
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3">
-            <Stat label={t('day.sales')} value={formatINR(stats.revenue)} />
-            <Stat label={t('day.bills')} value={String(stats.billCount)} />
-            <Stat label={t('billing.total')} value={formatINR(stats.average)} sub="avg / bill" />
-            <Stat label={t('pay.credit')} value={formatINR(stats.credit)} />
+            <Stat label={t('reports.revenue')} value={formatINR(stats.revenue)} />
+            <Stat label={t('reports.bills')} value={String(stats.billCount)} />
+            <Stat label={t('reports.avgBill')} value={formatINR(stats.average)} />
+            <Stat label={t('reports.creditGiven')} value={formatINR(stats.credit)} />
           </div>
 
-          <Section title={t('pay.title')}>
+          <Section title={t('reports.byMode')}>
             {stats.byMode.map(([mode, amount]) => (
               <div key={mode} className="flex justify-between py-1.5 text-sm">
                 <span>{t(`pay.${mode}` as 'pay.cash')}</span>
@@ -102,7 +110,7 @@ export const ReportsScreen: React.FC = () => {
             ))}
           </Section>
 
-          <Section title={t('day.sales')}>
+          <Section title={t('reports.daily')}>
             {stats.byDay.map(([day, amount]) => (
               <div key={day} className="py-1.5">
                 <div className="flex justify-between text-sm mb-1">
@@ -119,7 +127,7 @@ export const ReportsScreen: React.FC = () => {
             ))}
           </Section>
 
-          <Section title={t('billing.quickItems')}>
+          <Section title={t('reports.topItems')}>
             {stats.topProducts.map((p) => (
               <div key={p.name} className="flex justify-between py-1.5 text-sm gap-3">
                 <span className="truncate">{p.name}</span>
@@ -133,17 +141,16 @@ export const ReportsScreen: React.FC = () => {
   );
 };
 
-const Stat: React.FC<{ label: string; value: string; sub?: string }> = ({ label, value, sub }) => (
-  <div className="rounded-xl bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 p-4">
+const Stat: React.FC<{ label: string; value: string }> = ({ label, value }) => (
+  <Card className="p-3">
     <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">{label}</p>
     <p className="text-xl font-bold tnum mt-0.5">{value}</p>
-    {sub && <p className="text-[11px] text-light-text-secondary dark:text-dark-text-secondary">{sub}</p>}
-  </div>
+  </Card>
 );
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-  <div className="rounded-xl bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 p-4">
+  <Card className="p-3">
     <h2 className="font-semibold mb-2">{title}</h2>
     {children}
-  </div>
+  </Card>
 );

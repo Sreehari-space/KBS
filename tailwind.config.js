@@ -17,7 +17,7 @@ export default {
         'brand-on-dark': '#93c5fd',
         'brand-secondary': '#047857',
         'brand-secondary-hover': '#065f46',
-        'light-bg': '#f1f5f9',
+        'light-bg': '#e9eef5',
         'dark-bg': '#0b1220',
         'light-surface': '#ffffff',
         'dark-surface': '#151f32',

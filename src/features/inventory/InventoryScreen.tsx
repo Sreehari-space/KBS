@@ -156,10 +156,10 @@ export const InventoryScreen: React.FC = () => {
             <button
               key={f.id}
               onClick={() => setFilter(f.id)}
-              className={`flex-shrink-0 px-3 py-1.5 text-sm rounded-full ${
+              className={`flex-shrink-0 px-3 py-1.5 text-sm rounded-full border transition-colors ${
                 filter === f.id
-                  ? 'bg-brand-primary text-white'
-                  : 'bg-slate-100 dark:bg-slate-700'
+                  ? 'bg-brand-primary border-brand-primary text-white'
+                  : 'bg-light-surface dark:bg-dark-surface border-slate-300 dark:border-slate-600 hover:border-brand-primary'
               }`}
             >
               {f.label}

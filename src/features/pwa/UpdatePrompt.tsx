@@ -21,7 +21,7 @@ export const UpdatePrompt: React.FC = () => {
 
   return (
     <div className="fixed bottom-20 left-4 right-4 z-40 no-print sm:left-auto sm:w-80">
-      <div className="rounded-xl bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 shadow-lg p-4 flex items-center gap-3">
+      <div className="rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 shadow-lg p-4 flex items-center gap-3">
         <span className="flex-1 font-medium">{t('common.update')}</span>
         <Button className="py-2 px-4 text-sm" onClick={() => void updateServiceWorker(true)}>
           {t('common.updateNow')}

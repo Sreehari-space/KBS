@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Button, EmptyState, Field, Input, Sheet } from '@/components/ui';
-import { IconPlus } from '@/components/icons';
+import { IconCustomers, IconPlus } from '@/components/icons';
 import { formatINR, paiseToRupees, parseRupeeInput } from '@/domain/money';
 import {
   createCustomer,
@@ -105,7 +105,11 @@ export const CustomersScreen: React.FC = () => {
 
       <div className="flex-1 overflow-y-auto px-4 py-3">
         {visible.length === 0 ? (
-          <EmptyState title={t('cust.title')} hint={t('cust.add')} />
+          <EmptyState
+            title={t('cust.empty')}
+            hint={t('cust.emptyHint')}
+            icon={<IconCustomers className="w-10 h-10" />}
+          />
         ) : (
           <div className="space-y-2">
             {visible.map((c) => (

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Button, EmptyState } from '@/components/ui';
-import { IconWhatsApp } from '@/components/icons';
+import { IconCheck, IconWhatsApp } from '@/components/icons';
 import { formatQty } from '@/domain/money';
 import { lowStock } from '@/data/repositories/productRepo';
 import { useSettings } from '@/hooks/useSettings';
@@ -32,7 +32,7 @@ export const ReorderScreen: React.FC = () => {
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto px-4 py-4">
         {(items ?? []).length === 0 ? (
-          <EmptyState title={t('reorder.none')} />
+          <EmptyState title={t('reorder.none')} icon={<IconCheck className="w-10 h-10" />} />
         ) : (
           <div className="space-y-2">
             {(items ?? []).map((p) => (

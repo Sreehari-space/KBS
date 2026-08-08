@@ -107,6 +107,7 @@ export const ta: Record<TranslationKey, string> = {
   'pay.selectCustomer': 'கடனுக்கு வாடிக்கையாளரைத் தேர்வு செய்',
   'pay.currentBalance': 'இப்போதைய கடன்',
   'pay.overLimit': 'கடன் வரம்பை மீறியது',
+  'pay.choosePrompt': 'வாடிக்கையாளர் எப்படி பணம் செலுத்துகிறார் என்பதைத் தேர்வு செய்யவும்',
 
   // Bill / receipt
   'bill.title': 'பில்',
@@ -160,6 +161,8 @@ export const ta: Record<TranslationKey, string> = {
   'cust.address': 'முகவரி',
   'cust.balance': 'கடன் தொகை',
   'cust.creditLimit': 'கடன் வரம்பு',
+  'cust.empty': 'வாடிக்கையாளர் இல்லை',
+  'cust.emptyHint': 'கடன் கொடுக்கவும் வாட்ஸ்அப்பில் பில் அனுப்பவும் வாடிக்கையாளரைச் சேர்க்கவும்.',
   'ledger.title': 'கடன்',
   'ledger.outstanding': 'மொத்த கடன்',
   'ledger.customers': 'வாடிக்கையாளர்கள்',
@@ -225,6 +228,17 @@ export const ta: Record<TranslationKey, string> = {
   'scan.notSupported': 'இந்த browser-ல் ஸ்கேன் செய்ய முடியாது. தேடலைப் பயன்படுத்தவும்.',
   'scan.scanned': 'சேர்க்கப்பட்டது',
   'scan.marketingQr': 'இது பொருளின் பார்கோடு அல்ல, வலைத்தள QR குறியீடு போல் தெரிகிறது. கோடுகள் உள்ள பார்கோடை ஸ்கேன் செய்யவும் — QR ஒவ்வொரு பாக்கெட்டிலும் வேறுபடலாம்.',
+
+  // Reports
+  'reports.revenue': 'விற்பனை',
+  'reports.bills': 'பில்கள்',
+  'reports.avgBill': 'சராசரி பில்',
+  'reports.creditGiven': 'கடனில்',
+  'reports.byMode': 'பணம் செலுத்திய முறை',
+  'reports.daily': 'நாள்வாரி',
+  'reports.topItems': 'அதிகம் விற்றவை',
+  'reports.empty': 'இந்த காலத்தில் விற்பனை இல்லை',
+  'reports.emptyHint': 'முடிந்த பில்கள் இங்கே தெரியும்.',
 
   // Day close
   'day.title': 'கடை சாத்து',

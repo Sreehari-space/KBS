@@ -20,8 +20,10 @@ const VARIANTS: Record<ButtonVariant, string> = {
   primary: 'bg-brand-primary text-white hover:bg-brand-primary-hover active:bg-brand-primary-hover',
   secondary:
     'bg-brand-secondary text-white hover:bg-brand-secondary-hover active:bg-brand-secondary-hover',
+  // A border is what makes a ghost button read as a control rather than as
+  // floating text — without it these looked disabled on a white sheet.
   ghost:
-    'bg-slate-100 dark:bg-slate-700 text-light-text dark:text-dark-text hover:bg-slate-200 dark:hover:bg-slate-600',
+    'bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-light-text dark:text-dark-text hover:bg-slate-200 dark:hover:bg-slate-600',
   danger: 'bg-red-700 text-white hover:bg-red-800',
 };
 

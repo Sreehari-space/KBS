@@ -109,12 +109,12 @@ export const PaymentSheet: React.FC<{
           placeholder="0"
           className="text-lg tnum"
         />
-        <div className="flex flex-wrap gap-2 mt-2">
+        <div className="grid grid-cols-3 gap-2 mt-2">
           {QUICK_NOTES.map((paise) => (
             <button
               key={paise}
               onClick={() => setTendered(String(paise / 100))}
-              className="px-3 py-1.5 text-sm rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 tnum"
+              className="py-2 text-sm rounded-md bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600 tnum"
             >
               ₹{paise / 100}
             </button>
@@ -166,8 +166,10 @@ export const PaymentSheet: React.FC<{
         </div>
       )}
 
-      {/* Whatever is left becomes credit and needs a customer */}
-      {remaining > 0 && (
+      {/* Credit is only a decision once some payment has been entered — this
+          panel used to be visible the instant the sheet opened, so the default
+          state of the busiest sheet in the app was a yellow warning. */}
+      {remaining > 0 && payments.length > 0 && (
         <div className="mb-5 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/30 p-4">
           <p className="font-semibold text-amber-900 dark:text-amber-100 tnum">
             {t('pay.remaining')}: {formatINR(remaining)} &rarr; {t('pay.credit')}
@@ -202,6 +204,12 @@ export const PaymentSheet: React.FC<{
             </p>
           )}
         </div>
+      )}
+
+      {remaining > 0 && payments.length === 0 && (
+        <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mb-3">
+          {t('pay.choosePrompt')}
+        </p>
       )}
 
       <Button full onClick={complete} disabled={!canComplete}>

@@ -160,7 +160,8 @@ const Shell: React.FC<{
 
   return (
     <div className="flex flex-col h-[100dvh] bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text">
-      <header className="flex-shrink-0 flex items-center justify-between gap-3 px-4 py-2.5 bg-light-surface dark:bg-dark-surface border-b border-slate-200 dark:border-slate-700 no-print">
+      <header className="flex-shrink-0 bg-light-surface dark:bg-dark-surface border-b border-slate-200 dark:border-slate-700 no-print">
+        <div className="max-w-3xl mx-auto w-full flex items-center justify-between gap-3 px-4 py-2.5">
         <div className="min-w-0">
           {/* The shop's own name, the way a till identifies itself. */}
           <h1 className="font-semibold leading-tight truncate">{shopName}</h1>
@@ -176,6 +177,7 @@ const Shell: React.FC<{
         >
           {lang === 'ta' ? 'English' : 'தமிழ்'}
         </button>
+        </div>
       </header>
 
       {(ephemeral || (quotaLow && !quotaDismissed) || storage?.unavailable) && (
@@ -190,7 +192,9 @@ const Shell: React.FC<{
         </div>
       )}
 
-      <main className="flex-1 overflow-hidden">
+      {/* Content is capped so a wide screen doesn't strand the amount at one
+          edge and its button at the other. */}
+      <main className="flex-1 overflow-hidden w-full max-w-3xl mx-auto">
         {screen === 'billing' && <BillingScreen onBilled={onBilled} />}
         {screen === 'inventory' && <InventoryScreen />}
         {screen === 'ledger' && <LedgerScreen />}
@@ -203,7 +207,8 @@ const Shell: React.FC<{
         {screen === 'settings' && <SettingsScreen />}
       </main>
 
-      <nav className="flex-shrink-0 flex border-t border-slate-200 dark:border-slate-700 bg-light-surface dark:bg-dark-surface pb-safe no-print">
+      <nav className="flex-shrink-0 border-t border-slate-200 dark:border-slate-700 bg-light-surface dark:bg-dark-surface pb-safe no-print">
+        <div className="max-w-3xl mx-auto w-full flex">
         {PRIMARY.map((item) => (
           <NavButton
             key={item.id}
@@ -219,6 +224,7 @@ const Shell: React.FC<{
           active={inMore}
           onClick={() => setMoreOpen(true)}
         />
+        </div>
       </nav>
 
       <Sheet open={moreOpen} onClose={() => setMoreOpen(false)} title={t('nav.more')}>
