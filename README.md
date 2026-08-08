@@ -20,6 +20,7 @@ Start at **[docs/README.md](docs/README.md)** for the index and the decision log
 | [04 — Bill, print & WhatsApp](docs/04-bill-print-whatsapp.md) | 58mm thermal bill, WhatsApp text + image, UPI QR |
 | [05 — Ledger, Tamil, day close](docs/05-ledger-tamil-dayclose.md) | Credit ledger (கடன்), i18n, day close, backup |
 | [06 — Roadmap](docs/06-roadmap.md) | Phased delivery, risks, open questions |
+| [07 — Auto-save & durability](docs/07-autosave-durability.md) | Auto-save guarantees, commit protocol, draft recovery, storage budget |
 
 ## Run locally
 

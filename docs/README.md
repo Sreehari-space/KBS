@@ -15,6 +15,7 @@ Nothing here is implemented yet. This is the plan to review before any code chan
 | [04-bill-print-whatsapp.md](04-bill-print-whatsapp.md) | Bill model, 58mm thermal print, WhatsApp text + image, UPI QR, ESC/POS |
 | [05-ledger-tamil-dayclose.md](05-ledger-tamil-dayclose.md) | Credit ledger (கடன்), Tamil/English i18n, day close, backup/restore |
 | [06-roadmap.md](06-roadmap.md) | Phased delivery, PR-sized tasks, acceptance criteria, risks |
+| [07-autosave-durability.md](07-autosave-durability.md) | **Auto-save guarantees**, commit protocol, draft recovery, storage budget |
 
 ## Scope decisions (agreed)
 
@@ -23,6 +24,7 @@ Nothing here is implemented yet. This is the plan to review before any code chan
 | **Target shop** | Kirana / provision store first. Other shop types are mostly a subset. |
 | **Backend** | None. Client-only, offline-first. IndexedDB + PWA. Zero server cost. |
 | **This deliverable** | Design docs only. Implementation starts after review. |
+| **Auto-save** | **Hard requirement, no compromise.** Every bill and transaction saved to the device automatically. No Save button. Mobile-first. See [doc 07](07-autosave-durability.md). |
 
 ## Decision log
 
@@ -39,3 +41,6 @@ Choices made in these docs that are worth arguing about before we build.
 | D7 | Backup = JSON export/import + Web Share, **not** Google Drive API | Drive API needs a GCP project, OAuth consent screen, and internet. Too much friction for a single-shop owner. Drive stays a Phase 4 option. | [05](05-ledger-tamil-dayclose.md) |
 | D8 | Gemini becomes **bring-your-own-key**, entered in Settings | A client-only app cannot hold a secret. Today's key is compiled into public JS. | [01](01-architecture.md) |
 | D9 | Credit ledger is P0, not a nice-to-have | Kirana shops run on monthly credit. A POS without it won't be adopted. | [05](05-ledger-tamil-dayclose.md) |
+| D10 | On-device storage uses **IndexedDB**, not the `localStorage` API | Both are local and serverless, but `localStorage` caps at ~5 MB (≈6 weeks of bills) and its synchronous whole-blob rewrites would freeze a low-end phone on every sale. | [07](07-autosave-durability.md) |
+| D11 | Sale commit is **one atomic transaction**; the receipt renders only after it succeeds | A bill must never be shown as complete unless it is on disk. On failure the cart survives so the shopkeeper can retry. | [07](07-autosave-durability.md) |
+| D12 | Bills are **never pruned** and sales are **immutable** | "Every bill stored" means forever. Corrections are return bills, so an interrupted write can't corrupt existing history. | [07](07-autosave-durability.md) |

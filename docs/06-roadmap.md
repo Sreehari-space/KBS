@@ -14,6 +14,9 @@ persistence and offline, and they're worth nothing without them.
 | 1.2 | Restructure into `src/` per [doc 01](01-architecture.md); move existing components unchanged | whole tree |
 | 1.3 | `domain/money.ts` + `domain/cart.ts` with paise arithmetic, Indian formatting, round-off — **with unit tests** | `src/domain/` |
 | 1.4 | Dexie schema, repository interfaces, Dexie implementations | `src/data/` |
+| **1.4a** | **Atomic sale-commit transaction** per [doc 07](07-autosave-durability.md): sales + stock + ledger + bill counter in one transaction, strict durability, receipt renders only on success, cart preserved on failure | `data/repositories/saleRepo.ts` |
+| **1.4b** | **Draft auto-save** — debounced cart persistence + restore-on-boot banner | `features/billing/` |
+| **1.4c** | **Storage protection** — `persist()`, quota monitoring + 80% warning, incognito detection, non-silent write failures | `src/data/db.ts` |
 | 1.5 | Replace `useState` data with `useLiveQuery`; delete prop-drilling from `App.tsx` | `App.tsx`, all screens |
 | 1.6 | TN kirana seed data with Tamil names, units, real barcodes | `src/data/seed/` |
 | 1.7 | i18n scaffolding + Tamil strings + header language toggle | `src/i18n/` |
@@ -22,8 +25,9 @@ persistence and offline, and they're worth nothing without them.
 | 1.10 | Remove `API_KEY` from the bundle; move Gemini behind a user-supplied key | `vite.config.ts`, `geminiService.ts` |
 | 1.11 | JSON backup export/import + Web Share | `features/backup/` |
 
-**Done when:** bill a sale on an Android phone in aeroplane mode, force-close the browser,
-reopen — the sale is in history, stock is decremented, the UI is in Tamil.
+**Done when:** all ten acceptance tests in
+[doc 07](07-autosave-durability.md#acceptance-criteria) pass on a real Android phone — including
+force-stopping the browser straight after billing, and having Android kill the tab mid-cart.
 
 ## Phase 2 — Scanning & the bill
 
@@ -95,6 +99,8 @@ and without persistence there is nothing worth scanning into.
 | `BarcodeDetector` missing on the shop's device | Scanner dead on iOS/Firefox | ZXing WASM fallback, spec'd in Phase 2 |
 | Camera needs HTTPS | Scanner silently fails on a plain-HTTP deployment | HTTPS hosting is part of Phase 1, not an afterthought |
 | Browser storage eviction | **Total data loss** | `storage.persist()`, backup reminders, visible last-backup date |
+| Android kills a backgrounded tab mid-bill | Cart lost, customer waiting | Debounced draft auto-save + restore banner (task 1.4b) |
+| Storage quota exhausted by product photos | Writes start failing | Images capped at 50 KB before storage; 80% quota warning ([doc 07](07-autosave-durability.md)) |
 | Cheap thermal printers lack Tamil fonts | Tamil bills print as boxes | ESC/POS raster path reusing `billToCanvas` |
 | Web Bluetooth is Android-only | No direct print on iOS | Browser print (Path 1) is never removed |
 | Shop has no barcodes at all | Scanner is useless there | Search, quick tiles, and direct keypad entry are first-class, not fallbacks |
