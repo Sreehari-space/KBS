@@ -115,6 +115,7 @@ export const ta: Record<TranslationKey, string> = {
   'pay.currentBalance': 'இப்போதைய கடன்',
   'pay.overLimit': 'கடன் வரம்பை மீறியது',
   'pay.choosePrompt': 'வாடிக்கையாளர் எப்படி பணம் செலுத்துகிறார் என்பதைத் தேர்வு செய்யவும்',
+  'pay.noCustomers': 'இன்னும் வாடிக்கையாளர் யாரும் இல்லை. கடன் கொடுக்க வாடிக்கையாளர் பகுதியில் ஒருவரைச் சேர்க்கவும்.',
 
   // Bill / receipt
   'bill.title': 'பில்',

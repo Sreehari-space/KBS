@@ -112,6 +112,7 @@ export const en = {
   'pay.currentBalance': 'Current balance',
   'pay.overLimit': 'Over credit limit',
   'pay.choosePrompt': 'Choose how the customer is paying',
+  'pay.noCustomers': 'No customers saved yet. Add one under Customers to give credit.',
 
   // Bill / receipt
   'bill.title': 'Bill',

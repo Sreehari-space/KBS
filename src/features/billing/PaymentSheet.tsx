@@ -1,11 +1,26 @@
 import React, { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Button, Input, Money, Sheet } from '@/components/ui';
+import { Button, Input, Money, Select, Sheet } from '@/components/ui';
 import { IconClose, IconLowStock } from '@/components/icons';
-import { changeDue, creditRemaining } from '@/domain/cart';
+import { changeDue } from '@/domain/cart';
 import { parseRupeeInput, sumPaise } from '@/domain/money';
 import { listCustomers } from '@/data/repositories/customerRepo';
 import { useT } from '@/i18n/useT';
+import {
+  addPartial,
+  canComplete as canCompleteState,
+  emptyPaymentState,
+  isAwaitingChoice,
+  isCreditPanelVisible,
+  isModeSelected,
+  isPartialOfferVisible,
+  isTenderVisible,
+  remainingPaise,
+  removePayment,
+  selectMode,
+  toCommitInput,
+  type PaymentState,
+} from './paymentState';
 import type { Customer, Payment, PaymentMode } from '@/domain/types';
 
 const MODES: PaymentMode[] = ['cash', 'upi', 'card', 'credit'];
@@ -13,6 +28,13 @@ const MODES: PaymentMode[] = ['cash', 'upi', 'card', 'credit'];
 /** Notes a shopkeeper is actually handed. */
 const QUICK_NOTES = [10000, 20000, 50000, 100000, 200000, 500000];
 
+/**
+ * Take payment.
+ *
+ * All of the decision-making lives in `paymentState.ts` so it can be tested;
+ * this component only renders it. Credit is a first-class selectable mode
+ * here — it is the flow a kirana shop runs on.
+ */
 export const PaymentSheet: React.FC<{
   open: boolean;
   totalPaise: number;
@@ -23,55 +45,30 @@ export const PaymentSheet: React.FC<{
   const { t } = useT();
   const customers = useLiveQuery(() => listCustomers(), [], [] as Customer[]);
 
-  const [payments, setPayments] = useState<Payment[]>([]);
-  const [tendered, setTendered] = useState('');
-  const [customerId, setCustomerId] = useState<string>('');
+  const [state, setState] = useState<PaymentState>(emptyPaymentState);
 
   const paidPaise = useMemo(
-    () => sumPaise(payments.filter((p) => p.mode !== 'credit').map((p) => p.amountPaise)),
-    [payments],
+    () => sumPaise(state.payments.map((p) => p.amountPaise)),
+    [state.payments],
   );
-  const remaining = creditRemaining(totalPaise, payments);
-  const tenderedPaise = parseRupeeInput(tendered) ?? 0;
+  const remaining = remainingPaise(state, totalPaise);
+  const tenderedPaise = parseRupeeInput(state.tendered) ?? 0;
   const change = changeDue(totalPaise, Math.max(tenderedPaise, paidPaise));
 
-  const selectedCustomer = customers?.find((c) => c.id === customerId);
-
-  const reset = () => {
-    setPayments([]);
-    setTendered('');
-    setCustomerId('');
-  };
+  const selectedCustomer = customers?.find((c) => c.id === state.customerId);
+  const creditPanel = isCreditPanelVisible(state, totalPaise);
 
   const close = () => {
-    reset();
+    setState(emptyPaymentState);
     onClose();
   };
 
-  /** Pay the whole remaining balance in one mode — the common case. */
-  const payFull = (mode: PaymentMode) => {
-    if (mode === 'credit') {
-      setPayments((p) => p.filter((x) => x.mode !== 'credit'));
-      return; // credit is the leftover, assigned at completion
-    }
-    setPayments([{ mode, amountPaise: totalPaise }]);
-  };
-
-  const addPartial = (mode: PaymentMode, amountPaise: number) => {
-    if (amountPaise <= 0) return;
-    setPayments((p) => [...p, { mode, amountPaise: Math.min(amountPaise, remaining) }]);
-    setTendered('');
-  };
-
   const complete = () => {
-    // Credit is whatever the payments did not cover.
-    const credit = remaining;
-    if (credit > 0 && !customerId) return;
-    onComplete(payments, credit, credit > 0 ? customerId : undefined);
-    reset();
+    if (!canCompleteState(state, totalPaise, busy)) return;
+    const input = toCommitInput(state, totalPaise);
+    onComplete(input.payments, input.creditPaise, input.customerId);
+    setState(emptyPaymentState);
   };
-
-  const canComplete = totalPaise > 0 && (remaining === 0 || Boolean(customerId)) && !busy;
 
   return (
     <Sheet open={open} onClose={close} title={t('pay.title')} persistent={busy}>
@@ -82,16 +79,19 @@ export const PaymentSheet: React.FC<{
         <Money paise={totalPaise} className="block text-4xl font-bold" />
       </div>
 
-      {/* Full-payment shortcuts */}
+      {/* Full-payment shortcuts. Credit sits here as a peer of cash and UPI,
+          because "put it on their book" is a way of settling a bill, not an
+          error state you fall into by underpaying. */}
       <div className="grid grid-cols-4 gap-2 mb-5">
         {MODES.map((mode) => (
           <button
             key={mode}
-            onClick={() => payFull(mode)}
-            className={`py-3 rounded-lg border-2 text-sm font-medium ${
-              payments.length === 1 && payments[0]!.mode === mode
+            onClick={() => setState((cur) => selectMode(cur, mode, totalPaise))}
+            aria-pressed={isModeSelected(state, mode)}
+            className={`py-3 rounded-lg border-2 text-sm font-medium transition-colors focus-ring ${
+              isModeSelected(state, mode)
                 ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
-                : 'border-slate-300 dark:border-slate-600'
+                : 'border-slate-300 dark:border-slate-600 hover:border-brand-primary'
             }`}
           >
             {t(`pay.${mode}` as 'pay.cash')}
@@ -99,38 +99,43 @@ export const PaymentSheet: React.FC<{
         ))}
       </div>
 
-      {/* Cash tendered -> change due */}
-      <div className="mb-5">
-        <p className="text-sm font-medium mb-2">{t('pay.tendered')}</p>
-        <Input
-          inputMode="decimal"
-          value={tendered}
-          onChange={(e) => setTendered(e.target.value)}
-          placeholder="0"
-          className="text-lg tnum"
-        />
-        <div className="grid grid-cols-3 gap-2 mt-2">
-          {QUICK_NOTES.map((paise) => (
-            <button
-              key={paise}
-              onClick={() => setTendered(String(paise / 100))}
-              className="py-2 text-sm rounded-md bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600 tnum"
-            >
-              ₹{paise / 100}
-            </button>
-          ))}
+      {/* Cash tendered -> change due. Hidden for a full credit sale: no money
+          changes hands, so a "change to return" line there is nonsense. */}
+      {isTenderVisible(state) && (
+        <div className="mb-5">
+          <p className="text-sm font-medium mb-2">{t('pay.tendered')}</p>
+          <Input
+            inputMode="decimal"
+            value={state.tendered}
+            onChange={(e) => setState((cur) => ({ ...cur, tendered: e.target.value }))}
+            placeholder="0"
+            className="text-lg tnum"
+          />
+          <div className="grid grid-cols-3 gap-2 mt-2">
+            {QUICK_NOTES.map((paise) => (
+              <button
+                key={paise}
+                onClick={() =>
+                  setState((cur) => ({ ...cur, tendered: String(paise / 100) }))
+                }
+                className="py-2 text-sm rounded-md bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600 money focus-ring"
+              >
+                ₹{paise / 100}
+              </button>
+            ))}
+          </div>
+          {change > 0 && (
+            <p className="mt-3 text-lg font-semibold text-brand-secondary animate-fade-in">
+              {t('pay.change')}: <Money paise={change} />
+            </p>
+          )}
         </div>
-        {change > 0 && (
-          <p className="mt-3 text-lg font-semibold text-brand-secondary animate-fade-in">
-            {t('pay.change')}: <Money paise={change} />
-          </p>
-        )}
-      </div>
+      )}
 
       {/* Split payment rows */}
-      {payments.length > 0 && (
+      {state.payments.length > 0 && (
         <div className="mb-4 space-y-1">
-          {payments.map((p, i) => (
+          {state.payments.map((p, i) => (
             <div
               key={i}
               className="flex justify-between items-center text-sm bg-slate-100 dark:bg-slate-700 rounded-lg px-3 py-2 animate-row-in"
@@ -139,9 +144,9 @@ export const PaymentSheet: React.FC<{
               <span className="flex items-center gap-3">
                 <Money paise={p.amountPaise} className="font-medium" />
                 <button
-                  onClick={() => setPayments((all) => all.filter((_, idx) => idx !== i))}
-                  className="text-red-500 hover:text-red-600"
-                  aria-label="Remove"
+                  onClick={() => setState((cur) => removePayment(cur, i))}
+                  className="text-light-text-secondary dark:text-dark-text-secondary hover:text-red-600 rounded focus-ring"
+                  aria-label={t('common.delete')}
                 >
                   <IconClose className="w-4 h-4" />
                 </button>
@@ -151,14 +156,18 @@ export const PaymentSheet: React.FC<{
         </div>
       )}
 
-      {remaining > 0 && payments.length > 0 && (
+      {isPartialOfferVisible(state, totalPaise, tenderedPaise) && (
         <div className="flex gap-2 mb-4">
           {(['cash', 'upi'] as PaymentMode[]).map((mode) => (
             <Button
               key={mode}
               variant="ghost"
               className="flex-1 text-sm"
-              onClick={() => addPartial(mode, tenderedPaise || remaining)}
+              onClick={() =>
+                setState((cur) =>
+                  addPartial(cur, mode, tenderedPaise || remaining, totalPaise),
+                )
+              }
             >
               + {t(`pay.${mode}` as 'pay.cash')}
             </Button>
@@ -166,10 +175,10 @@ export const PaymentSheet: React.FC<{
         </div>
       )}
 
-      {/* Credit is only a decision once some payment has been entered — this
-          panel used to be visible the instant the sheet opened, so the default
-          state of the busiest sheet in the app was a yellow warning. */}
-      {remaining > 0 && payments.length > 0 && (
+      {/* Who carries the unpaid part. Appears only after a deliberate choice —
+          credit, or a partial tender — so the busiest sheet in the app never
+          opens in a yellow warning state. */}
+      {creditPanel && (
         <div className="mb-5 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/30 p-4 animate-fade-in">
           <p className="font-semibold text-amber-900 dark:text-amber-100">
             {t('pay.remaining')}: <Money paise={remaining} /> &rarr; {t('pay.credit')}
@@ -177,10 +186,10 @@ export const PaymentSheet: React.FC<{
           <p className="text-sm mt-1 mb-2 text-amber-800 dark:text-amber-200">
             {t('pay.selectCustomer')}
           </p>
-          <select
-            value={customerId}
-            onChange={(e) => setCustomerId(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600"
+          <Select
+            value={state.customerId}
+            onChange={(e) => setState((cur) => ({ ...cur, customerId: e.target.value }))}
+            aria-label={t('pay.selectCustomer')}
           >
             <option value="">— {t('cust.name')} —</option>
             {customers?.map((c) => (
@@ -188,7 +197,14 @@ export const PaymentSheet: React.FC<{
                 {c.name} · {c.phone}
               </option>
             ))}
-          </select>
+          </Select>
+          {/* A shop with no customers on file cannot give credit yet, and the
+              empty dropdown alone does not say so. */}
+          {(customers ?? []).length === 0 && (
+            <p className="text-sm mt-2 text-amber-900 dark:text-amber-100">
+              {t('pay.noCustomers')}
+            </p>
+          )}
           {selectedCustomer && (
             <p className="text-sm mt-2 text-amber-900 dark:text-amber-100">
               {t('pay.currentBalance')}: <Money paise={selectedCustomer.balancePaise} />
@@ -206,13 +222,13 @@ export const PaymentSheet: React.FC<{
         </div>
       )}
 
-      {remaining > 0 && payments.length === 0 && (
+      {isAwaitingChoice(state, totalPaise, tenderedPaise) && (
         <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mb-3">
           {t('pay.choosePrompt')}
         </p>
       )}
 
-      <Button full onClick={complete} disabled={!canComplete}>
+      <Button full onClick={complete} disabled={!canCompleteState(state, totalPaise, busy)}>
         {busy ? '…' : t('pay.complete')}
       </Button>
     </Sheet>

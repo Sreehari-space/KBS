@@ -51,3 +51,4 @@ Choices made in these docs that are worth arguing about before we build.
 | D15 | `useLiveQuery` on the billing path takes **no default value** | `undefined` is the loading state. A default of `[]` renders an empty-state for a frame on every mount. | [09](09-premium-ui.md) |
 | D16 | Profit is reported **only over lines with a recorded cost price** | Treating a missing cost as zero would flatter the shop and make the number useless. | [09](09-premium-ui.md) |
 | D17 | The bill number shown while billing is a **peek, not an allocation** | The real number is still handed out inside the commit transaction, so two fast taps can never share one. | [09](09-premium-ui.md) |
+| D18 | Payment-sheet decisions live in a **tested pure module**, not in component state | A UI-polish commit silently made every credit and split-payment sale unreachable, and no test could see it. | [09](09-premium-ui.md) |

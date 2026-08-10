@@ -207,6 +207,28 @@ otherwise every cold start would flash the setup flow.
 
 ---
 
+---
+
+## A regression this pass caused, and the rule that prevents the next one
+
+Fixing "the payment sheet opens in an amber alarm state" changed the credit
+panel's condition to `remaining > 0 && payments.length > 0`. That condition can
+never be true: the only thing that filled `payments` was a full-amount tender,
+which drives `remaining` to zero. The panel and the `+ Cash` / `+ UPI` buttons
+became dead markup, and with them **every credit sale and every split payment** —
+the flow a kirana shop runs on (D9). Tapping *Credit* did nothing at all,
+because it filtered `payments` for a mode that is never in `payments`.
+
+Two things let a P0 flow disappear in a UI polish commit:
+
+1. **The state was only expressible as `useState` inside a component**, where
+   nothing could assert on it. It now lives in `src/features/billing/paymentState.ts`
+   as pure functions with tests, and the component only renders them.
+2. **Credit is not a payment**, it is the *absence* of one — the remainder.
+   Conflating "the customer chose credit" with "there is a credit row in
+   `payments`" is what made the chip unclickable. The two are now separate:
+   `fullCredit` is a flag, and the amount is still derived at completion.
+
 ## Decision log additions
 
 | # | Decision | Rationale |
@@ -216,3 +238,4 @@ otherwise every cold start would flash the setup flow.
 | D15 | `useLiveQuery` on the billing path takes **no default value** | `undefined` is the loading state. A default of `[]` renders an empty-state for a frame on every mount, which is what made screens feel cheap. |
 | D16 | Profit is reported **only over lines with a recorded cost price** | Treating a missing cost as zero would flatter the shop and make the number useless. Uncosted revenue is shown separately instead. |
 | D17 | The next bill number shown on the billing screen is a **peek, not an allocation** | The number must still be handed out inside the commit transaction, or two fast taps could share one. |
+| D18 | Payment-sheet decisions live in a **tested pure module**, not in component state | A UI-polish commit silently made every credit and split-payment sale unreachable, and no test could see it. Anything that decides whether a shop can put a bill on a khata is not presentation. |
