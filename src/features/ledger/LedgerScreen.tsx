@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Button, EmptyState, Field, Input, Sheet } from '@/components/ui';
+import { Button, EmptyState, Field, Input, Money, Sheet, SkeletonRows } from '@/components/ui';
 import { IconLedger, IconWhatsApp } from '@/components/icons';
 import { formatINR, parseRupeeInput } from '@/domain/money';
 import { db } from '@/data/db';
@@ -24,7 +24,7 @@ import type { Customer, LedgerEntry, PaymentMode } from '@/domain/types';
 export const LedgerScreen: React.FC = () => {
   const { t, lang } = useT();
   const settings = useSettings();
-  const customers = useLiveQuery(() => outstandingCustomers(), [], [] as Customer[]);
+  const customers = useLiveQuery(() => outstandingCustomers(), []);
   const [selected, setSelected] = useState<Customer | null>(null);
 
   const total = useMemo(
@@ -60,15 +60,14 @@ export const LedgerScreen: React.FC = () => {
           >
             {t('ledger.outstanding')}
           </p>
-          <p
-            className={`text-3xl font-bold tnum ${
+          <Money
+            paise={total}
+            className={`block text-3xl font-bold ${
               total > 0 ? 'text-amber-900 dark:text-amber-100' : ''
             }`}
-          >
-            {formatINR(total)}
-          </p>
+          />
           <p
-            className={`text-xs mt-0.5 ${
+            className={`text-xs mt-0.5 count ${
               total > 0
                 ? 'text-amber-800 dark:text-amber-200'
                 : 'text-light-text-secondary dark:text-dark-text-secondary'
@@ -79,26 +78,33 @@ export const LedgerScreen: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-3">
-        {(customers ?? []).length === 0 ? (
-          <EmptyState title={t('ledger.noDues')} icon={<IconLedger className="w-10 h-10" />} />
+      <div className="flex-1 overflow-y-auto px-4 py-3" aria-busy={customers === undefined}>
+        {customers === undefined ? (
+          <SkeletonRows rows={4} />
+        ) : customers.length === 0 ? (
+          <EmptyState
+            title={t('ledger.noDues')}
+            hint={t('ledger.noDuesHint')}
+            icon={<IconLedger className="w-10 h-10" />}
+          />
         ) : (
           <div className="space-y-2">
-            {(customers ?? []).map((c) => (
+            {customers.map((c) => (
               <button
                 key={c.id}
                 onClick={() => setSelected(c)}
-                className="w-full text-left flex items-center gap-3 p-3 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700"
+                className="w-full text-left flex items-center gap-3 p-3 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 hover:border-brand-primary transition-colors focus-ring"
               >
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{c.name}</p>
-                  <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary tnum">
+                  <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary count">
                     {c.phone}
                   </p>
                 </div>
-                <p className="font-bold tnum text-amber-600 dark:text-amber-400 flex-shrink-0">
-                  {formatINR(c.balancePaise)}
-                </p>
+                <Money
+                  paise={c.balancePaise}
+                  className="font-bold text-amber-600 dark:text-amber-400 flex-shrink-0"
+                />
               </button>
             ))}
           </div>
@@ -176,8 +182,8 @@ const StatementSheet: React.FC<{
         <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
           {t('cust.balance')}
         </p>
-        <p className="text-3xl font-bold tnum">{formatINR(customer.balancePaise)}</p>
-        <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary tnum">
+        <Money paise={customer.balancePaise} className="block text-3xl font-bold" />
+        <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary count">
           {customer.phone}
         </p>
       </div>
@@ -245,16 +251,17 @@ const StatementSheet: React.FC<{
             </div>
             <div className="text-right flex-shrink-0">
               <p
-                className={`font-semibold tnum ${
+                className={`font-semibold ${
                   entry.amountPaise > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-brand-secondary'
                 }`}
               >
                 {entry.amountPaise > 0 ? '+' : '−'}
-                {formatINR(Math.abs(entry.amountPaise))}
+                <Money paise={Math.abs(entry.amountPaise)} />
               </p>
-              <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary tnum">
-                {formatINR(after)}
-              </p>
+              <Money
+                paise={after}
+                className="block text-xs text-light-text-secondary dark:text-dark-text-secondary"
+              />
             </div>
           </div>
         ))}

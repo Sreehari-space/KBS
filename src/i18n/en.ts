@@ -25,6 +25,7 @@ export const en = {
   'bills.refund': 'Refund',
   'bills.confirmReturn': 'Confirm return',
   'bills.reprint': 'Reprint',
+  'bills.emptyHint': 'Every completed bill is kept here — reprint it, send it again, or take items back.',
 
   // Reorder
   'reorder.title': 'Low stock',
@@ -37,6 +38,9 @@ export const en = {
   'labels.hint': 'For loose goods with no manufacturer barcode. Stick these on bins or bags, then scan them like any product.',
   'labels.select': 'Select items',
   'labels.print': 'Print labels',
+  'labels.selected': '{n} selected',
+  'labels.empty': 'Every item already has a barcode',
+  'labels.emptyHint': 'Labels are for loose goods — rice, dal, sweets — that no packet barcode covers.',
 
   // Voice
   'voice.title': 'Say the item',
@@ -76,6 +80,9 @@ export const en = {
   'billing.inStock': 'in stock',
   'billing.noResults': 'No items found',
   'billing.addNew': 'Add as new item',
+  'billing.noTiles': 'No quick items yet',
+  'billing.noTilesHint': 'Search or scan to bill anything. Mark your fastest sellers as quick items and they will wait here.',
+  'billing.nextBill': 'Next bill',
 
   // Draft recovery
   'draft.title': 'Unfinished bill',
@@ -147,6 +154,8 @@ export const en = {
   'inv.linkHint': 'Pick the item this barcode belongs to. It will be recognised from next time.',
   'inv.linkSearch': 'Search your items…',
   'inv.linked': 'Barcode added to',
+  'inv.empty': 'No items yet',
+  'inv.emptyHint': 'Add what you sell, or just scan a packet at the till — the app asks for the name and price once, then remembers it.',
   'inv.autoTamil': 'Tamil name filled automatically — tap to edit',
   'inv.autoTamilCheck': 'Sound-alike only. Please check the Tamil name.',
 
@@ -167,6 +176,7 @@ export const en = {
   'ledger.remind': 'WhatsApp reminder',
   'ledger.statement': 'Statement',
   'ledger.noDues': 'No pending credit',
+  'ledger.noDuesHint': 'Nobody owes the shop anything right now. Credit given at the till shows up here.',
   'ledger.daysAgo': 'days ago',
 
   // Settings
@@ -204,6 +214,19 @@ export const en = {
   'set.aiKey': 'Gemini API key',
   'set.aiHint': 'Optional. Stored only on this device. Billing works without it.',
   'set.recalcBalances': 'Recalculate credit balances',
+  'set.theme': 'Theme',
+  'set.scanBeep': 'Beep on a good scan',
+  'set.scanContinuous': 'Keep the camera open',
+  'set.scanContinuousHint': 'Scan several packets without reopening the scanner',
+  'set.weightPrefix': 'Weight barcode prefix',
+  'set.weightPrefixHint': 'Only if your weighing scale prints the weight into the barcode. Usually 2.',
+  'set.advanced': 'Advanced',
+  'set.advancedHint': 'You will not normally need anything in here.',
+  'set.protected': 'protected from clean-up',
+  'set.atRisk': 'not yet protected',
+  'set.installedAlready': 'Installed on this device',
+  'set.readyTitle': 'This device',
+  'set.pinDigits': '4 to 6 digits',
 
   // Backup
   'backup.exported': 'Backup created',
@@ -236,6 +259,57 @@ export const en = {
   'reports.topItems': 'Best sellers',
   'reports.empty': 'No sales in this period',
   'reports.emptyHint': 'Completed bills will appear here.',
+  'reports.vsPrevious': 'vs previous {days} days',
+  'reports.noBaseline': 'no earlier period',
+  'reports.profit': 'Profit',
+  'reports.profitHint': 'On items where you entered a cost price',
+  'reports.noCost': 'Enter cost prices on your items to see profit here.',
+  'reports.uncosted': 'sold with no cost price recorded',
+  'reports.byHour': 'Busiest hours',
+  'reports.byHourHint': 'Sales by hour of the day, across the whole period',
+  'reports.drillTitle': 'Bills in this period',
+  'reports.tapForBills': 'Tap a figure to see the bills behind it',
+  'reports.units': 'sold',
+
+  // Keyboard shortcuts
+  'keys.title': 'Keyboard shortcuts',
+  'keys.hint': 'Press ? any time',
+  'keys.search': 'Jump to search',
+  'keys.scan': 'Open the scanner',
+  'keys.add': 'Add the highlighted item',
+  'keys.move': 'Move between items',
+  'keys.qtyUp': 'One more of the last item',
+  'keys.qtyDown': 'One fewer of the last item',
+  'keys.pay': 'Take payment',
+  'keys.cart': 'Open the cart',
+  'keys.close': 'Close, or clear the search',
+  'keys.help': 'Show this list',
+  'keys.billingOnly': 'These work on the billing screen.',
+
+  // Save state & connectivity
+  'save.saving': 'Saving…',
+  'save.saved': 'Saved',
+  'net.offline': 'Working offline',
+
+  // Onboarding
+  'onb.welcome': 'Set up your till',
+  'onb.welcomeHint': 'Three questions, about four minutes. You can change all of it later.',
+  'onb.step': 'Step {n} of 3',
+  'onb.shopTitle': "Your shop's name",
+  'onb.shopHint': 'This prints at the top of every bill.',
+  'onb.gstTitle': 'Do you charge GST?',
+  'onb.gstYes': 'Yes, I am GST registered',
+  'onb.gstNo': 'No',
+  'onb.gstHint': 'Most small shops are not registered. Leave it off if you are unsure.',
+  'onb.itemsTitle': 'Add what you sell most',
+  'onb.itemsHint': 'Five is plenty. Everything else can be scanned in while you bill.',
+  'onb.itemName': 'Item',
+  'onb.itemPrice': 'Price',
+  'onb.addRow': 'Add another',
+  'onb.next': 'Next',
+  'onb.finish': 'Start billing',
+  'onb.skip': 'Skip setup',
+  'onb.itemsAdded': '{n} items added',
 
   // Day close
   'day.title': 'Day close',

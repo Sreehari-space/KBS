@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Button, Input, Sheet } from '@/components/ui';
+import { Button, Input, Money, Sheet } from '@/components/ui';
 import { IconClose, IconLowStock } from '@/components/icons';
 import { changeDue, creditRemaining } from '@/domain/cart';
-import { formatINR, parseRupeeInput, sumPaise } from '@/domain/money';
+import { parseRupeeInput, sumPaise } from '@/domain/money';
 import { listCustomers } from '@/data/repositories/customerRepo';
 import { useT } from '@/i18n/useT';
 import type { Customer, Payment, PaymentMode } from '@/domain/types';
@@ -79,7 +79,7 @@ export const PaymentSheet: React.FC<{
         <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
           {t('billing.total')}
         </p>
-        <p className="text-4xl font-bold tnum">{formatINR(totalPaise)}</p>
+        <Money paise={totalPaise} className="block text-4xl font-bold" />
       </div>
 
       {/* Full-payment shortcuts */}
@@ -121,8 +121,8 @@ export const PaymentSheet: React.FC<{
           ))}
         </div>
         {change > 0 && (
-          <p className="mt-3 text-lg font-semibold text-brand-secondary tnum">
-            {t('pay.change')}: {formatINR(change)}
+          <p className="mt-3 text-lg font-semibold text-brand-secondary animate-fade-in">
+            {t('pay.change')}: <Money paise={change} />
           </p>
         )}
       </div>
@@ -133,11 +133,11 @@ export const PaymentSheet: React.FC<{
           {payments.map((p, i) => (
             <div
               key={i}
-              className="flex justify-between items-center text-sm bg-slate-100 dark:bg-slate-700 rounded-lg px-3 py-2"
+              className="flex justify-between items-center text-sm bg-slate-100 dark:bg-slate-700 rounded-lg px-3 py-2 animate-row-in"
             >
               <span>{t(`pay.${p.mode}` as 'pay.cash')}</span>
               <span className="flex items-center gap-3">
-                <span className="tnum font-medium">{formatINR(p.amountPaise)}</span>
+                <Money paise={p.amountPaise} className="font-medium" />
                 <button
                   onClick={() => setPayments((all) => all.filter((_, idx) => idx !== i))}
                   className="text-red-500 hover:text-red-600"
@@ -170,9 +170,9 @@ export const PaymentSheet: React.FC<{
           panel used to be visible the instant the sheet opened, so the default
           state of the busiest sheet in the app was a yellow warning. */}
       {remaining > 0 && payments.length > 0 && (
-        <div className="mb-5 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/30 p-4">
-          <p className="font-semibold text-amber-900 dark:text-amber-100 tnum">
-            {t('pay.remaining')}: {formatINR(remaining)} &rarr; {t('pay.credit')}
+        <div className="mb-5 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/30 p-4 animate-fade-in">
+          <p className="font-semibold text-amber-900 dark:text-amber-100">
+            {t('pay.remaining')}: <Money paise={remaining} /> &rarr; {t('pay.credit')}
           </p>
           <p className="text-sm mt-1 mb-2 text-amber-800 dark:text-amber-200">
             {t('pay.selectCustomer')}
@@ -190,8 +190,8 @@ export const PaymentSheet: React.FC<{
             ))}
           </select>
           {selectedCustomer && (
-            <p className="text-sm mt-2 tnum text-amber-900 dark:text-amber-100">
-              {t('pay.currentBalance')}: {formatINR(selectedCustomer.balancePaise)}
+            <p className="text-sm mt-2 text-amber-900 dark:text-amber-100">
+              {t('pay.currentBalance')}: <Money paise={selectedCustomer.balancePaise} />
               {selectedCustomer.creditLimitPaise !== undefined &&
                 selectedCustomer.balancePaise + remaining > selectedCustomer.creditLimitPaise && (
                   // A warning, never a block — the shopkeeper knows their

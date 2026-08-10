@@ -1,8 +1,18 @@
 import React, { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Button, EmptyState, Field, Input, Select, Sheet, Toggle } from '@/components/ui';
-import { IconChevronDown, IconChevronRight, IconPlus } from '@/components/icons';
-import { formatINR, formatQty, parseRupeeInput, paiseToRupees } from '@/domain/money';
+import {
+  Button,
+  EmptyState,
+  Field,
+  Input,
+  Money,
+  Select,
+  Sheet,
+  SkeletonRows,
+  Toggle,
+} from '@/components/ui';
+import { IconChevronDown, IconChevronRight, IconInventory, IconPlus } from '@/components/icons';
+import { formatQty, parseRupeeInput, paiseToRupees } from '@/domain/money';
 import {
   createProduct,
   deleteProduct,
@@ -51,7 +61,9 @@ const emptyDraft: Draft = {
 
 export const InventoryScreen: React.FC = () => {
   const { t, lang } = useT();
-  const products = useLiveQuery(() => listProducts(), [], [] as Product[]);
+  // `undefined` is the loading state; a skeleton belongs there rather than a
+  // frame of "no items found" while IndexedDB answers.
+  const products = useLiveQuery(() => listProducts(), []);
   const categories = useLiveQuery(() => listCategories(), [], [] as string[]);
 
   const [search, setSearch] = useState('');
@@ -168,9 +180,39 @@ export const InventoryScreen: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-3">
-        {visible.length === 0 ? (
-          <EmptyState title={t('billing.noResults')} />
+      <div className="flex-1 overflow-y-auto px-4 py-3" aria-busy={products === undefined}>
+        {products === undefined ? (
+          <SkeletonRows rows={6} />
+        ) : visible.length === 0 ? (
+          // An empty catalogue and an empty search result are different
+          // problems and deserve different offers.
+          products.length === 0 ? (
+            <EmptyState
+              title={t('inv.empty')}
+              hint={t('inv.emptyHint')}
+              icon={<IconInventory className="w-10 h-10" />}
+              action={{
+                label: t('inv.add'),
+                onClick: () => {
+                  setShowMore(false);
+                  setTamilEdited(false);
+                  setDraft(emptyDraft);
+                },
+              }}
+            />
+          ) : (
+            <EmptyState
+              title={t('billing.noResults')}
+              action={{
+                label: t('inv.add'),
+                onClick: () => {
+                  setShowMore(false);
+                  setTamilEdited(false);
+                  setDraft({ ...emptyDraft, nameEn: search.trim() });
+                },
+              }}
+            />
+          )
         ) : (
           <div className="space-y-2">
             {visible.map((p) => {
@@ -179,7 +221,7 @@ export const InventoryScreen: React.FC = () => {
                 <button
                   key={p.id}
                   onClick={() => openEdit(p)}
-                  className="w-full text-left flex items-center gap-3 p-3 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700"
+                  className="w-full text-left flex items-center gap-3 p-3 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 hover:border-brand-primary transition-colors focus-ring"
                 >
                   <div className="flex-1 min-w-0">
                     <p className="font-medium truncate">{productName(p, lang)}</p>
@@ -189,10 +231,10 @@ export const InventoryScreen: React.FC = () => {
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="font-bold tnum">{formatINR(p.sellPricePaise)}</p>
+                    <Money paise={p.sellPricePaise} className="block font-bold" />
                     {p.trackStock && (
                       <p
-                        className={`text-xs tnum ${
+                        className={`text-xs count ${
                           low ? 'text-red-500 font-semibold' : 'text-light-text-secondary dark:text-dark-text-secondary'
                         }`}
                       >

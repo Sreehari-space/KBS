@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Banner, Button, EmptyState, Sheet } from '@/components/ui';
+import { Banner, Button, EmptyState, Money, Sheet, SkeletonRows } from '@/components/ui';
 import { IconBills, IconPrint } from '@/components/icons';
-import { formatINR, formatQty } from '@/domain/money';
+import { formatQty } from '@/domain/money';
 import { listSales } from '@/data/repositories/saleRepo';
 import { commitReturn } from '@/data/repositories/returnRepo';
 import { ReceiptSheet } from '@/features/bill/ReceiptSheet';
@@ -13,25 +13,44 @@ import type { Sale } from '@/domain/types';
 /** Past bills: reprint, resend, and return items. */
 export const BillsScreen: React.FC = () => {
   const { t, lang } = useT();
-  const sales = useLiveQuery(() => listSales(100), [], [] as Sale[]);
+  const sales = useLiveQuery(() => listSales(100), []);
   const [viewing, setViewing] = useState<Sale | null>(null);
   const [returning, setReturning] = useState<Sale | null>(null);
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto px-4 py-4">
-        {(sales ?? []).length === 0 ? (
-          <EmptyState title={t('bills.none')} icon={<IconBills className="w-10 h-10" />} />
+      <div className="flex-1 overflow-y-auto px-4 py-4" aria-busy={sales === undefined}>
+        {sales === undefined ? (
+          <SkeletonRows rows={6} />
+        ) : sales.length === 0 ? (
+          // The preview shows, greyed out, exactly what will fill this screen —
+          // more useful than an icon and an apology.
+          <EmptyState
+            title={t('bills.none')}
+            hint={t('bills.emptyHint')}
+            icon={<IconBills className="w-10 h-10" />}
+            preview={
+              <div className="max-w-xs mx-auto p-3 rounded-lg border border-slate-300 dark:border-slate-600 text-left">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="font-medium count">{t('bill.no')} 000000-001</p>
+                    <p className="text-xs">— · 3 {t('billing.items')}</p>
+                  </div>
+                  <Money paise={0} className="text-xl font-bold" />
+                </div>
+              </div>
+            }
+          />
         ) : (
           <div className="space-y-2">
-            {(sales ?? []).map((sale) => (
+            {sales.map((sale) => (
               <div
                 key={sale.id}
                 className="p-3 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700"
               >
                 <div className="flex items-center gap-3">
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium tnum">{sale.billNo}</p>
+                    <p className="font-medium count">{sale.billNo}</p>
                     <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
                       {formatDateTime(sale.createdAt, lang)} · {sale.lines.length}{' '}
                       {t('billing.items')}
@@ -42,13 +61,12 @@ export const BillsScreen: React.FC = () => {
                       </p>
                     )}
                   </div>
-                  <p
-                    className={`text-xl font-bold tnum flex-shrink-0 ${
+                  <Money
+                    paise={sale.totalPaise}
+                    className={`text-xl font-bold flex-shrink-0 ${
                       sale.totalPaise < 0 ? 'text-red-600 dark:text-red-400' : ''
                     }`}
-                  >
-                    {formatINR(sale.totalPaise)}
-                  </p>
+                  />
                 </div>
                 {/* The amount is what an operator scans this list for, so the
                     actions stay subordinate: reprint is a small button, and
@@ -150,9 +168,9 @@ const ReturnSheet: React.FC<{
             >
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-sm">{name}</p>
-                <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary tnum">
+                <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary count">
                   {formatQty(line.qty)} {unitLabel(line.unit, lang)} ·{' '}
-                  {formatINR(line.unitPricePaise)}
+                  <Money paise={line.unitPricePaise} />
                 </p>
               </div>
               <div className="flex items-center gap-1 flex-shrink-0">
@@ -208,7 +226,7 @@ const ReturnSheet: React.FC<{
 
       <div className="flex justify-between text-lg font-bold mb-3">
         <span>{t('bills.refund')}</span>
-        <span className="tnum">{formatINR(refundPaise)}</span>
+        <Money paise={refundPaise} />
       </div>
 
       <Button full onClick={submit} disabled={refundPaise <= 0}>

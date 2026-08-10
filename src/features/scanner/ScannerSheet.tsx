@@ -56,8 +56,10 @@ export const ScannerSheet: React.FC<{
   const blocked =
     status === 'permission-denied' || status === 'no-camera' || status === 'unsupported';
 
+  const warmingUp = status === 'idle' || status === 'starting';
+
   return (
-    <div className="fixed inset-0 z-[60] bg-black flex flex-col no-print">
+    <div className="fixed inset-0 z-[60] bg-black flex flex-col no-print animate-fade-in">
       <div className="flex items-center justify-between px-4 py-3 text-white flex-shrink-0">
         <span className="font-semibold">{t('scan.title')}</span>
         <button onClick={onClose} className="p-2 -mr-2" aria-label="Close">
@@ -73,10 +75,16 @@ export const ScannerSheet: React.FC<{
           playsInline
         />
 
-        {/* Aiming frame */}
+        {/* Aiming frame. While the camera warms up the frame is dimmed and
+            breathes — the feed used to arrive after a dead black beat, which
+            reads as a failure rather than as a wait. */}
         {!blocked && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-4/5 max-w-sm aspect-[3/2] border-2 border-white/80 rounded-xl shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]" />
+            <div
+              className={`w-4/5 max-w-sm aspect-[3/2] border-2 rounded-xl shadow-[0_0_0_9999px_rgba(0,0,0,0.45)] ${
+                warmingUp ? 'border-white/40 animate-breathe' : 'border-white/80'
+              }`}
+            />
           </div>
         )}
 
@@ -108,12 +116,12 @@ export const ScannerSheet: React.FC<{
           {hits.map((hit, i) => (
             <div
               key={`${hit.code}-${i}`}
-              className={`text-sm flex justify-between gap-2 ${
+              className={`text-sm flex justify-between gap-2 animate-row-in ${
                 hit.known ? 'text-green-300' : 'text-amber-300'
               }`}
             >
               <span className="truncate">{hit.label}</span>
-              <span className="tnum opacity-60 flex-shrink-0">{hit.code}</span>
+              <span className="count opacity-60 flex-shrink-0">{hit.code}</span>
             </div>
           ))}
         </div>

@@ -9,8 +9,23 @@ import type { Settings } from '@/domain/types';
  * tax rate and UPI ID were typed into fields nothing ever read.
  */
 export function useSettings(): Settings {
+  return useSettingsStatus().settings;
+}
+
+/**
+ * Settings plus whether they have actually been read off disk yet.
+ *
+ * `useSettings` cannot tell "not loaded" from "loaded and empty", which is
+ * fine for a colour scheme and wrong for anything gated on a stored flag —
+ * first-run setup would flash on every cold start. Only App needs this.
+ */
+export function useSettingsStatus(): { settings: Settings; loaded: boolean } {
   const stored = useLiveQuery(() => db.settings.get(SETTINGS_ID), [], undefined);
-  if (!stored) return defaultSettings;
+  if (!stored) return { settings: defaultSettings, loaded: false };
+  return { loaded: true, settings: mergeStored(stored) };
+}
+
+function mergeStored(stored: Settings): Settings {
   return {
     ...defaultSettings,
     ...stored,

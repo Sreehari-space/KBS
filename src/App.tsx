@@ -27,6 +27,8 @@ import { SettingsScreen } from '@/features/settings/SettingsScreen';
 import { ReceiptSheet } from '@/features/bill/ReceiptSheet';
 import { UpdatePrompt } from '@/features/pwa/UpdatePrompt';
 import { LockScreen } from '@/features/lock/LockScreen';
+import { OnboardingScreen } from '@/features/onboarding/OnboardingScreen';
+import { ShortcutsOverlay } from '@/components/ShortcutsOverlay';
 import {
   getStorageStatus,
   isStorageEphemeral,
@@ -34,7 +36,9 @@ import {
   type StorageStatus,
 } from '@/data/db';
 import { seedIfEmpty } from '@/data/seed';
-import { updateSettings, useSettings } from '@/hooks/useSettings';
+import { useHotkeys, useKeyboardUser } from '@/hooks/useHotkeys';
+import { useOnline } from '@/hooks/useOnline';
+import { updateSettings, useSettings, useSettingsStatus } from '@/hooks/useSettings';
 import { I18nContext, useT } from '@/i18n/useT';
 import type { TranslationKey } from '@/i18n/en';
 import type { Language, Sale } from '@/domain/types';
@@ -75,13 +79,24 @@ const MORE: NavItem[] = [
 ];
 
 const App: React.FC = () => {
-  const settings = useSettings();
+  const { settings, loaded } = useSettingsStatus();
   const [screen, setScreen] = useState<Screen>('billing');
   const [lastSale, setLastSale] = useState<Sale | null>(null);
   const [storage, setStorage] = useState<StorageStatus | null>(null);
   const [ephemeral, setEphemeral] = useState(false);
   const [quotaDismissed, setQuotaDismissed] = useState(false);
   const [locked, setLocked] = useState(true);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const [setupDone, setSetupDone] = useState(false);
+  const keyboardUser = useKeyboardUser();
+
+  // "?" is the one shortcut that works everywhere — including with the caret
+  // in the search box, which is exactly where a lost operator will be sitting
+  // when they go looking for help. It is Shift+/ and nobody types it into a
+  // product search, so claiming it costs nothing.
+  useHotkeys([
+    { key: '?', whileTyping: true, handler: () => setShortcutsOpen((open) => !open) },
+  ]);
 
   useEffect(() => {
     void seedIfEmpty();
@@ -114,10 +129,15 @@ const App: React.FC = () => {
   );
 
   const pin = settings.ui.staffPin?.trim();
+  // Only once settings are genuinely on disk — otherwise every cold start
+  // would flash the setup flow before the stored flag arrives.
+  const needsSetup = loaded && !settings.ui.onboardedAt && !setupDone;
 
   return (
     <I18nContext.Provider value={i18nValue}>
-      {pin && locked ? (
+      {needsSetup ? (
+        <OnboardingScreen onDone={() => setSetupDone(true)} />
+      ) : pin && locked ? (
         <LockScreen pin={pin} onUnlock={() => setLocked(false)} />
       ) : (
         <CartProvider>
@@ -129,11 +149,14 @@ const App: React.FC = () => {
             quotaDismissed={quotaDismissed}
             onDismissQuota={() => setQuotaDismissed(true)}
             onBilled={setLastSale}
+            keyboardUser={keyboardUser}
+            onShowShortcuts={() => setShortcutsOpen(true)}
           />
           <ReceiptSheet sale={lastSale} onClose={() => setLastSale(null)} />
           <UpdatePrompt />
         </CartProvider>
       )}
+      <ShortcutsOverlay open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
     </I18nContext.Provider>
   );
 };
@@ -146,9 +169,22 @@ const Shell: React.FC<{
   quotaDismissed: boolean;
   onDismissQuota: () => void;
   onBilled: (sale: Sale) => void;
-}> = ({ screen, setScreen, storage, ephemeral, quotaDismissed, onDismissQuota, onBilled }) => {
+  keyboardUser: boolean;
+  onShowShortcuts: () => void;
+}> = ({
+  screen,
+  setScreen,
+  storage,
+  ephemeral,
+  quotaDismissed,
+  onDismissQuota,
+  onBilled,
+  keyboardUser,
+  onShowShortcuts,
+}) => {
   const { t, lang, setLang } = useT();
   const settings = useSettings();
+  const online = useOnline();
   const [moreOpen, setMoreOpen] = useState(false);
 
   const shopName =
@@ -165,18 +201,43 @@ const Shell: React.FC<{
         <div className="min-w-0">
           {/* The shop's own name, the way a till identifies itself. */}
           <h1 className="font-semibold leading-tight truncate">{shopName}</h1>
-          <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary truncate">
+          <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary truncate flex items-center gap-1.5">
             {title ? t(title.key) : ''}
+            {/* Offline is a NORMAL state for this app, so it gets a dot, not
+                a banner. Banners are reserved for things that are wrong. */}
+            {!online && (
+              <span
+                className="inline-flex items-center gap-1"
+                title={t('net.offline')}
+                aria-label={t('net.offline')}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden />
+              </span>
+            )}
           </p>
         </div>
-        {/* Language toggle lives in the header, not buried in Settings —
-            staff switch mid-shift. */}
-        <button
-          onClick={() => setLang(lang === 'ta' ? 'en' : 'ta')}
-          className="flex-shrink-0 px-3 py-1.5 text-sm font-medium rounded-md border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700"
-        >
-          {lang === 'ta' ? 'English' : 'தமிழ்'}
-        </button>
+        <div className="flex-shrink-0 flex items-center gap-2">
+          {/* The hint only appears once a hardware keyboard has been used, so
+              a phone never carries it. */}
+          {keyboardUser && (
+            <button
+              onClick={onShowShortcuts}
+              className="px-2 py-1.5 text-sm rounded-md border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 focus-ring"
+              title={t('keys.hint')}
+              aria-label={t('keys.title')}
+            >
+              ?
+            </button>
+          )}
+          {/* Language toggle lives in the header, not buried in Settings —
+              staff switch mid-shift. */}
+          <button
+            onClick={() => setLang(lang === 'ta' ? 'en' : 'ta')}
+            className="px-3 py-1.5 text-sm font-medium rounded-md border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 focus-ring"
+          >
+            {lang === 'ta' ? 'English' : 'தமிழ்'}
+          </button>
+        </div>
         </div>
       </header>
 
@@ -195,7 +256,13 @@ const Shell: React.FC<{
       {/* Content is capped so a wide screen doesn't strand the amount at one
           edge and its button at the other. */}
       <main className="flex-1 overflow-hidden w-full max-w-3xl mx-auto">
-        {screen === 'billing' && <BillingScreen onBilled={onBilled} />}
+        {screen === 'billing' && (
+          <BillingScreen
+            onBilled={onBilled}
+            onNavigate={setScreen}
+            keyboardUser={keyboardUser}
+          />
+        )}
         {screen === 'inventory' && <InventoryScreen />}
         {screen === 'ledger' && <LedgerScreen />}
         {screen === 'reports' && <ReportsScreen />}

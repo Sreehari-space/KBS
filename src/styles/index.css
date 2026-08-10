@@ -77,6 +77,82 @@
   .tnum {
     font-variant-numeric: tabular-nums;
   }
+
+  /* ── Money typography ───────────────────────────────────────────────────
+     Amounts are set tabular and very slightly tighter than surrounding text,
+     so a column of them scans as a column. `.paise` de-emphasises the
+     fractional part the way every serious finance UI does: ₹1,240.00 reads
+     as "twelve forty", and the ".00" stops competing with the rupees. */
+  .money {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    font-feature-settings: 'tnum' 1;
+  }
+  .money .paise {
+    font-size: 0.82em;
+    opacity: 0.62;
+    font-weight: inherit;
+  }
+  /* Counts are deliberately NOT money: same tabular figures, no tightening,
+     normal weight — so "12 items" never carries the visual weight of ₹1,240. */
+  .count {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* One focus ring definition, offset against the element's own backdrop
+     rather than a single assumed page colour. */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary dark:focus-visible:ring-brand-on-dark focus-visible:ring-offset-2 focus-visible:ring-offset-light-bg dark:focus-visible:ring-offset-dark-bg;
+  }
+}
+
+/* Keyboard navigation marks the *candidate* row; it is not focus, because
+   focus stays in the search box while the arrow keys move this. */
+.kbd-active {
+  @apply border-brand-primary ring-2 ring-brand-primary/40;
+}
+
+/* ── Reduced motion ───────────────────────────────────────────────────────
+   A single wholesale opt-out. Everything above is decoration; nothing in this
+   app conveys state through movement alone. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Receipt paper ────────────────────────────────────────────────────────
+   The on-screen receipt is the screen the CUSTOMER looks at over the counter,
+   which makes it the shop's face. A torn thermal-roll edge costs two gradients
+   and reads as paper instead of as a form. The shadow lives on the wrapper —
+   a mask clips its own element's shadow, but `filter: drop-shadow` on the
+   parent follows the masked silhouette exactly. */
+.receipt-paper {
+  --tooth-w: 12px;
+  --tooth-h: 6px;
+  -webkit-mask:
+    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top center /
+      var(--tooth-w) var(--tooth-h) repeat-x,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom center /
+      var(--tooth-w) var(--tooth-h) repeat-x,
+    linear-gradient(#000 0 0) center / 100% calc(100% - 2 * var(--tooth-h)) no-repeat;
+  mask:
+    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top center /
+      var(--tooth-w) var(--tooth-h) repeat-x,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom center /
+      var(--tooth-w) var(--tooth-h) repeat-x,
+    linear-gradient(#000 0 0) center / 100% calc(100% - 2 * var(--tooth-h)) no-repeat;
+  padding-top: calc(var(--tooth-h) + 8px);
+  padding-bottom: calc(var(--tooth-h) + 8px);
+}
+
+.receipt-shadow {
+  filter: drop-shadow(0 6px 14px rgb(15 23 42 / 0.18));
 }
 
 /* ── Thermal bill printing (doc 04) ───────────────────────────────────────
@@ -108,5 +184,16 @@
   }
   .no-print {
     display: none !important;
+  }
+  /* The torn edge is a screen affordance. On paper it would crop the first
+     and last lines of the bill. */
+  .receipt-paper {
+    -webkit-mask: none;
+    mask: none;
+    padding-top: 2mm;
+    padding-bottom: 2mm;
+  }
+  .receipt-shadow {
+    filter: none;
   }
 }

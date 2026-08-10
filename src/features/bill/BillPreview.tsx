@@ -30,18 +30,23 @@ export const BillPreview: React.FC<{ bill: Bill; widthMm: 58 | 80 }> = ({ bill, 
   }, [bill.upiQrPayload]);
 
   return (
+    // Paper, not a form. The torn top and bottom edge come from a mask in
+    // index.css; the shadow lives on this wrapper so it follows the teeth
+    // instead of being clipped by them. Both are disabled for @media print.
+    <div className="receipt-shadow mx-auto" style={{ width: widthMm === 80 ? 300 : 240 }}>
     <div
-      className="bill-print bg-white text-black rounded-md p-3 mx-auto border border-slate-300 shadow-sm"
+      className="bill-print receipt-paper bg-white text-black px-3"
       style={{
         ['--bill-width' as string]: `${widthMm}mm`,
-        width: widthMm === 80 ? 300 : 240,
         fontFamily: '"Noto Sans Tamil", monospace',
         fontSize: 12,
         lineHeight: 1.35,
       }}
     >
       <div className="text-center">
-        <div className="font-bold text-base leading-tight">{bill.header.shopName}</div>
+        <div className="font-bold text-base leading-tight tracking-wide">
+          {bill.header.shopName}
+        </div>
         {bill.header.addressLines.map((line, i) => (
           <div key={i} className="text-[10px]">
             {line}
@@ -130,6 +135,7 @@ export const BillPreview: React.FC<{ bill: Bill; widthMm: 58 | 80 }> = ({ bill, 
           {line}
         </div>
       ))}
+    </div>
     </div>
   );
 };

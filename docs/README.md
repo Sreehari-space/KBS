@@ -17,6 +17,7 @@ Nothing here is implemented yet. This is the plan to review before any code chan
 | [06-roadmap.md](06-roadmap.md) | Phased delivery, PR-sized tasks, acceptance criteria, risks |
 | [07-autosave-durability.md](07-autosave-durability.md) | **Auto-save guarantees**, commit protocol, draft recovery, storage budget |
 | [08-deployment.md](08-deployment.md) | Deploying to Vercel, cache headers, installing on a phone, rollback |
+| [09-premium-ui.md](09-premium-ui.md) | Keyboard-first billing, motion language, loading states, report comparisons, receipt paper, numerals, first run |
 
 ## Scope decisions (agreed)
 
@@ -45,3 +46,8 @@ Choices made in these docs that are worth arguing about before we build.
 | D10 | On-device storage uses **IndexedDB**, not the `localStorage` API | Both are local and serverless, but `localStorage` caps at ~5 MB (≈6 weeks of bills) and its synchronous whole-blob rewrites would freeze a low-end phone on every sale. | [07](07-autosave-durability.md) |
 | D11 | Sale commit is **one atomic transaction**; the receipt renders only after it succeeds | A bill must never be shown as complete unless it is on disk. On failure the cart survives so the shopkeeper can retry. | [07](07-autosave-durability.md) |
 | D12 | Bills are **never pruned** and sales are **immutable** | "Every bill stored" means forever. Corrections are return bills, so an interrupted write can't corrupt existing history. | [07](07-autosave-durability.md) |
+| D13 | Keyboard shortcuts are **additive and never steal a printable key from a focused field** | The touch path is the one that must never regress; a shortcut that eats a character the operator was typing costs more than it saves. | [09](09-premium-ui.md) |
+| D14 | Motion is capped at **260 ms** and disabled wholesale under `prefers-reduced-motion` | Nothing conveys state through movement alone, so it can all be switched off; on a low-end phone slow animation is worse than none. | [09](09-premium-ui.md) |
+| D15 | `useLiveQuery` on the billing path takes **no default value** | `undefined` is the loading state. A default of `[]` renders an empty-state for a frame on every mount. | [09](09-premium-ui.md) |
+| D16 | Profit is reported **only over lines with a recorded cost price** | Treating a missing cost as zero would flatter the shop and make the number useless. | [09](09-premium-ui.md) |
+| D17 | The bill number shown while billing is a **peek, not an allocation** | The real number is still handed out inside the commit transaction, so two fast taps can never share one. | [09](09-premium-ui.md) |

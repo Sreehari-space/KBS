@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Banner, Button } from '@/components/ui';
+import { Banner, Button, Checkbox, EmptyState, SkeletonRows } from '@/components/ui';
+import { IconLabels } from '@/components/icons';
 import { buildProductQrPayload } from '@/domain/barcode';
 import { formatINR } from '@/domain/money';
 import { listProducts } from '@/data/repositories/productRepo';
 import { productName, unitLabel, useT } from '@/i18n/useT';
-import type { Product } from '@/domain/types';
+
 
 /**
  * Shop-printed QR labels for loose goods (docs/03).
@@ -17,7 +18,7 @@ import type { Product } from '@/domain/types';
  */
 export const ShelfLabelsScreen: React.FC = () => {
   const { t, lang } = useT();
-  const products = useLiveQuery(() => listProducts(), [], [] as Product[]);
+  const products = useLiveQuery(() => listProducts(), []);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [codes, setCodes] = useState<Map<string, string>>(new Map());
 
@@ -56,22 +57,45 @@ export const ShelfLabelsScreen: React.FC = () => {
           <Banner tone="info">{t('labels.hint')}</Banner>
         </div>
 
-        <div className="no-print space-y-2">
-          <h2 className="font-semibold">{t('labels.select')}</h2>
-          {candidates.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => toggle(p.id)}
-              className={`w-full text-left flex items-center gap-3 p-3 rounded-lg border ${
-                selected.has(p.id)
-                  ? 'border-brand-primary bg-brand-primary/10'
-                  : 'border-slate-200 dark:border-slate-700 bg-light-surface dark:bg-dark-surface'
-              }`}
-            >
-              <span className="flex-1 truncate font-medium">{productName(p, lang)}</span>
-              <span className="tnum text-sm">{formatINR(p.sellPricePaise)}</span>
-            </button>
-          ))}
+        <div className="no-print space-y-2" aria-busy={products === undefined}>
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="font-semibold">{t('labels.select')}</h2>
+            {selected.size > 0 && (
+              <span className="text-sm count text-light-text-secondary dark:text-dark-text-secondary">
+                {t('labels.selected', { n: selected.size })}
+              </span>
+            )}
+          </div>
+          {products === undefined ? (
+            <SkeletonRows rows={4} />
+          ) : candidates.length === 0 ? (
+            <EmptyState
+              title={t('labels.empty')}
+              hint={t('labels.emptyHint')}
+              icon={<IconLabels className="w-10 h-10" />}
+            />
+          ) : (
+            candidates.map((p) => (
+              // The tinted background alone never said these rows were
+              // tickable, which is a strange thing to leave next to a button
+              // that counts the ticks. A box that fills is unambiguous.
+              <button
+                key={p.id}
+                onClick={() => toggle(p.id)}
+                role="checkbox"
+                aria-checked={selected.has(p.id)}
+                className={`w-full text-left flex items-center gap-3 p-3 rounded-lg border transition-colors focus-ring ${
+                  selected.has(p.id)
+                    ? 'border-brand-primary bg-brand-primary/10'
+                    : 'border-slate-200 dark:border-slate-700 bg-light-surface dark:bg-dark-surface hover:border-brand-primary'
+                }`}
+              >
+                <Checkbox checked={selected.has(p.id)} />
+                <span className="flex-1 truncate font-medium">{productName(p, lang)}</span>
+                <span className="money text-sm">{formatINR(p.sellPricePaise)}</span>
+              </button>
+            ))
+          )}
         </div>
 
         {/* The printable sheet. `.bill-print` is reused so only this prints. */}

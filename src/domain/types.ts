@@ -188,6 +188,8 @@ export interface Settings {
     billingLayout: 'grid' | 'list';
     /** Optional staff PIN. Keeps casual hands out; it is not encryption. */
     staffPin?: string;
+    /** Set when first-run setup was completed or skipped. Absent = show it. */
+    onboardedAt?: ISODate;
   };
 
   ai: {

@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { Button, EmptyState, Field, Input, Sheet } from '@/components/ui';
+import { Button, EmptyState, Field, Input, Money, Sheet, SkeletonRows } from '@/components/ui';
 import { IconCustomers, IconPlus } from '@/components/icons';
-import { formatINR, paiseToRupees, parseRupeeInput } from '@/domain/money';
+import { paiseToRupees, parseRupeeInput } from '@/domain/money';
 import {
   createCustomer,
   isValidIndianMobile,
@@ -11,7 +11,7 @@ import {
 } from '@/data/repositories/customerRepo';
 import { setOpeningBalance } from '@/data/repositories/ledgerRepo';
 import { useT } from '@/i18n/useT';
-import type { Customer } from '@/domain/types';
+
 
 type Draft = {
   id?: string;
@@ -32,7 +32,7 @@ const emptyDraft: Draft = {
 
 export const CustomersScreen: React.FC = () => {
   const { t } = useT();
-  const customers = useLiveQuery(() => listCustomers(), [], [] as Customer[]);
+  const customers = useLiveQuery(() => listCustomers(), []);
   const [search, setSearch] = useState('');
   const [draft, setDraft] = useState<Draft | null>(null);
 
@@ -80,9 +80,10 @@ export const CustomersScreen: React.FC = () => {
         {totalOutstanding > 0 && (
           <div className="rounded-lg bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 px-4 py-3">
             <p className="text-sm text-amber-800 dark:text-amber-200">{t('ledger.outstanding')}</p>
-            <p className="text-2xl font-bold tnum text-amber-900 dark:text-amber-100">
-              {formatINR(totalOutstanding)}
-            </p>
+            <Money
+              paise={totalOutstanding}
+              className="block text-2xl font-bold text-amber-900 dark:text-amber-100"
+            />
           </div>
         )}
         <div className="flex gap-2">
@@ -103,12 +104,15 @@ export const CustomersScreen: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-3">
-        {visible.length === 0 ? (
+      <div className="flex-1 overflow-y-auto px-4 py-3" aria-busy={customers === undefined}>
+        {customers === undefined ? (
+          <SkeletonRows rows={5} />
+        ) : visible.length === 0 ? (
           <EmptyState
             title={t('cust.empty')}
             hint={t('cust.emptyHint')}
             icon={<IconCustomers className="w-10 h-10" />}
+            action={{ label: t('cust.add'), onClick: () => setDraft(emptyDraft) }}
           />
         ) : (
           <div className="space-y-2">
@@ -127,11 +131,11 @@ export const CustomersScreen: React.FC = () => {
                     openingBalance: '',
                   })
                 }
-                className="w-full text-left flex items-center gap-3 p-3 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700"
+                className="w-full text-left flex items-center gap-3 p-3 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 hover:border-brand-primary transition-colors focus-ring"
               >
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{c.name}</p>
-                  <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary tnum">
+                  <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary count">
                     {c.phone}
                   </p>
                 </div>
@@ -140,13 +144,12 @@ export const CustomersScreen: React.FC = () => {
                     <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
                       {t('cust.balance')}
                     </p>
-                    <p
-                      className={`font-bold tnum ${
+                    <Money
+                      paise={c.balancePaise}
+                      className={`block font-bold ${
                         c.balancePaise > 0 ? 'text-amber-600 dark:text-amber-400' : ''
                       }`}
-                    >
-                      {formatINR(c.balancePaise)}
-                    </p>
+                    />
                   </div>
                 )}
               </button>

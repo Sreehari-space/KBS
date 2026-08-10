@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Banner, Button, Field, Input, Select, Sheet, Toggle } from '@/components/ui';
+import { Banner, Button, Card, Field, Input, Select, Sheet, Toggle } from '@/components/ui';
+import { IconCheck, IconChevronDown, IconChevronRight } from '@/components/icons';
+import { formatDateTime } from '@/domain/datetime';
 import { getStorageStatus, type StorageStatus } from '@/data/db';
 import { isBluetoothPrintingAvailable } from '@/features/bill/escpos';
 import { recalculateAllBalances } from '@/data/repositories/ledgerRepo';
@@ -24,6 +26,7 @@ export const SettingsScreen: React.FC = () => {
   const [pendingRestore, setPendingRestore] = useState<BackupFile | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [installPrompt, setInstallPrompt] = useState<Event | null>(null);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
 
   const refresh = () => {
     void getStorageStatus().then(setStorage);
@@ -63,6 +66,94 @@ export const SettingsScreen: React.FC = () => {
       {staleDays !== null && staleDays >= 7 && (
         <Banner tone="warning">{t('backup.reminder', { days: staleDays })}</Banner>
       )}
+
+      {/* Settings opens with reassurance, not with a form. This is the one
+          screen where the shopkeeper comes to ask "is my data safe?", and it
+          should answer before they scroll. */}
+      <Card className="p-4">
+        <p className="font-semibold text-lg leading-tight">
+          {lang === 'ta' && settings.shop.nameTa ? settings.shop.nameTa : settings.shop.nameEn}
+        </p>
+        {/* No `uppercase tracking-wide` here: uppercase is a no-op in Tamil
+            and the extra letter-spacing pulls its glyph clusters apart. */}
+        <h2 className="text-xs font-semibold text-light-text-secondary dark:text-dark-text-secondary mt-3 mb-2">
+          {t('set.readyTitle')}
+        </h2>
+
+        <div className="space-y-2.5 text-sm">
+          <div>
+            <div className="flex justify-between gap-3">
+              <span className="text-light-text-secondary dark:text-dark-text-secondary">
+                {t('set.storageUsed')}
+              </span>
+              <span className="count">
+                {storage && storage.quotaBytes > 0
+                  ? `${(storage.usageBytes / 1_048_576).toFixed(1)} MB`
+                  : '—'}
+              </span>
+            </div>
+            {storage && storage.quotaBytes > 0 && (
+              <>
+                <div className="mt-1 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-[width] duration-500 ${
+                      storage.usedFraction > 0.8 ? 'bg-amber-500' : 'bg-brand-primary'
+                    }`}
+                    style={{ width: `${Math.max(1, storage.usedFraction * 100)}%` }}
+                  />
+                </div>
+                <p
+                  className={`text-xs mt-1 ${
+                    storage.persisted
+                      ? 'text-brand-secondary dark:text-emerald-400'
+                      : 'text-light-text-secondary dark:text-dark-text-secondary'
+                  }`}
+                >
+                  {storage.persisted ? t('set.protected') : t('set.atRisk')}
+                </p>
+              </>
+            )}
+          </div>
+
+          <div className="flex justify-between gap-3">
+            <span className="text-light-text-secondary dark:text-dark-text-secondary">
+              {t('set.lastBackup')}
+            </span>
+            {/* Age is colour-coded, because "12 days ago" only means something
+                if the screen says whether that is fine. */}
+            <span
+              className={`count text-right ${
+                lastBackup === null || (staleDays !== null && staleDays >= 7)
+                  ? 'text-amber-600 dark:text-amber-400 font-medium'
+                  : 'text-brand-secondary dark:text-emerald-400'
+              }`}
+            >
+              {lastBackup ? formatDateTime(lastBackup.toISOString(), lang) : t('set.never')}
+            </span>
+          </div>
+
+          {installPrompt ? (
+            <Button
+              variant="secondary"
+              full
+              className="py-2.5 text-sm"
+              onClick={async () => {
+                await (installPrompt as unknown as { prompt: () => Promise<void> }).prompt();
+                setInstallPrompt(null);
+              }}
+            >
+              {t('set.install')}
+            </Button>
+          ) : (
+            window.matchMedia?.('(display-mode: standalone)').matches && (
+              <p className="flex items-center gap-1.5 text-brand-secondary dark:text-emerald-400">
+                <IconCheck className="w-4 h-4" />
+                {t('set.installedAlready')}
+              </p>
+            )
+          )}
+        </div>
+      </Card>
 
       {/* ── Shop ── */}
       <Section title={t('set.shop')}>
@@ -176,33 +267,22 @@ export const SettingsScreen: React.FC = () => {
         )}
       </Section>
 
-      {/* ── Scanner ── */}
+      {/* ── Scanner ──
+          Section and field labels used to be the same word ("Scan" inside
+          "Scan"), which reads as a placeholder nobody finished. Each control
+          now says what it actually does. */}
       <Section title={t('billing.scan')}>
         <Toggle
           checked={settings.scanner.continuousMode}
           onChange={(v) => void updateSettings('scanner', { continuousMode: v })}
-          label={t('billing.scan')}
-          hint="Keep the camera open after each item"
+          label={t('set.scanContinuous')}
+          hint={t('set.scanContinuousHint')}
         />
         <Toggle
           checked={settings.scanner.beepOnScan}
           onChange={(v) => void updateSettings('scanner', { beepOnScan: v })}
-          label="Beep"
+          label={t('set.scanBeep')}
         />
-        <Field
-          label="Weight barcode prefix"
-          hint="Only set this if your scale prints weight into the barcode. Usually 2."
-        >
-          <Input
-            inputMode="numeric"
-            maxLength={2}
-            value={settings.scanner.weightBarcodePrefix}
-            onChange={(e) =>
-              void updateSettings('scanner', { weightBarcodePrefix: e.target.value })
-            }
-            placeholder={t('common.none')}
-          />
-        </Field>
       </Section>
 
       {/* ── Appearance ── */}
@@ -213,7 +293,7 @@ export const SettingsScreen: React.FC = () => {
               <button
                 key={l}
                 onClick={() => setLang(l)}
-                className={`flex-1 py-2.5 rounded-lg border-2 font-medium ${
+                className={`flex-1 py-2.5 rounded-lg border-2 font-medium transition-colors focus-ring ${
                   lang === l
                     ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
                     : 'border-slate-300 dark:border-slate-600'
@@ -224,13 +304,13 @@ export const SettingsScreen: React.FC = () => {
             ))}
           </div>
         </Field>
-        <Field label={t('set.appearance')}>
+        <Field label={t('set.theme')}>
           <div className="flex gap-2">
             {(['light', 'dark'] as const).map((th) => (
               <button
                 key={th}
                 onClick={() => void updateSettings('ui', { theme: th })}
-                className={`flex-1 py-2.5 rounded-lg border-2 font-medium ${
+                className={`flex-1 py-2.5 rounded-lg border-2 font-medium transition-colors focus-ring ${
                   settings.ui.theme === th
                     ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
                     : 'border-slate-300 dark:border-slate-600'
@@ -243,26 +323,10 @@ export const SettingsScreen: React.FC = () => {
         </Field>
       </Section>
 
-      {/* ── Data & backup ── */}
+      {/* ── Data & backup ──
+          Storage and last-backup figures moved to the status card at the top;
+          this section is now purely the two actions. */}
       <Section title={t('set.data')}>
-        <div className="text-sm space-y-1 mb-3 text-light-text-secondary dark:text-dark-text-secondary">
-          <div className="flex justify-between">
-            <span>{t('set.lastBackup')}</span>
-            <span className="tnum">
-              {lastBackup ? lastBackup.toLocaleString() : t('set.never')}
-            </span>
-          </div>
-          {storage && storage.quotaBytes > 0 && (
-            <div className="flex justify-between">
-              <span>{t('set.storageUsed')}</span>
-              <span className="tnum">
-                {(storage.usageBytes / 1_048_576).toFixed(1)} MB
-                {storage.persisted ? ' · protected' : ''}
-              </span>
-            </div>
-          )}
-        </div>
-
         <div className="flex flex-col gap-2">
           <Button
             onClick={async () => {
@@ -286,38 +350,17 @@ export const SettingsScreen: React.FC = () => {
                 e.target.value = '';
               }}
             />
-            <span className="block text-center px-4 py-3 rounded-lg font-semibold bg-slate-100 dark:bg-slate-700 cursor-pointer">
+            <span className="block text-center px-4 py-3 rounded-md font-semibold bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 cursor-pointer">
               {t('set.import')}
             </span>
           </label>
-
-          <Button
-            variant="ghost"
-            onClick={async () => {
-              const fixed = await recalculateAllBalances();
-              setMessage(`${t('set.recalcBalances')}: ${fixed}`);
-            }}
-          >
-            {t('set.recalcBalances')}
-          </Button>
-
-          {installPrompt && (
-            <Button
-              variant="secondary"
-              onClick={async () => {
-                await (installPrompt as unknown as { prompt: () => Promise<void> }).prompt();
-                setInstallPrompt(null);
-              }}
-            >
-              {t('set.install')}
-            </Button>
-          )}
         </div>
       </Section>
 
-      {/* ── Staff PIN ── */}
+      {/* ── Staff PIN ──
+          The field used to repeat the section's own title back at the reader. */}
       <Section title={t('lock.set')}>
-        <Field label={t('lock.set')} hint={t('lock.setHint')}>
+        <Field label={t('set.pinDigits')} hint={t('lock.setHint')}>
           <Input
             inputMode="numeric"
             maxLength={6}
@@ -331,17 +374,68 @@ export const SettingsScreen: React.FC = () => {
         </Field>
       </Section>
 
-      {/* ── AI (optional, user-supplied key) ── */}
-      <Section title={t('set.ai')}>
-        <Field label={t('set.aiKey')} hint={t('set.aiHint')}>
-          <Input
-            type="password"
-            value={settings.ai.geminiApiKey ?? ''}
-            onChange={(e) => void updateSettings('ai', { geminiApiKey: e.target.value })}
-            placeholder="AIza…"
-          />
-        </Field>
-      </Section>
+      {/* ── Advanced ──
+          A Gemini API key sitting in the open in a kirana till's settings
+          reads like a developer left a demo behind. Everything here is real
+          and useful, and none of it belongs in the shopkeeper's line of sight
+          on an ordinary day. */}
+      <div className="rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700">
+        <button
+          type="button"
+          onClick={() => setAdvancedOpen((v) => !v)}
+          aria-expanded={advancedOpen}
+          className="w-full flex items-center gap-2 p-3 text-left focus-ring rounded-lg"
+        >
+          {advancedOpen ? (
+            <IconChevronDown className="w-4 h-4 flex-shrink-0" />
+          ) : (
+            <IconChevronRight className="w-4 h-4 flex-shrink-0" />
+          )}
+          <span className="font-semibold">{t('set.advanced')}</span>
+          {/* Hidden on a phone, where it would wrap under the chevron and
+              turn a one-line row into three. */}
+          <span className="ml-auto hidden sm:inline text-xs text-light-text-secondary dark:text-dark-text-secondary">
+            {t('set.advancedHint')}
+          </span>
+        </button>
+
+        {advancedOpen && (
+          <div className="p-3 pt-0 space-y-3 animate-fade-in">
+            <Field label={t('set.weightPrefix')} hint={t('set.weightPrefixHint')}>
+              <Input
+                inputMode="numeric"
+                maxLength={2}
+                value={settings.scanner.weightBarcodePrefix}
+                onChange={(e) =>
+                  void updateSettings('scanner', { weightBarcodePrefix: e.target.value })
+                }
+                placeholder={t('common.none')}
+                className="tnum"
+              />
+            </Field>
+
+            <Field label={t('set.aiKey')} hint={t('set.aiHint')}>
+              <Input
+                type="password"
+                value={settings.ai.geminiApiKey ?? ''}
+                onChange={(e) => void updateSettings('ai', { geminiApiKey: e.target.value })}
+                placeholder="AIza…"
+              />
+            </Field>
+
+            <Button
+              variant="ghost"
+              full
+              onClick={async () => {
+                const fixed = await recalculateAllBalances();
+                setMessage(`${t('set.recalcBalances')}: ${fixed}`);
+              }}
+            >
+              {t('set.recalcBalances')}
+            </Button>
+          </div>
+        )}
+      </div>
 
       {/* Restore confirmation — never silent. */}
       <Sheet
@@ -354,10 +448,8 @@ export const SettingsScreen: React.FC = () => {
             <Banner tone="danger">{t('backup.importWarn')}</Banner>
             <div className="text-sm">
               <p className="font-semibold mb-1">{t('backup.contains')}</p>
-              <p className="tnum">
-                {new Date(pendingRestore.exportedAt).toLocaleString()}
-              </p>
-              <ul className="mt-2 space-y-0.5 tnum">
+              <p className="count">{formatDateTime(pendingRestore.exportedAt, lang)}</p>
+              <ul className="mt-2 space-y-0.5 count">
                 {Object.entries(pendingRestore.counts ?? {}).map(([key, count]) => (
                   <li key={key} className="flex justify-between">
                     <span>{key}</span>

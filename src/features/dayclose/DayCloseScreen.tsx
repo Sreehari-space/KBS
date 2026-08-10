@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Field, Input } from '@/components/ui';
+import { Button, Card, Field, Input, Money, Skeleton } from '@/components/ui';
 import { IconCheck, IconWhatsApp } from '@/components/icons';
 import { buildDayClose, dayCloseText, type DayCloseSummary } from './dayClose';
 import { exportBackup } from '@/features/backup/backupService';
-import { formatINR, parseRupeeInput } from '@/domain/money';
+import { parseRupeeInput } from '@/domain/money';
 import { useSettings } from '@/hooks/useSettings';
 import { useT } from '@/i18n/useT';
 import { formatDate } from '@/domain/datetime';
@@ -19,7 +19,24 @@ export const DayCloseScreen: React.FC = () => {
     void buildDayClose().then(setSummary);
   }, []);
 
-  if (!summary) return null;
+  // Rendering `null` here flashed a blank screen on every visit. A skeleton
+  // holds the shape the totals will occupy, so nothing jumps when they land.
+  if (!summary) {
+    return (
+      <div className="h-full overflow-y-auto px-4 py-4 space-y-4" aria-busy>
+        {[3, 5, 2].map((rows, i) => (
+          <Card key={i} className="p-3 space-y-2">
+            {Array.from({ length: rows }, (_, r) => (
+              <div key={r} className="flex justify-between">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+            ))}
+          </Card>
+        ))}
+      </div>
+    );
+  }
 
   const countedPaise = parseRupeeInput(counted);
   const difference = countedPaise === null ? null : countedPaise - summary.expectedCashPaise;
@@ -49,22 +66,22 @@ export const DayCloseScreen: React.FC = () => {
         <h2 className="font-semibold mb-3">
           {t('day.title')} — {formatDate(summary.date.toISOString(), lang)}
         </h2>
-        <Row label={t('day.bills')} value={String(summary.billCount)} />
-        <Row label={t('day.sales')} value={formatINR(summary.salesTotalPaise)} bold />
+        <Row label={t('day.bills')} count={summary.billCount} />
+        <Row label={t('day.sales')} paise={summary.salesTotalPaise} bold />
       </div>
 
       <div className="rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 p-3">
-        <Row label={t('pay.cash')} value={formatINR(summary.byMode.cash)} />
-        <Row label={t('pay.upi')} value={formatINR(summary.byMode.upi)} />
-        <Row label={t('pay.card')} value={formatINR(summary.byMode.card)} />
-        <Row label={t('day.creditGiven')} value={formatINR(summary.creditGivenPaise)} />
-        <Row label={t('day.creditCollected')} value={formatINR(summary.creditCollectedPaise)} />
+        <Row label={t('pay.cash')} paise={summary.byMode.cash} />
+        <Row label={t('pay.upi')} paise={summary.byMode.upi} />
+        <Row label={t('pay.card')} paise={summary.byMode.card} />
+        <Row label={t('day.creditGiven')} paise={summary.creditGivenPaise} />
+        <Row label={t('day.creditCollected')} paise={summary.creditCollectedPaise} />
       </div>
 
       <div className="rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 p-3 space-y-3">
         {/* Expected cash is takings PLUS cash collected against old credit —
             not just the day's sales. */}
-        <Row label={t('day.expectedCash')} value={formatINR(summary.expectedCashPaise)} bold />
+        <Row label={t('day.expectedCash')} paise={summary.expectedCashPaise} bold />
         <Field label={t('day.countedCash')}>
           <Input
             inputMode="decimal"
@@ -76,7 +93,7 @@ export const DayCloseScreen: React.FC = () => {
         </Field>
         {difference !== null && (
           <div
-            className={`flex justify-between font-bold tnum text-lg ${
+            className={`flex justify-between font-bold text-lg ${
               difference === 0
                 ? 'text-brand-secondary'
                 : 'text-amber-600 dark:text-amber-400'
@@ -85,7 +102,7 @@ export const DayCloseScreen: React.FC = () => {
             <span>{t('day.difference')}</span>
             <span>
               {difference < 0 ? '−' : '+'}
-              {formatINR(Math.abs(difference))}
+              <Money paise={Math.abs(difference)} />
             </span>
           </div>
         )}
@@ -121,15 +138,17 @@ export const DayCloseScreen: React.FC = () => {
   );
 };
 
-const Row: React.FC<{ label: string; value: string; bold?: boolean }> = ({
+/** Money rows render through `Money`; a bill count is a count, not an amount. */
+const Row: React.FC<{ label: string; paise?: number; count?: number; bold?: boolean }> = ({
   label,
-  value,
+  paise,
+  count,
   bold,
 }) => (
   <div className={`flex justify-between py-1 ${bold ? 'font-bold text-lg' : 'text-sm'}`}>
     <span className={bold ? '' : 'text-light-text-secondary dark:text-dark-text-secondary'}>
       {label}
     </span>
-    <span className="tnum">{value}</span>
+    {paise !== undefined ? <Money paise={paise} /> : <span className="count">{count}</span>}
   </div>
 );

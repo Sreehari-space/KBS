@@ -164,6 +164,22 @@ export async function commitSale(input: CommitSaleInput): Promise<Sale> {
 
 export const ACTIVE_DRAFT_ID = 'active';
 
+/**
+ * The number the NEXT bill will get, for display only.
+ *
+ * Showing it while the cart is still open makes the sequence feel like a
+ * ledger rather than a database — the operator can see the shop is on bill 14
+ * today before the customer has paid. It is deliberately a peek: the real
+ * number is allocated inside the commit transaction, so two tills (or two
+ * fast taps) can never collide on it. If a bill lands between this read and
+ * the commit, the committed number simply moves on by one.
+ */
+export async function peekNextBillNo(at: Date = new Date()): Promise<string> {
+  const key = `bill:${billDateKey(at)}`;
+  const counter = await db.counters.get(key);
+  return `${billDateKey(at)}-${String((counter?.value ?? 0) + 1).padStart(3, '0')}`;
+}
+
 export function listSales(limit = 50): Promise<Sale[]> {
   return db.sales.orderBy('createdAt').reverse().limit(limit).toArray();
 }
