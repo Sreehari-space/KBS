@@ -36,6 +36,7 @@ import {
   type StorageStatus,
 } from '@/data/db';
 import { seedIfEmpty } from '@/data/seed';
+import { daysSinceBackup, exportBackup } from '@/features/backup/backupService';
 import { useHotkeys, useKeyboardUser } from '@/hooks/useHotkeys';
 import { useOnline } from '@/hooks/useOnline';
 import { updateSettings, useSettings, useSettingsStatus } from '@/hooks/useSettings';
@@ -88,21 +89,26 @@ const App: React.FC = () => {
   const [locked, setLocked] = useState(true);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [setupDone, setSetupDone] = useState(false);
+  const [staleBackupDays, setStaleBackupDays] = useState<number | null>(null);
+  const [backupDismissed, setBackupDismissed] = useState(false);
   const keyboardUser = useKeyboardUser();
 
   // "?" is the one shortcut that works everywhere — including with the caret
   // in the search box, which is exactly where a lost operator will be sitting
   // when they go looking for help. It is Shift+/ and nobody types it into a
   // product search, so claiming it costs nothing.
-  useHotkeys([
-    { key: '?', whileTyping: true, handler: () => setShortcutsOpen((open) => !open) },
-  ]);
+  useHotkeys([{ key: '?', whileTyping: true, handler: () => setShortcutsOpen((open) => !open) }]);
 
   useEffect(() => {
     void seedIfEmpty();
     void requestPersistentStorage();
     void getStorageStatus().then(setStorage);
     void isStorageEphemeral().then(setEphemeral);
+    // The stale-backup reminder used to live only on the Settings screen — a
+    // warning shown exclusively to people who go looking for warnings. Since
+    // private-mode detection is a heuristic that can miss, an off-device copy
+    // is the defence that actually holds; it belongs where it is seen.
+    void daysSinceBackup().then(setStaleBackupDays);
   }, []);
 
   // Theme is mirrored to localStorage purely so index.html can apply it before
@@ -151,6 +157,12 @@ const App: React.FC = () => {
             onBilled={setLastSale}
             keyboardUser={keyboardUser}
             onShowShortcuts={() => setShortcutsOpen(true)}
+            staleBackupDays={backupDismissed ? null : staleBackupDays}
+            onBackupNow={async () => {
+              await exportBackup();
+              setStaleBackupDays(0);
+            }}
+            onDismissBackup={() => setBackupDismissed(true)}
           />
           <ReceiptSheet sale={lastSale} onClose={() => setLastSale(null)} />
           <UpdatePrompt />
@@ -171,6 +183,10 @@ const Shell: React.FC<{
   onBilled: (sale: Sale) => void;
   keyboardUser: boolean;
   onShowShortcuts: () => void;
+  /** Null when there is nothing to nag about, or the nag was dismissed. */
+  staleBackupDays: number | null;
+  onBackupNow: () => Promise<void>;
+  onDismissBackup: () => void;
 }> = ({
   screen,
   setScreen,
@@ -181,16 +197,19 @@ const Shell: React.FC<{
   onBilled,
   keyboardUser,
   onShowShortcuts,
+  staleBackupDays,
+  onBackupNow,
+  onDismissBackup,
 }) => {
   const { t, lang, setLang } = useT();
   const settings = useSettings();
   const online = useOnline();
   const [moreOpen, setMoreOpen] = useState(false);
 
-  const shopName =
-    (lang === 'ta' && settings.shop.nameTa.trim()) || settings.shop.nameEn || 'KBS';
+  const shopName = (lang === 'ta' && settings.shop.nameTa.trim()) || settings.shop.nameEn || 'KBS';
 
   const quotaLow = storage !== null && storage.usedFraction > 0.8;
+  const backupStale = staleBackupDays !== null && staleBackupDays >= 7;
   const inMore = MORE.some((item) => item.id === screen);
   const title = [...PRIMARY, ...MORE].find((item) => item.id === screen);
 
@@ -198,56 +217,71 @@ const Shell: React.FC<{
     <div className="flex flex-col h-[100dvh] bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text">
       <header className="flex-shrink-0 bg-light-surface dark:bg-dark-surface border-b border-slate-200 dark:border-slate-700 no-print">
         <div className="max-w-3xl mx-auto w-full flex items-center justify-between gap-3 px-4 py-2.5">
-        <div className="min-w-0">
-          {/* The shop's own name, the way a till identifies itself. */}
-          <h1 className="font-semibold leading-tight truncate">{shopName}</h1>
-          <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary truncate flex items-center gap-1.5">
-            {title ? t(title.key) : ''}
-            {/* Offline is a NORMAL state for this app, so it gets a dot, not
+          <div className="min-w-0">
+            {/* The shop's own name, the way a till identifies itself. */}
+            <h1 className="font-semibold leading-tight truncate">{shopName}</h1>
+            <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary truncate flex items-center gap-1.5">
+              {title ? t(title.key) : ''}
+              {/* Offline is a NORMAL state for this app, so it gets a dot, not
                 a banner. Banners are reserved for things that are wrong. */}
-            {!online && (
-              <span
-                className="inline-flex items-center gap-1"
-                title={t('net.offline')}
-                aria-label={t('net.offline')}
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden />
-              </span>
-            )}
-          </p>
-        </div>
-        <div className="flex-shrink-0 flex items-center gap-2">
-          {/* The hint only appears once a hardware keyboard has been used, so
+              {!online && (
+                <span
+                  className="inline-flex items-center gap-1"
+                  title={t('net.offline')}
+                  aria-label={t('net.offline')}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden />
+                </span>
+              )}
+            </p>
+          </div>
+          <div className="flex-shrink-0 flex items-center gap-2">
+            {/* The hint only appears once a hardware keyboard has been used, so
               a phone never carries it. */}
-          {keyboardUser && (
-            <button
-              onClick={onShowShortcuts}
-              className="px-2 py-1.5 text-sm rounded-md border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 focus-ring"
-              title={t('keys.hint')}
-              aria-label={t('keys.title')}
-            >
-              ?
-            </button>
-          )}
-          {/* Language toggle lives in the header, not buried in Settings —
+            {keyboardUser && (
+              <button
+                onClick={onShowShortcuts}
+                className="px-2 py-1.5 text-sm rounded-md border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 focus-ring"
+                title={t('keys.hint')}
+                aria-label={t('keys.title')}
+              >
+                ?
+              </button>
+            )}
+            {/* Language toggle lives in the header, not buried in Settings —
               staff switch mid-shift. */}
-          <button
-            onClick={() => setLang(lang === 'ta' ? 'en' : 'ta')}
-            className="px-3 py-1.5 text-sm font-medium rounded-md border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 focus-ring"
-          >
-            {lang === 'ta' ? 'English' : 'தமிழ்'}
-          </button>
-        </div>
+            <button
+              onClick={() => setLang(lang === 'ta' ? 'en' : 'ta')}
+              className="px-3 py-1.5 text-sm font-medium rounded-md border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 focus-ring"
+            >
+              {lang === 'ta' ? 'English' : 'தமிழ்'}
+            </button>
+          </div>
         </div>
       </header>
 
-      {(ephemeral || (quotaLow && !quotaDismissed) || storage?.unavailable) && (
+      {(ephemeral || (quotaLow && !quotaDismissed) || storage?.unavailable || backupStale) && (
         <div className="px-4 pt-3 space-y-2 flex-shrink-0 no-print">
           {ephemeral && <Banner tone="danger">{t('warn.ephemeral')}</Banner>}
           {storage?.unavailable && <Banner tone="danger">{t('warn.noStorage')}</Banner>}
           {quotaLow && !quotaDismissed && (
             <Banner tone="warning" onDismiss={onDismissQuota}>
               {t('warn.quota')}
+            </Banner>
+          )}
+          {backupStale && (
+            <Banner tone="warning" onDismiss={onDismissBackup}>
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="flex-1 min-w-[12rem]">
+                  {t('backup.reminder', { days: staleBackupDays as number })}
+                </span>
+                <button
+                  onClick={() => void onBackupNow()}
+                  className="font-semibold underline underline-offset-2 rounded focus-ring"
+                >
+                  {t('backup.backupNow')}
+                </button>
+              </div>
             </Banner>
           )}
         </div>
@@ -257,11 +291,7 @@ const Shell: React.FC<{
           edge and its button at the other. */}
       <main className="flex-1 overflow-hidden w-full max-w-3xl mx-auto">
         {screen === 'billing' && (
-          <BillingScreen
-            onBilled={onBilled}
-            onNavigate={setScreen}
-            keyboardUser={keyboardUser}
-          />
+          <BillingScreen onBilled={onBilled} onNavigate={setScreen} keyboardUser={keyboardUser} />
         )}
         {screen === 'inventory' && <InventoryScreen />}
         {screen === 'ledger' && <LedgerScreen />}
@@ -276,21 +306,21 @@ const Shell: React.FC<{
 
       <nav className="flex-shrink-0 border-t border-slate-200 dark:border-slate-700 bg-light-surface dark:bg-dark-surface pb-safe no-print">
         <div className="max-w-3xl mx-auto w-full flex">
-        {PRIMARY.map((item) => (
+          {PRIMARY.map((item) => (
+            <NavButton
+              key={item.id}
+              Icon={item.Icon}
+              label={t(item.key)}
+              active={screen === item.id}
+              onClick={() => setScreen(item.id)}
+            />
+          ))}
           <NavButton
-            key={item.id}
-            Icon={item.Icon}
-            label={t(item.key)}
-            active={screen === item.id}
-            onClick={() => setScreen(item.id)}
+            Icon={IconMore}
+            label={t('nav.more')}
+            active={inMore}
+            onClick={() => setMoreOpen(true)}
           />
-        ))}
-        <NavButton
-          Icon={IconMore}
-          label={t('nav.more')}
-          active={inMore}
-          onClick={() => setMoreOpen(true)}
-        />
         </div>
       </nav>
 

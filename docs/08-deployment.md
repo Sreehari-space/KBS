@@ -39,13 +39,13 @@ preview link".
 
 JSON has no comments, so the reasoning lives here.
 
-| Path | Cache-Control | Why |
-|---|---|---|
-| `/sw.js` | `max-age=0, must-revalidate` | **The important one.** A cached service worker means shops get stuck on an old build indefinitely. Workbox does its own versioning; the file itself must always be re-checked. |
-| `/index.html` | `max-age=0, must-revalidate` | Points at content-hashed bundles, so it has to be revalidated every load. |
-| `/manifest.webmanifest` | `max-age=0, must-revalidate` | Same reason; also pinned to the correct content type. |
-| `/assets/*` | `1 year, immutable` | Vite content-hashes these filenames, so they can never go stale. |
-| `/fonts/*`, `/icons/*` | `7 days` | Not content-hashed, but Workbox revisions them in the precache manifest. A week is a safe middle ground. |
+| Path                    | Cache-Control                | Why                                                                                                                                                                            |
+| ----------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `/sw.js`                | `max-age=0, must-revalidate` | **The important one.** A cached service worker means shops get stuck on an old build indefinitely. Workbox does its own versioning; the file itself must always be re-checked. |
+| `/index.html`           | `max-age=0, must-revalidate` | Points at content-hashed bundles, so it has to be revalidated every load.                                                                                                      |
+| `/manifest.webmanifest` | `max-age=0, must-revalidate` | Same reason; also pinned to the correct content type.                                                                                                                          |
+| `/assets/*`             | `1 year, immutable`          | Vite content-hashes these filenames, so they can never go stale.                                                                                                               |
+| `/fonts/*`, `/icons/*`  | `7 days`                     | Not content-hashed, but Workbox revisions them in the precache manifest. A week is a safe middle ground.                                                                       |
 
 Other headers:
 
@@ -57,7 +57,7 @@ Other headers:
   ordinary hardening.
 
 The single `rewrites` rule sends unknown paths to `index.html`. Vercel checks the filesystem
-*before* applying rewrites, so real files still serve normally.
+_before_ applying rewrites, so real files still serve normally.
 
 ## Getting it onto a shopkeeper's phone
 
@@ -65,8 +65,8 @@ The app is only properly installed when it is on the home screen — that is wha
 like an app, and (on iOS) what stops Safari wiping storage after ~7 days of not visiting.
 
 - **Android / Chrome:** Settings → **Install app** (the button appears once Chrome fires
-  `beforeinstallprompt`), or Chrome's ⋮ → *Add to Home screen*.
-- **iOS / Safari:** Share → *Add to Home Screen*. Safari never shows an install prompt, so this
+  `beforeinstallprompt`), or Chrome's ⋮ → _Add to Home screen_.
+- **iOS / Safari:** Share → _Add to Home Screen_. Safari never shows an install prompt, so this
   has to be done by hand.
 
 After installing, walk through the checks in

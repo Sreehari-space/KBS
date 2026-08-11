@@ -20,10 +20,12 @@ These come from the shop floor, not from preference.
 
 ```html
 <script type="importmap">
-{ "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "recharts": "https://aistudiocdn.com/recharts@^3.3.0"
-} }
+  {
+    "imports": {
+      "react": "https://aistudiocdn.com/react@^19.2.0",
+      "recharts": "https://aistudiocdn.com/recharts@^3.3.0"
+    }
+  }
 </script>
 <script src="https://cdn.tailwindcss.com"></script>
 ```
@@ -203,16 +205,16 @@ kbs/
 
 ## Migration map
 
-| Today | Becomes |
-|---|---|
-| `App.tsx` (holds all data in `useState`) | Shell + routing only. Data comes from `useLiveQuery`. |
-| `data/mockData.ts` (US grocery) | `data/seed/tnKiranaProducts.ts` (TN provisions, seeded on first run only) |
-| `components/Sales.tsx` (319 lines, does everything) | Split across `features/billing/` and `features/bill/` |
-| `components/Inventory.tsx` | `features/inventory/` + units, barcodes, cost price |
-| `components/Reports.tsx` (hardcoded arrays) | `features/reports/` reading real sales |
-| `components/Settings.tsx` (fields wired to nothing) | `features/settings/` persisted via `settingsRepo` |
-| `constants.tsx` (ICONS) | Keep as-is. It works. |
-| `services/geminiService.ts` | Keep, but behind a user-supplied key and off the billing path |
+| Today                                               | Becomes                                                                   |
+| --------------------------------------------------- | ------------------------------------------------------------------------- |
+| `App.tsx` (holds all data in `useState`)            | Shell + routing only. Data comes from `useLiveQuery`.                     |
+| `data/mockData.ts` (US grocery)                     | `data/seed/tnKiranaProducts.ts` (TN provisions, seeded on first run only) |
+| `components/Sales.tsx` (319 lines, does everything) | Split across `features/billing/` and `features/bill/`                     |
+| `components/Inventory.tsx`                          | `features/inventory/` + units, barcodes, cost price                       |
+| `components/Reports.tsx` (hardcoded arrays)         | `features/reports/` reading real sales                                    |
+| `components/Settings.tsx` (fields wired to nothing) | `features/settings/` persisted via `settingsRepo`                         |
+| `constants.tsx` (ICONS)                             | Keep as-is. It works.                                                     |
+| `services/geminiService.ts`                         | Keep, but behind a user-supplied key and off the billing path             |
 
 ## Testing
 

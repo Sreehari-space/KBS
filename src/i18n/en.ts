@@ -25,7 +25,10 @@ export const en = {
   'bills.refund': 'Refund',
   'bills.confirmReturn': 'Confirm return',
   'bills.reprint': 'Reprint',
-  'bills.emptyHint': 'Every completed bill is kept here — reprint it, send it again, or take items back.',
+  'bills.emptyHint':
+    'Every completed bill is kept here — reprint it, send it again, or take items back.',
+  'bills.refundToAccount': 'Taken off their account',
+  'bills.refundInHand': 'Handed back',
 
   // Reorder
   'reorder.title': 'Low stock',
@@ -35,12 +38,14 @@ export const en = {
 
   // QR labels
   'labels.title': 'Print shelf labels',
-  'labels.hint': 'For loose goods with no manufacturer barcode. Stick these on bins or bags, then scan them like any product.',
+  'labels.hint':
+    'For loose goods with no manufacturer barcode. Stick these on bins or bags, then scan them like any product.',
   'labels.select': 'Select items',
   'labels.print': 'Print labels',
   'labels.selected': '{n} selected',
   'labels.empty': 'Every item already has a barcode',
-  'labels.emptyHint': 'Labels are for loose goods — rice, dal, sweets — that no packet barcode covers.',
+  'labels.emptyHint':
+    'Labels are for loose goods — rice, dal, sweets — that no packet barcode covers.',
 
   // Voice
   'voice.title': 'Say the item',
@@ -72,6 +77,7 @@ export const en = {
   'billing.items': 'items',
   'billing.item': 'item',
   'billing.clear': 'Clear',
+  'billing.clearConfirm': 'Remove every item from this bill? The saved copy goes too.',
   'billing.hold': 'Hold',
   'billing.heldBills': 'Held bills',
   'billing.resume': 'Resume',
@@ -81,7 +87,8 @@ export const en = {
   'billing.noResults': 'No items found',
   'billing.addNew': 'Add as new item',
   'billing.noTiles': 'No quick items yet',
-  'billing.noTilesHint': 'Search or scan to bill anything. Mark your fastest sellers as quick items and they will wait here.',
+  'billing.noTilesHint':
+    'Search or scan to bill anything. Mark your fastest sellers as quick items and they will wait here.',
   'billing.nextBill': 'Next bill',
 
   // Draft recovery
@@ -148,7 +155,8 @@ export const en = {
   'inv.save': 'Save',
   'inv.delete': 'Delete',
   'inv.newFromScan': 'New item',
-  'inv.newFromScanHint': 'New barcode. Add the name and price once — after that it goes straight into the bill.',
+  'inv.newFromScanHint':
+    'New barcode. Add the name and price once — after that it goes straight into the bill.',
   'inv.moreDetails': 'More details',
   'inv.createNew': 'New item',
   'inv.linkExisting': 'Already have it',
@@ -156,7 +164,8 @@ export const en = {
   'inv.linkSearch': 'Search your items…',
   'inv.linked': 'Barcode added to',
   'inv.empty': 'No items yet',
-  'inv.emptyHint': 'Add what you sell, or just scan a packet at the till — the app asks for the name and price once, then remembers it.',
+  'inv.emptyHint':
+    'Add what you sell, or just scan a packet at the till — the app asks for the name and price once, then remembers it.',
   'inv.autoTamil': 'Tamil name filled automatically — tap to edit',
   'inv.autoTamilCheck': 'Sound-alike only. Please check the Tamil name.',
 
@@ -177,7 +186,8 @@ export const en = {
   'ledger.remind': 'WhatsApp reminder',
   'ledger.statement': 'Statement',
   'ledger.noDues': 'No pending credit',
-  'ledger.noDuesHint': 'Nobody owes the shop anything right now. Credit given at the till shows up here.',
+  'ledger.noDuesHint':
+    'Nobody owes the shop anything right now. Credit given at the till shows up here.',
   'ledger.daysAgo': 'days ago',
 
   // Settings
@@ -220,7 +230,8 @@ export const en = {
   'set.scanContinuous': 'Keep the camera open',
   'set.scanContinuousHint': 'Scan several packets without reopening the scanner',
   'set.weightPrefix': 'Weight barcode prefix',
-  'set.weightPrefixHint': 'Only if your weighing scale prints the weight into the barcode. Usually 2.',
+  'set.weightPrefixHint':
+    'Only if your weighing scale prints the weight into the barcode. Usually 2.',
   'set.advanced': 'Advanced',
   'set.advancedHint': 'You will not normally need anything in here.',
   'set.protected': 'protected from clean-up',
@@ -248,7 +259,8 @@ export const en = {
   'scan.permissionDenied': 'Camera blocked. Tap the lock icon in the address bar to allow it.',
   'scan.notSupported': 'This browser cannot scan. Use search or type the barcode.',
   'scan.scanned': 'Added',
-  'scan.marketingQr': 'This looks like a website QR code, not the product barcode. Scan the striped barcode instead — the QR is often different on every packet.',
+  'scan.marketingQr':
+    'This looks like a website QR code, not the product barcode. Scan the striped barcode instead — the QR is often different on every packet.',
 
   // Reports
   'reports.revenue': 'Sales',
@@ -325,7 +337,8 @@ export const en = {
   'day.close': 'Close day',
 
   // Storage warnings
-  'warn.ephemeral': 'Private browsing detected — your bills will be LOST when you close this window. Please open KBS in a normal window.',
+  'warn.ephemeral':
+    'Private browsing detected — your bills will be LOST when you close this window. Please open KBS in a normal window.',
   'warn.quota': 'Device storage is almost full. Export a backup and free up space.',
   'warn.noStorage': 'This browser is blocking storage. Bills cannot be saved.',
 

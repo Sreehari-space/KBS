@@ -78,7 +78,8 @@ const L = {
   scanToPay: ['Scan to pay', 'ஸ்கேன் செய்து செலுத்து'],
 } as const;
 
-const pick = (pair: readonly [string, string], lang: Language) => (lang === 'ta' ? pair[1] : pair[0]);
+const pick = (pair: readonly [string, string], lang: Language) =>
+  lang === 'ta' ? pair[1] : pair[0];
 
 /** UPI deep link. Generated locally — never fetched from a QR web service. */
 export function buildUpiPayload(

@@ -285,8 +285,18 @@ describe('draft auto-save', () => {
 
   it('overwrites rather than accumulating drafts', async () => {
     const product = makeProduct();
-    await saveDraft({ id: ACTIVE_DRAFT_ID, kind: 'active', lines: [buildLine(product, 1)], billDiscountPaise: 0 });
-    await saveDraft({ id: ACTIVE_DRAFT_ID, kind: 'active', lines: [buildLine(product, 2)], billDiscountPaise: 0 });
+    await saveDraft({
+      id: ACTIVE_DRAFT_ID,
+      kind: 'active',
+      lines: [buildLine(product, 1)],
+      billDiscountPaise: 0,
+    });
+    await saveDraft({
+      id: ACTIVE_DRAFT_ID,
+      kind: 'active',
+      lines: [buildLine(product, 2)],
+      billDiscountPaise: 0,
+    });
 
     expect(await db.drafts.count()).toBe(1);
     expect((await db.drafts.get(ACTIVE_DRAFT_ID))!.lines[0]!.qty).toBe(2);

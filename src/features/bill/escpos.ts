@@ -28,11 +28,7 @@ const CHUNK_SIZE = 512;
 export const isBluetoothPrintingAvailable = (): boolean =>
   typeof navigator !== 'undefined' && 'bluetooth' in navigator;
 
-export async function printViaBluetooth(
-  bill: Bill,
-  widthMm: 58 | 80,
-  copies = 1,
-): Promise<void> {
+export async function printViaBluetooth(bill: Bill, widthMm: 58 | 80, copies = 1): Promise<void> {
   if (!isBluetoothPrintingAvailable()) {
     throw new Error('Bluetooth printing is not supported on this browser');
   }

@@ -111,7 +111,12 @@ describe('partial payment then credit', () => {
   });
 
   it('splits across two modes', () => {
-    const split = addPartial(addPartial(emptyPaymentState, 'cash', 4000, TOTAL), 'upi', 6000, TOTAL);
+    const split = addPartial(
+      addPartial(emptyPaymentState, 'cash', 4000, TOTAL),
+      'upi',
+      6000,
+      TOTAL,
+    );
     expect(remainingPaise(split, TOTAL)).toBe(0);
     expect(canComplete(split, TOTAL)).toBe(true);
     expect(() => assertBalances(TOTAL, split.payments, 0)).not.toThrow();

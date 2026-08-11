@@ -184,8 +184,6 @@ for (const entry of LEXICON) {
 export const lookupEnglish = (word: string): LexEntry | undefined =>
   byEnglish.get(word.trim().toLowerCase()) ?? byRoman.get(romanKey(word));
 
-export const lookupRoman = (word: string): LexEntry | undefined =>
-  byRoman.get(romanKey(word));
+export const lookupRoman = (word: string): LexEntry | undefined => byRoman.get(romanKey(word));
 
-export const lookupTamil = (word: string): LexEntry | undefined =>
-  byTamil.get(word.trim());
+export const lookupTamil = (word: string): LexEntry | undefined => byTamil.get(word.trim());

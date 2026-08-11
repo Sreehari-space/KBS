@@ -20,15 +20,25 @@ export interface PeriodSummary {
   averagePaise: Paise;
 }
 
-/** Summarise a set of sales. Returns zeros for an empty set, never NaN. */
+/** A refund bill, which nets off revenue but is not a sale in its own right. */
+export const isReturn = (sale: Sale): boolean => Boolean(sale.returnOfSaleId);
+
+/**
+ * Summarise a set of sales. Returns zeros for an empty set, never NaN.
+ *
+ * Refund bills net off the revenue — that is the point of storing them as
+ * negative sales — but they are NOT counted as bills. One sale and its return
+ * used to read as "Bills: 2", which also dragged the average bill down.
+ */
 export function summarise(sales: readonly Sale[]): PeriodSummary {
   const revenuePaise = sales.reduce((sum, s) => sum + s.totalPaise, 0);
   const creditPaise = sales.reduce((sum, s) => sum + s.creditPaise, 0);
+  const billCount = sales.filter((s) => !isReturn(s)).length;
   return {
-    billCount: sales.length,
+    billCount,
     revenuePaise,
     creditPaise,
-    averagePaise: sales.length ? Math.round(revenuePaise / sales.length) : 0,
+    averagePaise: billCount ? Math.round(revenuePaise / billCount) : 0,
   };
 }
 
@@ -78,7 +88,7 @@ export function dailySeries(
     const bucket = index.get(dayKey(new Date(sale.createdAt)));
     if (!bucket) continue;
     bucket.totalPaise += sale.totalPaise;
-    bucket.billCount += 1;
+    if (!isReturn(sale)) bucket.billCount += 1;
   }
   return buckets;
 }

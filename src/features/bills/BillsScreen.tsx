@@ -123,10 +123,19 @@ const ReturnSheet: React.FC<{
   const [mode, setMode] = useState<'cash' | 'upi' | 'credit'>('cash');
   const [error, setError] = useState<string | null>(null);
 
-  const refundPaise = [...quantities.entries()].reduce((sum, [index, qty]) => {
+  // Mirrors `proportionalRefund` in returnRepo: the refund is a share of what
+  // was actually charged, so a bill discount and the round-off come back too.
+  // Summing raw line totals quoted the customer more than they had paid.
+  const returnedSubtotal = [...quantities.entries()].reduce((sum, [index, qty]) => {
     const line = sale.lines[index];
     return line ? sum + Math.round(qty * line.unitPricePaise) : sum;
   }, 0);
+  const ratio = sale.subtotalPaise > 0 ? Math.min(1, returnedSubtotal / sale.subtotalPaise) : 0;
+  const refundPaise = Math.round(sale.totalPaise * ratio);
+
+  // Anything still owed on this bill is cleared before cash is handed over.
+  const toAccount = sale.customerId ? Math.min(refundPaise, sale.creditPaise) : 0;
+  const toHand = refundPaise - toAccount;
 
   const submit = async () => {
     setError(null);
@@ -208,26 +217,46 @@ const ReturnSheet: React.FC<{
         })}
       </div>
 
-      <div className="flex gap-2 mb-4">
-        {(['cash', 'upi', ...(sale.customerId ? (['credit'] as const) : [])] as const).map((m) => (
-          <button
-            key={m}
-            onClick={() => setMode(m)}
-            className={`flex-1 py-2 rounded-lg border-2 text-sm font-medium ${
-              mode === m
-                ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
-                : 'border-slate-300 dark:border-slate-600'
-            }`}
-          >
-            {t(`pay.${m}` as 'pay.cash')}
-          </button>
-        ))}
-      </div>
+      {/* Only offered for the part that is actually being handed over. */}
+      {toHand > 0 && (
+        <div className="flex gap-2 mb-4">
+          {(['cash', 'upi'] as const).map((m) => (
+            <button
+              key={m}
+              onClick={() => setMode(m)}
+              className={`flex-1 py-2 rounded-lg border-2 text-sm font-medium transition-colors focus-ring ${
+                mode === m
+                  ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
+                  : 'border-slate-300 dark:border-slate-600'
+              }`}
+            >
+              {t(`pay.${m}` as 'pay.cash')}
+            </button>
+          ))}
+        </div>
+      )}
 
-      <div className="flex justify-between text-lg font-bold mb-3">
+      <div className="flex justify-between text-lg font-bold mb-1">
         <span>{t('bills.refund')}</span>
         <Money paise={refundPaise} />
       </div>
+
+      {/* An unpaid bill cannot pay cash back. Saying so before the shopkeeper
+          opens the drawer is the whole point of showing this split. */}
+      {toAccount > 0 && (
+        <div className="mb-3 text-sm space-y-0.5 text-light-text-secondary dark:text-dark-text-secondary">
+          <div className="flex justify-between">
+            <span>{t('bills.refundToAccount')}</span>
+            <Money paise={toAccount} />
+          </div>
+          {toHand > 0 && (
+            <div className="flex justify-between">
+              <span>{t('bills.refundInHand')}</span>
+              <Money paise={toHand} />
+            </div>
+          )}
+        </div>
+      )}
 
       <Button full onClick={submit} disabled={refundPaise <= 0}>
         {t('bills.confirmReturn')}

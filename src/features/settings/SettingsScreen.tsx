@@ -174,7 +174,10 @@ export const SettingsScreen: React.FC = () => {
             value={settings.shop.addressLines.join(', ')}
             onChange={(e) =>
               void updateSettings('shop', {
-                addressLines: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
+                addressLines: e.target.value
+                  .split(',')
+                  .map((s) => s.trim())
+                  .filter(Boolean),
               })
             }
           />
@@ -208,7 +211,9 @@ export const SettingsScreen: React.FC = () => {
             <Field label={t('set.gstin')}>
               <Input
                 value={settings.gst.gstin ?? ''}
-                onChange={(e) => void updateSettings('gst', { gstin: e.target.value.toUpperCase() })}
+                onChange={(e) =>
+                  void updateSettings('gst', { gstin: e.target.value.toUpperCase() })
+                }
               />
             </Field>
             <Toggle

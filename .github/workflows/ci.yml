@@ -18,7 +18,12 @@ jobs:
 
       - run: npm ci
 
-      # Typecheck first: it catches the widest class of mistakes fastest.
+      # Cheapest check first, and the only one whose failures are mechanical:
+      # `npm run format` fixes every one of them.
+      - name: Formatting
+        run: npm run format:check
+
+      # Typecheck next: it catches the widest class of mistakes fastest.
       - name: Typecheck
         run: npx tsc --noEmit
 

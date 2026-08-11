@@ -16,7 +16,7 @@ TN kirana stocks.
 So the design is:
 
 1. **Scan both formats in one camera view** — EAN-13, EAN-8, UPC-A, UPC-E, Code-128, Code-39,
-   *and* QR. QR support costs nothing extra and covers shop-printed labels (below).
+   _and_ QR. QR support costs nothing extra and covers shop-printed labels (below).
 2. **Learn as you scan (D4).** The shop's catalogue builds itself during normal billing.
 
 ### Learn-as-you-scan flow
@@ -56,13 +56,13 @@ its place, and it's why we scan both formats.
 
 ### The QR-on-the-packet trap
 
-Most Indian FMCG packs now carry a QR *next to* the striped barcode — and it is almost never a
+Most Indian FMCG packs now carry a QR _next to_ the striped barcode — and it is almost never a
 product identifier. It is usually a campaign URL, and increasingly it is **batch- or
 packet-specific**, meaning a different payload on every single packet.
 
 Scanning one of those decodes perfectly well, so learn-as-you-scan would happily create a
 catalogue entry keyed to it. That entry would look like it worked, then never match again — and
-on a serialised pack it would create a fresh product for *every packet sold*.
+on a serialised pack it would create a fresh product for _every packet sold_.
 
 So `looksLikeMarketingQr()` flags payloads that are `http(s)://`, `upi://`, `www.`-prefixed, or
 longer than 20 characters (real retail barcodes are shorter). When an unknown code trips it, the
@@ -88,12 +88,12 @@ src/features/scanner/
    missing. It must not sit in the main bundle.
 
 ```ts
-const FORMATS = ['ean_13','ean_8','upc_a','upc_e','code_128','code_39','qr_code'];
+const FORMATS = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'qr_code'];
 
 async function createDetector() {
   if ('BarcodeDetector' in globalThis) {
     const supported = await BarcodeDetector.getSupportedFormats();
-    return new BarcodeDetector({ formats: FORMATS.filter(f => supported.includes(f)) });
+    return new BarcodeDetector({ formats: FORMATS.filter((f) => supported.includes(f)) });
   }
   const { BrowserMultiFormatReader } = await import('@zxing/library'); // lazy
   return wrapZxing(new BrowserMultiFormatReader());
@@ -105,15 +105,15 @@ Detection runs in a `requestAnimationFrame` loop against the video frame.
 
 **Behaviours that decide whether a shopkeeper keeps using this:**
 
-| Behaviour | Why |
-|---|---|
-| **Continuous mode** — camera stays open after each hit | A 20-item bill must not require 20 taps to reopen the camera |
-| **Beep + `navigator.vibrate(40)`** | Staff scan without looking at the screen. The beep *is* the feedback |
-| **1500 ms duplicate debounce**, keyed by code | Holding one packet in frame otherwise registers 5 times. Scanning the *same* item twice on purpose still works — just tap `+` in the cart |
-| **Torch toggle** via `track.applyConstraints({ advanced: [{ torch: true }] })` | Shop lighting is often poor, and barcodes on shiny wrappers need it |
-| **Manual entry fallback** | Faded and torn labels are routine. Never trap the user in a camera that can't read |
-| **Running scanned-item strip** at the bottom of the camera view | Confirms what went in without closing the scanner |
-| **Permission-denied state** with recovery instructions | "Camera blocked → tap the lock icon in the address bar". Otherwise the feature looks broken |
+| Behaviour                                                                      | Why                                                                                                                                       |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| **Continuous mode** — camera stays open after each hit                         | A 20-item bill must not require 20 taps to reopen the camera                                                                              |
+| **Beep + `navigator.vibrate(40)`**                                             | Staff scan without looking at the screen. The beep _is_ the feedback                                                                      |
+| **1500 ms duplicate debounce**, keyed by code                                  | Holding one packet in frame otherwise registers 5 times. Scanning the _same_ item twice on purpose still works — just tap `+` in the cart |
+| **Torch toggle** via `track.applyConstraints({ advanced: [{ torch: true }] })` | Shop lighting is often poor, and barcodes on shiny wrappers need it                                                                       |
+| **Manual entry fallback**                                                      | Faded and torn labels are routine. Never trap the user in a camera that can't read                                                        |
+| **Running scanned-item strip** at the bottom of the camera view                | Confirms what went in without closing the scanner                                                                                         |
+| **Permission-denied state** with recovery instructions                         | "Camera blocked → tap the lock icon in the address bar". Otherwise the feature looks broken                                               |
 
 **Checksum validation.** `domain/barcode.ts` validates the EAN-13 check digit before lookup.
 A misread that fails the checksum is discarded silently rather than creating a junk product.

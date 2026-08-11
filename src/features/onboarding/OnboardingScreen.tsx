@@ -187,9 +187,7 @@ export const OnboardingScreen: React.FC<{ onDone: () => void }> = ({ onDone }) =
                     placeholder={t('onb.itemName')}
                     onChange={(e) =>
                       setItems((cur) =>
-                        cur.map((row, i) =>
-                          i === index ? { ...row, name: e.target.value } : row,
-                        ),
+                        cur.map((row, i) => (i === index ? { ...row, name: e.target.value } : row)),
                       )
                     }
                     className="flex-1"

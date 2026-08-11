@@ -235,7 +235,9 @@ export const InventoryScreen: React.FC = () => {
                     {p.trackStock && (
                       <p
                         className={`text-xs count ${
-                          low ? 'text-red-500 font-semibold' : 'text-light-text-secondary dark:text-dark-text-secondary'
+                          low
+                            ? 'text-red-500 font-semibold'
+                            : 'text-light-text-secondary dark:text-dark-text-secondary'
                         }`}
                       >
                         {formatQty(p.stockQty)} {unitLabel(p.unit, lang)}
@@ -273,11 +275,7 @@ export const InventoryScreen: React.FC = () => {
                       (isTanglish(typed) || typedTamil) && suggestion.nameEn
                         ? suggestion.nameEn
                         : typed,
-                    nameTa: tamilEdited
-                      ? draft.nameTa
-                      : typedTamil
-                        ? typed
-                        : suggestion.nameTa,
+                    nameTa: tamilEdited ? draft.nameTa : typedTamil ? typed : suggestion.nameTa,
                   });
                 }}
                 autoFocus

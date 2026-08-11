@@ -115,9 +115,7 @@ export const PaymentSheet: React.FC<{
             {QUICK_NOTES.map((paise) => (
               <button
                 key={paise}
-                onClick={() =>
-                  setState((cur) => ({ ...cur, tendered: String(paise / 100) }))
-                }
+                onClick={() => setState((cur) => ({ ...cur, tendered: String(paise / 100) }))}
                 className="py-2 text-sm rounded-md bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600 money focus-ring"
               >
                 ₹{paise / 100}
@@ -158,15 +156,15 @@ export const PaymentSheet: React.FC<{
 
       {isPartialOfferVisible(state, totalPaise, tenderedPaise) && (
         <div className="flex gap-2 mb-4">
-          {(['cash', 'upi'] as PaymentMode[]).map((mode) => (
+          {/* Card belongs here too: a card-plus-cash split was impossible
+              purely because this list was hard-coded to two modes. */}
+          {(['cash', 'upi', 'card'] as PaymentMode[]).map((mode) => (
             <Button
               key={mode}
               variant="ghost"
               className="flex-1 text-sm"
               onClick={() =>
-                setState((cur) =>
-                  addPartial(cur, mode, tenderedPaise || remaining, totalPaise),
-                )
+                setState((cur) => addPartial(cur, mode, tenderedPaise || remaining, totalPaise))
               }
             >
               + {t(`pay.${mode}` as 'pay.cash')}

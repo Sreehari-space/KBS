@@ -16,7 +16,7 @@ export const isVoiceAvailable = (): boolean =>
   typeof window !== 'undefined' &&
   Boolean(
     (window as unknown as { SpeechRecognition?: unknown }).SpeechRecognition ??
-      (window as unknown as { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition,
+    (window as unknown as { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition,
   );
 
 interface SpeechRecognitionLike {
@@ -132,9 +132,7 @@ export const VoiceSheet: React.FC<{
             >
               <IconMic className="w-9 h-9" />
             </div>
-            <p className="mt-3 font-medium">
-              {listening ? t('voice.listening') : t('voice.hint')}
-            </p>
+            <p className="mt-3 font-medium">{listening ? t('voice.listening') : t('voice.hint')}</p>
             {transcript && <p className="mt-2 text-lg font-semibold">{transcript}</p>}
           </div>
 

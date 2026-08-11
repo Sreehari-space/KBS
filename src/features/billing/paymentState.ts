@@ -153,11 +153,7 @@ export function isTenderVisible(state: PaymentState): boolean {
  * customer to carry it. A credit sale with no customer is refused — there
  * would be nobody to bill.
  */
-export function canComplete(
-  state: PaymentState,
-  totalPaise: Paise,
-  busy = false,
-): boolean {
+export function canComplete(state: PaymentState, totalPaise: Paise, busy = false): boolean {
   if (busy || totalPaise <= 0) return false;
   return remainingPaise(state, totalPaise) === 0 || Boolean(state.customerId);
 }

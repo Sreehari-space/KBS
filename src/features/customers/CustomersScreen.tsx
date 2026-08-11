@@ -12,7 +12,6 @@ import {
 import { setOpeningBalance } from '@/data/repositories/ledgerRepo';
 import { useT } from '@/i18n/useT';
 
-
 type Draft = {
   id?: string;
   name: string;
@@ -94,11 +93,7 @@ export const CustomersScreen: React.FC = () => {
             onChange={(e) => setSearch(e.target.value)}
             className="flex-1"
           />
-          <Button
-            onClick={() => setDraft(emptyDraft)}
-            className="px-4"
-            aria-label={t('cust.add')}
-          >
+          <Button onClick={() => setDraft(emptyDraft)} className="px-4" aria-label={t('cust.add')}>
             <IconPlus className="w-5 h-5" />
           </Button>
         </div>

@@ -114,7 +114,9 @@ export const LedgerScreen: React.FC = () => {
       <StatementSheet
         customer={liveSelected ?? selected}
         onClose={() => setSelected(null)}
-        shopName={lang === 'ta' && settings.shop.nameTa ? settings.shop.nameTa : settings.shop.nameEn}
+        shopName={
+          lang === 'ta' && settings.shop.nameTa ? settings.shop.nameTa : settings.shop.nameEn
+        }
       />
     </div>
   );
@@ -252,7 +254,9 @@ const StatementSheet: React.FC<{
             <div className="text-right flex-shrink-0">
               <p
                 className={`font-semibold ${
-                  entry.amountPaise > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-brand-secondary'
+                  entry.amountPaise > 0
+                    ? 'text-amber-600 dark:text-amber-400'
+                    : 'text-brand-secondary'
                 }`}
               >
                 {entry.amountPaise > 0 ? '+' : '−'}

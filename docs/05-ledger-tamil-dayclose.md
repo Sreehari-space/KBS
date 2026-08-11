@@ -33,20 +33,23 @@ drifts.
 ### Screens
 
 **Ledger list (கடன் பட்டியல்)**
+
 - Customers with a non-zero balance, sorted by amount owed
 - Header totals: total outstanding, count of customers, oldest unsettled bill
 - Per row: name, balance, days since last payment
 - Rows past ~30 days are visually flagged — not with alarming red, just enough to be noticed
 
 **Customer statement**
+
 - Running balance, newest first, each row showing the delta and the resulting balance
 - Tap a `credit_sale` row → opens the original bill
 - **[ பணம் வசூல் / Collect ]** — record a full or part payment
 - **[ WhatsApp நினைவூட்டல் ]** — send the statement as a reminder
 
 **During billing**
+
 - Selecting a customer shows their current balance inline, before the sale is committed —
-  the shopkeeper needs to know *before* handing over more goods
+  the shopkeeper needs to know _before_ handing over more goods
 - Past the credit limit: a warning, never a block. The shopkeeper knows their customers better
   than the app does, and a hard block would just get worked around
 
@@ -68,12 +71,12 @@ for a two-language app with no pluralisation rules or runtime locale loading.
 ```ts
 // i18n/ta.ts
 export const ta = {
-  'nav.billing':   'பில்லிங்',
+  'nav.billing': 'பில்லிங்',
   'nav.inventory': 'சரக்கு',
-  'nav.ledger':    'கடன்',
-  'billing.scan':  'ஸ்கேன்',
+  'nav.ledger': 'கடன்',
+  'billing.scan': 'ஸ்கேன்',
   'billing.total': 'மொத்தம்',
-  'billing.bill':  'பில் போடு',
+  'billing.bill': 'பில் போடு',
   // ...
 } as const;
 
@@ -131,6 +134,7 @@ Card                    ₹1,200.00
 ```
 
 Notes:
+
 - **Expected cash** = cash payments + cash credit collections − cash refunds. Not just sales.
 - The difference is recorded, not judged. A running history of differences is what reveals a
   pattern.
@@ -174,7 +178,7 @@ distributed beyond a test list), a client ID compiled into public JS, and a live
 connection at backup time. For one shop owner installing a web app, that is a wall.
 
 Web Share to Drive achieves the same outcome — the file lands in Drive — with two taps and no
-setup, because the Drive *app* is already signed in on their phone. Proper Drive API sync stays
+setup, because the Drive _app_ is already signed in on their phone. Proper Drive API sync stays
 on the Phase 4 list if multi-device restore is ever wanted.
 
 ### Additional safety nets
@@ -191,12 +195,12 @@ on the Phase 4 list if multi-device restore is ever wanted.
 Product names fill themselves in as the shopkeeper types, in all three
 directions:
 
-| Typed | English field | Tamil field |
-|---|---|---|
-| `Tomato` | Tomato | தக்காளி |
-| `thakkali` | **Tomato** | தக்காளி |
-| `தக்காளி` | **Tomato** | தக்காளி |
-| `Britannia` | Britannia | பிரிடணிய *(sound-alike)* |
+| Typed       | English field | Tamil field              |
+| ----------- | ------------- | ------------------------ |
+| `Tomato`    | Tomato        | தக்காளி                  |
+| `thakkali`  | **Tomato**    | தக்காளி                  |
+| `தக்காளி`   | **Tomato**    | தக்காளி                  |
+| `Britannia` | Britannia     | பிரிடணிய _(sound-alike)_ |
 
 ### Why not a translation API
 

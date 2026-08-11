@@ -5,7 +5,7 @@ till. This document records what changed and, more usefully, the rules the
 changes follow — so the next screen added to KBS matches without anyone having
 to guess.
 
-Nothing here changes what the app *does*. Every change is additive to the
+Nothing here changes what the app _does_. Every change is additive to the
 touch path: a shopkeeper on a ₹8,000 Android phone gets the same flow they had,
 with fewer dead frames and better-set numbers.
 
@@ -17,17 +17,17 @@ A till is fast because a trained hand never leaves the keys. On the counter
 tablet with a Bluetooth keyboard — or on a laptop — this is the difference
 between "an app" and "a till".
 
-| Key | Action |
-|---|---|
-| `/` | Jump to search |
-| `F2` | Open the scanner |
-| `↑ ↓ ← →` | Move the highlight through the product grid |
-| `Enter` | Add the highlighted item (the top search match by default) |
-| `+` / `−` | One more / one fewer of the last item |
-| `F4` | Open the cart |
-| `F9` | Take payment |
-| `Esc` | Close the topmost sheet, or clear the search |
-| `?` | Show the shortcut list |
+| Key       | Action                                                     |
+| --------- | ---------------------------------------------------------- |
+| `/`       | Jump to search                                             |
+| `F2`      | Open the scanner                                           |
+| `↑ ↓ ← →` | Move the highlight through the product grid                |
+| `Enter`   | Add the highlighted item (the top search match by default) |
+| `+` / `−` | One more / one fewer of the last item                      |
+| `F4`      | Open the cart                                              |
+| `F9`      | Take payment                                               |
+| `Esc`     | Close the topmost sheet, or clear the search               |
+| `?`       | Show the shortcut list                                     |
 
 Three rules keep this from fighting the person typing (`src/hooks/useHotkeys.ts`):
 
@@ -55,12 +55,12 @@ so a phone never carries them.
 
 Four verbs, one vocabulary, defined once in `tailwind.config.js`:
 
-| Verb | Used by | Timing |
-|---|---|---|
-| **Rise** | Sheets, from the edge they belong to | 200 ms in, 140 ms out |
-| **Settle** | A new cart line, a new scan hit, a new split-payment row | 180 ms |
-| **Fade** | Banners, panels, disclosures | 160 ms |
-| **Breathe** | Skeletons, the scanner's warm-up frame | 1.4 s loop |
+| Verb        | Used by                                                  | Timing                |
+| ----------- | -------------------------------------------------------- | --------------------- |
+| **Rise**    | Sheets, from the edge they belong to                     | 200 ms in, 140 ms out |
+| **Settle**  | A new cart line, a new scan hit, a new split-payment row | 180 ms                |
+| **Fade**    | Banners, panels, disclosures                             | 160 ms                |
+| **Breathe** | Skeletons, the scanner's warm-up frame                   | 1.4 s loop            |
 
 Rules:
 
@@ -82,7 +82,7 @@ value; the last frame writes the real number, never an interpolation.
 ## 3. Loading states
 
 Screens used to render `null` (Day close) or pop in fully formed (Reports).
-Both flash. Every screen that reads IndexedDB now shows the *shape* of what is
+Both flash. Every screen that reads IndexedDB now shows the _shape_ of what is
 coming.
 
 The mechanism is deliberately simple: drop the third argument to
@@ -98,10 +98,10 @@ themselves are shapes with no text and no labels.
 A number on its own is data. A number with a baseline is information.
 
 - **Every stat carries a comparison** with the immediately preceding window of
-  the same length. Growing from zero is reported as *"no earlier period"*, not
+  the same length. Growing from zero is reported as _"no earlier period"_, not
   as infinity percent — see `percentChange`.
-- **Sparklines** are built from one bucket per day *including days with no
-  sales*, so a closed Sunday does not look like a normal trading day.
+- **Sparklines** are built from one bucket per day _including days with no
+  sales_, so a closed Sunday does not look like a normal trading day.
 - **Hour-of-day** is the thing no paper notebook can produce: a kirana owner
   genuinely does not know whether the 7–9 pm rush beats the morning one.
 - **Profit** is the most valuable line the app can show and the one it must
@@ -216,7 +216,7 @@ panel's condition to `remaining > 0 && payments.length > 0`. That condition can
 never be true: the only thing that filled `payments` was a full-amount tender,
 which drives `remaining` to zero. The panel and the `+ Cash` / `+ UPI` buttons
 became dead markup, and with them **every credit sale and every split payment** —
-the flow a kirana shop runs on (D9). Tapping *Credit* did nothing at all,
+the flow a kirana shop runs on (D9). Tapping _Credit_ did nothing at all,
 because it filtered `payments` for a mode that is never in `payments`.
 
 Two things let a P0 flow disappear in a UI polish commit:
@@ -224,18 +224,18 @@ Two things let a P0 flow disappear in a UI polish commit:
 1. **The state was only expressible as `useState` inside a component**, where
    nothing could assert on it. It now lives in `src/features/billing/paymentState.ts`
    as pure functions with tests, and the component only renders them.
-2. **Credit is not a payment**, it is the *absence* of one — the remainder.
+2. **Credit is not a payment**, it is the _absence_ of one — the remainder.
    Conflating "the customer chose credit" with "there is a credit row in
    `payments`" is what made the chip unclickable. The two are now separate:
    `fullCredit` is a flag, and the amount is still derived at completion.
 
 ## Decision log additions
 
-| # | Decision | Rationale |
-|---|---|---|
-| D13 | Keyboard shortcuts are **additive and never steal a printable key from a focused field** | The touch path is the one that must never regress. A shortcut that eats a character the operator was typing costs more than it saves. |
-| D14 | Motion is capped at **260 ms** and disabled wholesale under `prefers-reduced-motion` | Nothing in this app conveys state through movement alone, so it can all be switched off; on a low-end phone slow animation is worse than none. |
-| D15 | `useLiveQuery` on the billing path takes **no default value** | `undefined` is the loading state. A default of `[]` renders an empty-state for a frame on every mount, which is what made screens feel cheap. |
-| D16 | Profit is reported **only over lines with a recorded cost price** | Treating a missing cost as zero would flatter the shop and make the number useless. Uncosted revenue is shown separately instead. |
-| D17 | The next bill number shown on the billing screen is a **peek, not an allocation** | The number must still be handed out inside the commit transaction, or two fast taps could share one. |
-| D18 | Payment-sheet decisions live in a **tested pure module**, not in component state | A UI-polish commit silently made every credit and split-payment sale unreachable, and no test could see it. Anything that decides whether a shop can put a bill on a khata is not presentation. |
+| #   | Decision                                                                                 | Rationale                                                                                                                                                                                       |
+| --- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D13 | Keyboard shortcuts are **additive and never steal a printable key from a focused field** | The touch path is the one that must never regress. A shortcut that eats a character the operator was typing costs more than it saves.                                                           |
+| D14 | Motion is capped at **260 ms** and disabled wholesale under `prefers-reduced-motion`     | Nothing in this app conveys state through movement alone, so it can all be switched off; on a low-end phone slow animation is worse than none.                                                  |
+| D15 | `useLiveQuery` on the billing path takes **no default value**                            | `undefined` is the loading state. A default of `[]` renders an empty-state for a frame on every mount, which is what made screens feel cheap.                                                   |
+| D16 | Profit is reported **only over lines with a recorded cost price**                        | Treating a missing cost as zero would flatter the shop and make the number useless. Uncosted revenue is shown separately instead.                                                               |
+| D17 | The next bill number shown on the billing screen is a **peek, not an allocation**        | The number must still be handed out inside the commit transaction, or two fast taps could share one.                                                                                            |
+| D18 | Payment-sheet decisions live in a **tested pure module**, not in component state         | A UI-polish commit silently made every credit and split-payment sale unreachable, and no test could see it. Anything that decides whether a shop can put a bill on a khata is not presentation. |

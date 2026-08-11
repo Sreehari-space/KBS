@@ -122,10 +122,7 @@ export async function setOpeningBalance(
  */
 export async function recalculateAllBalances(): Promise<number> {
   return db.transaction('rw', [db.ledger, db.customers], async () => {
-    const [entries, customers] = await Promise.all([
-      db.ledger.toArray(),
-      db.customers.toArray(),
-    ]);
+    const [entries, customers] = await Promise.all([db.ledger.toArray(), db.customers.toArray()]);
     const sums = new Map<Id, number>();
     for (const e of entries) {
       sums.set(e.customerId, (sums.get(e.customerId) ?? 0) + e.amountPaise);

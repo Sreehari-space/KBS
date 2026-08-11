@@ -6,7 +6,12 @@ import type { Sale, Settings } from './types';
 const settings = (over: Partial<Settings> = {}): Settings => ({
   ...defaultSettings,
   ...over,
-  shop: { ...defaultSettings.shop, nameEn: 'KBS Stores', nameTa: 'கே.பி.எஸ். ஸ்டோர்ஸ்', ...over.shop },
+  shop: {
+    ...defaultSettings.shop,
+    nameEn: 'KBS Stores',
+    nameTa: 'கே.பி.எஸ். ஸ்டோர்ஸ்',
+    ...over.shop,
+  },
   billing: { ...defaultSettings.billing, ...over.billing },
   gst: { ...defaultSettings.gst, ...over.gst },
 });
@@ -60,11 +65,10 @@ describe('buildBill', () => {
   });
 
   it('shows the round-off row when non-zero, and hides it at zero', () => {
-    const withRound = buildBill(
-      sale({ roundOffPaise: -40, totalPaise: 28960 }),
-      settings(),
-      { lang: 'en', customer: undefined },
-    );
+    const withRound = buildBill(sale({ roundOffPaise: -40, totalPaise: 28960 }), settings(), {
+      lang: 'en',
+      customer: undefined,
+    });
     expect(withRound.totals.some((r) => r.label === 'Round off')).toBe(true);
 
     const noRound = buildBill(sale(), settings(), { lang: 'en', customer: undefined });
@@ -72,10 +76,14 @@ describe('buildBill', () => {
   });
 
   it('omits GSTIN when GST mode is off', () => {
-    const bill = buildBill(sale(), settings({ gst: { ...defaultSettings.gst, gstin: '33AAAAA0000A1Z5' } }), {
-      lang: 'en',
-      customer: undefined,
-    });
+    const bill = buildBill(
+      sale(),
+      settings({ gst: { ...defaultSettings.gst, gstin: '33AAAAA0000A1Z5' } }),
+      {
+        lang: 'en',
+        customer: undefined,
+      },
+    );
     expect(bill.header.gstin).toBeUndefined();
   });
 
@@ -92,11 +100,10 @@ describe('buildBill', () => {
     const plain = buildBill(sale(), settings(), { lang: 'en', customer: undefined });
     expect(plain.savings).toBeUndefined();
 
-    const discounted = buildBill(
-      sale({ billDiscountPaise: 1000, totalPaise: 28000 }),
-      settings(),
-      { lang: 'en', customer: undefined },
-    );
+    const discounted = buildBill(sale({ billDiscountPaise: 1000, totalPaise: 28000 }), settings(), {
+      lang: 'en',
+      customer: undefined,
+    });
     expect(discounted.savings).toContain('10.00');
   });
 

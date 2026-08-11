@@ -11,13 +11,13 @@ Primary device is an **Android phone**. Everything below is designed for that fi
 
 Both are on-device local storage. `localStorage` cannot meet the requirement above.
 
-| | `localStorage` | IndexedDB |
-|---|---|---|
-| Capacity | ~5 MB hard cap per origin | Large share of free disk (Chrome: up to ~60%) |
-| Data types | Strings only | Structured objects + Blobs |
-| Write model | Synchronous, blocks the main thread | Async, transactional |
-| Incremental writes | Must rewrite the entire value | Insert/update a single record |
-| Atomicity | None | Multi-store transactions |
+|                    | `localStorage`                      | IndexedDB                                     |
+| ------------------ | ----------------------------------- | --------------------------------------------- |
+| Capacity           | ~5 MB hard cap per origin           | Large share of free disk (Chrome: up to ~60%) |
+| Data types         | Strings only                        | Structured objects + Blobs                    |
+| Write model        | Synchronous, blocks the main thread | Async, transactional                          |
+| Incremental writes | Must rewrite the entire value       | Insert/update a single record                 |
+| Atomicity          | None                                | Multi-store transactions                      |
 
 **Capacity.** A bill with Tamil item names is ~1–2 KB stored. At 100 bills/day that is
 **36–70 MB/year**. `localStorage` would hit its 5 MB ceiling in roughly 6–8 weeks and then
@@ -33,13 +33,13 @@ a flash of the wrong background. Nothing else.
 
 ## Storage budget
 
-| Data | Per unit | 1 year @ 100 bills/day | 5 years |
-|---|---|---|---|
-| Sales | ~1–2 KB/bill | 36–70 MB | 180–350 MB |
-| Ledger entries | ~200 B | < 5 MB | < 25 MB |
-| Products | ~500 B | < 1 MB | < 1 MB |
-| Customers | ~300 B | < 1 MB | < 1 MB |
-| **Product images** | **capped at 50 KB** | ~25 MB @ 500 products | ~25 MB |
+| Data               | Per unit            | 1 year @ 100 bills/day | 5 years    |
+| ------------------ | ------------------- | ---------------------- | ---------- |
+| Sales              | ~1–2 KB/bill        | 36–70 MB               | 180–350 MB |
+| Ledger entries     | ~200 B              | < 5 MB                 | < 25 MB    |
+| Products           | ~500 B              | < 1 MB                 | < 1 MB     |
+| Customers          | ~300 B              | < 1 MB                 | < 1 MB     |
+| **Product images** | **capped at 50 KB** | ~25 MB @ 500 products  | ~25 MB     |
 
 Comfortably within a phone's budget. **Bills are never pruned** — see Retention below.
 
@@ -91,12 +91,12 @@ Rules that fall out of this:
 `"relaxed"` — the write may sit in OS buffers rather than being flushed. For the sale-commit
 transaction specifically we want `"strict"`, so a battery pull a second after billing cannot
 lose the last sale. The cost is a few milliseconds per bill, which is irrelevant at counter
-speed. *(Confirm how Dexie exposes this at implementation time; fall back to a raw IDB
-transaction for this one path if needed.)*
+speed. _(Confirm how Dexie exposes this at implementation time; fall back to a raw IDB
+transaction for this one path if needed.)_
 
 ## Draft auto-save (the in-progress cart)
 
-The commit protocol protects *completed* bills. The open cart needs its own protection, and on
+The commit protocol protects _completed_ bills. The open cart needs its own protection, and on
 Android it needs it badly: **the OS kills backgrounded browser tabs on low-RAM phones routinely**.
 A shopkeeper who takes a phone call halfway through a 20-item bill comes back to a dead tab.
 
@@ -112,7 +112,7 @@ interruption, tab closed by mistake.
 
 ## Append-only, never delete
 
-- **Sales are immutable once written.** A mistake is corrected with a *return* bill linked via
+- **Sales are immutable once written.** A mistake is corrected with a _return_ bill linked via
   `returnOfSaleId` — the original stays. An interrupted write can therefore never corrupt an
   existing bill.
 - **Ledger entries are append-only.** Corrections are new `adjustment` rows ([doc 05](05-ledger-tamil-dayclose.md)).
@@ -145,7 +145,7 @@ then-archive of a chosen date range — never automatic, never silent.
   blocking error with the cart preserved. The one unacceptable outcome is a shopkeeper
   believing a bill saved when it didn't.
 
-## What auto-save does *not* cover
+## What auto-save does _not_ cover
 
 Auto-save fully solves crashes, forgetting to save, interrupted bills, and low-memory tab
 kills. It cannot solve **the phone being lost, stolen, broken, or wiped** — the data lives in
@@ -159,8 +159,8 @@ The local-only mitigation that fits the no-server constraint, in priority order:
    daily, rather than a reminder they'll dismiss.
 2. **Desktop auto-backup.** On a laptop, the File System Access API can hold a folder handle
    and write a daily backup with no prompt after one-time setup. Point it at a synced Drive or
-   OneDrive folder and backup becomes fully automatic. *(Not available on Android Chrome, so
-   phones stay on the share-sheet path.)*
+   OneDrive folder and backup becomes fully automatic. _(Not available on Android Chrome, so
+   phones stay on the share-sheet path.)_
 3. **Visible backup age.** "Last backup: 3 days ago" in Settings and on the dashboard.
 
 The credit ledger is the data whose loss is unrecoverable — it is money owed that no customer
@@ -170,15 +170,15 @@ will volunteer. If off-device backup is ever revisited, that's the reason.
 
 Phase 1 is not done until all of these pass on a real Android phone:
 
-| # | Test | Expected |
-|---|---|---|
-| 1 | Complete a bill, force-stop the browser immediately | Bill present on reopen, stock decremented |
-| 2 | Complete a bill in aeroplane mode | Saves normally; no network involved |
-| 3 | Add 10 items, background the app, let Android kill the tab | Draft restores with all 10 items |
-| 4 | Bill 500 sales, then bill one more | Save latency unchanged; no UI freeze |
-| 5 | Fill storage to quota, then bill | Blocking error shown, **cart preserved**, retry works |
-| 6 | Two fast taps on [BILL] | Exactly one sale, one bill number |
-| 7 | Credit sale | Sale + ledger entry + customer balance all update, or none do |
-| 8 | Kill the app mid-transaction (dev-tools throttle) | No partial sale; stock not decremented without a bill |
-| 9 | Reopen after 30 days idle, PWA installed | Data intact |
-| 10 | Export, wipe site data, import | Every bill, ledger entry and product returns |
+| #   | Test                                                       | Expected                                                      |
+| --- | ---------------------------------------------------------- | ------------------------------------------------------------- |
+| 1   | Complete a bill, force-stop the browser immediately        | Bill present on reopen, stock decremented                     |
+| 2   | Complete a bill in aeroplane mode                          | Saves normally; no network involved                           |
+| 3   | Add 10 items, background the app, let Android kill the tab | Draft restores with all 10 items                              |
+| 4   | Bill 500 sales, then bill one more                         | Save latency unchanged; no UI freeze                          |
+| 5   | Fill storage to quota, then bill                           | Blocking error shown, **cart preserved**, retry works         |
+| 6   | Two fast taps on [BILL]                                    | Exactly one sale, one bill number                             |
+| 7   | Credit sale                                                | Sale + ledger entry + customer balance all update, or none do |
+| 8   | Kill the app mid-transaction (dev-tools throttle)          | No partial sale; stock not decremented without a bill         |
+| 9   | Reopen after 30 days idle, PWA installed                   | Data intact                                                   |
+| 10  | Export, wipe site data, import                             | Every bill, ledger entry and product returns                  |

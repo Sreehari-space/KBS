@@ -10,14 +10,9 @@
  * that is already signed in reaches the same place in two taps.
  */
 
-import { db } from '../../data/db';
-import type {
-  Customer,
-  LedgerEntry,
-  Product,
-  Sale,
-  Settings,
-} from '@/domain/types';
+import { db, type Counter } from '../../data/db';
+import { recalculateAllBalances } from '@/data/repositories/ledgerRepo';
+import type { Customer, LedgerEntry, Product, Sale, Settings } from '@/domain/types';
 
 export const BACKUP_VERSION = 1;
 const LAST_BACKUP_KEY = 'lastBackupAt';
@@ -31,15 +26,44 @@ export interface BackupFile {
   sales: Sale[];
   ledger: LedgerEntry[];
   settings: Settings | null;
+  /** Optional: absent in v1 files, which restore rebuilds from the sales. */
+  counters?: Counter[];
+}
+
+/**
+ * Rebuild the daily bill and return sequences from the bills themselves.
+ *
+ * This is the fix for the worst bug in the restore path: counters were never
+ * exported, so restoring onto a NEW device — the disaster-recovery case, the
+ * only one that matters — left every sequence at zero and the next sale
+ * reissued a bill number that already existed. Two different sales, same
+ * number, no error, discovered during a dispute months later.
+ *
+ * Deriving from the sales rather than trusting an exported counter also
+ * repairs backups taken before this existed, and self-corrects if a counter
+ * was ever left behind by a partial write.
+ */
+export function countersFromSales(sales: readonly Sale[]): Counter[] {
+  const highest = new Map<string, number>();
+  for (const sale of sales) {
+    // "080826-014" and "080826-R002" — date key, series, sequence.
+    const match = /^(\d{6})-(R?)(\d+)$/.exec(sale.billNo);
+    if (!match) continue;
+    const [, dateKey, isReturn, seq] = match;
+    const id = `${isReturn ? 'return' : 'bill'}:${dateKey}`;
+    highest.set(id, Math.max(highest.get(id) ?? 0, Number(seq)));
+  }
+  return [...highest.entries()].map(([id, value]) => ({ id, value }));
 }
 
 export async function buildBackup(): Promise<BackupFile> {
-  const [products, customers, sales, ledger, settings] = await Promise.all([
+  const [products, customers, sales, ledger, settings, counters] = await Promise.all([
     db.products.toArray(),
     db.customers.toArray(),
     db.sales.toArray(),
     db.ledger.toArray(),
     db.settings.toArray(),
+    db.counters.toArray(),
   ]);
 
   return {
@@ -55,6 +79,7 @@ export async function buildBackup(): Promise<BackupFile> {
     customers,
     sales,
     ledger,
+    counters,
     // Images are excluded: they are the bulk of the bytes and are
     // reconstructible by re-photographing. Bills and the ledger are not.
     settings: settings[0] ?? null,
@@ -139,10 +164,31 @@ export async function restoreBackup(backup: BackupFile): Promise<void> {
       await db.sales.bulkAdd(backup.sales ?? []);
       await db.ledger.bulkAdd(backup.ledger ?? []);
       if (backup.settings) await db.settings.put({ ...backup.settings, id: 'singleton' });
+
+      // Bill sequences are rebuilt from the restored bills rather than taken
+      // from the file, so an older backup with no counters — and any counter
+      // left stale by a partial write — still lands on the right next number.
+      // Without this the next sale reissues a bill number that already exists.
+      const rebuilt = countersFromSales(backup.sales ?? []);
+      await db.counters.bulkPut(rebuilt);
+
+      // Anything else the file carried (the backup timestamp, future keys)
+      // that the sequences above do not own.
+      const owned = new Set(rebuilt.map((c) => c.id));
+      const carried = (backup.counters ?? []).filter(
+        (c) => !owned.has(c.id) && c.id !== 'seeded:v1',
+      );
+      if (carried.length > 0) await db.counters.bulkPut(carried);
+
       // Mark as seeded so first-run seeding can't run over restored data.
       await db.counters.put({ id: 'seeded:v1', value: 1 });
     },
   );
+
+  // The cached balances came straight out of the file. Recomputing them from
+  // the restored ledger costs one pass and turns "probably fine" into
+  // "checked" on the one operation that has no undo.
+  await recalculateAllBalances();
 }
 
 export async function getLastBackupAt(): Promise<Date | null> {

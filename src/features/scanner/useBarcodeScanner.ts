@@ -20,13 +20,7 @@ const FORMATS = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'qr
 const DUPLICATE_WINDOW_MS = 1500;
 
 export type ScannerStatus =
-  | 'idle'
-  | 'starting'
-  | 'scanning'
-  | 'permission-denied'
-  | 'no-camera'
-  | 'unsupported'
-  | 'error';
+  'idle' | 'starting' | 'scanning' | 'permission-denied' | 'no-camera' | 'unsupported' | 'error';
 
 interface BarcodeDetectorLike {
   detect(source: CanvasImageSource): Promise<{ rawValue: string }[]>;
@@ -74,22 +68,19 @@ export function useBarcodeScanner({ onScan, continuous, enabled }: UseBarcodeSca
   const onScanRef = useRef(onScan);
   onScanRef.current = onScan;
 
-  const handleCode = useCallback(
-    (raw: string) => {
-      const code = raw.trim();
-      // A misread that fails its check digit is discarded silently — better
-      // than creating a junk product in the catalogue.
-      if (!isPlausibleBarcode(code)) return;
+  const handleCode = useCallback((raw: string) => {
+    const code = raw.trim();
+    // A misread that fails its check digit is discarded silently — better
+    // than creating a junk product in the catalogue.
+    if (!isPlausibleBarcode(code)) return;
 
-      const now = Date.now();
-      const previous = lastSeen.current.get(code);
-      if (previous && now - previous < DUPLICATE_WINDOW_MS) return;
-      lastSeen.current.set(code, now);
+    const now = Date.now();
+    const previous = lastSeen.current.get(code);
+    if (previous && now - previous < DUPLICATE_WINDOW_MS) return;
+    lastSeen.current.set(code, now);
 
-      onScanRef.current(code);
-    },
-    [],
-  );
+    onScanRef.current(code);
+  }, []);
 
   const stop = useCallback(() => {
     if (rafRef.current !== null) {

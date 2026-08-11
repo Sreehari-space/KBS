@@ -68,6 +68,33 @@ describe('summarise', () => {
     const sales = [sale({ totalPaise: 5000, creditPaise: 2000 })];
     expect(summarise(sales)).toMatchObject({ revenuePaise: 5000, creditPaise: 2000 });
   });
+
+  it('nets refunds off revenue without counting them as bills', () => {
+    // A sale and its return used to read as "Bills: 2", which also halved the
+    // average bill. The refund still has to reduce the takings.
+    const sales = [
+      sale({ id: 'a', totalPaise: 5000 }),
+      sale({ id: 'a-return', totalPaise: -2000, returnOfSaleId: 'a' }),
+    ];
+    expect(summarise(sales)).toMatchObject({
+      billCount: 1,
+      revenuePaise: 3000,
+      averagePaise: 3000,
+    });
+  });
+
+  it('does not count refunds in the daily bill count either', () => {
+    const now = new Date(2026, 0, 10, 12, 0);
+    const buckets = dailySeries(
+      [
+        sale({ id: 'a', createdAt: now.toISOString(), totalPaise: 5000 }),
+        sale({ id: 'r', createdAt: now.toISOString(), totalPaise: -2000, returnOfSaleId: 'a' }),
+      ],
+      7,
+      now,
+    );
+    expect(buckets[6]).toMatchObject({ totalPaise: 3000, billCount: 1 });
+  });
 });
 
 describe('percentChange', () => {

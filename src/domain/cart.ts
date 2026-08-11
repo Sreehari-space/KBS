@@ -75,7 +75,8 @@ export function computeTotals(input: CartTotalsInput): CartTotals {
 
   // When prices include tax the tax is already inside `afterDiscount`, so it
   // must NOT be added again. When they exclude tax, it goes on top.
-  const preRound = gst.enabled && !gst.pricesIncludeTax ? afterDiscount + gstResult.totalTaxPaise : afterDiscount;
+  const preRound =
+    gst.enabled && !gst.pricesIncludeTax ? afterDiscount + gstResult.totalTaxPaise : afterDiscount;
 
   const roundOffPaise = roundOffEnabled ? roundOffDelta(preRound) : 0;
 
@@ -128,11 +129,7 @@ export function assertBalances(
  * twice should read as quantity 2, not two separate lines. Weight-based items
  * always open a fresh line because the quantity comes from the keypad.
  */
-export function addToCart(
-  lines: readonly SaleLine[],
-  product: Product,
-  qty: number,
-): SaleLine[] {
+export function addToCart(lines: readonly SaleLine[], product: Product, qty: number): SaleLine[] {
   const existingIndex = lines.findIndex(
     (l) => l.productId === product.id && l.lineDiscountPaise === 0,
   );

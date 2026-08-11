@@ -73,8 +73,7 @@ export function billToText(bill: Bill): string {
   for (const footer of bill.footerLines) out.push(centre(footer));
 
   const body = out.filter((line) => line !== undefined).join('\n');
-  const trimmed =
-    body.length > MAX_CHARS ? `${body.slice(0, MAX_CHARS)}\n…` : body;
+  const trimmed = body.length > MAX_CHARS ? `${body.slice(0, MAX_CHARS)}\n…` : body;
 
   return '```\n' + trimmed + '\n```';
 }

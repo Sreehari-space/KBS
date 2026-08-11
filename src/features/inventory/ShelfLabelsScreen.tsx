@@ -8,7 +8,6 @@ import { formatINR } from '@/domain/money';
 import { listProducts } from '@/data/repositories/productRepo';
 import { productName, unitLabel, useT } from '@/i18n/useT';
 
-
 /**
  * Shop-printed QR labels for loose goods (docs/03).
  *
@@ -100,10 +99,16 @@ export const ShelfLabelsScreen: React.FC = () => {
 
         {/* The printable sheet. `.bill-print` is reused so only this prints. */}
         {chosen.length > 0 && (
-          <div className="bill-print bg-white text-black p-3" style={{ ['--bill-width' as string]: 'auto' }}>
+          <div
+            className="bill-print bg-white text-black p-3"
+            style={{ ['--bill-width' as string]: 'auto' }}
+          >
             <div className="grid grid-cols-2 gap-3">
               {chosen.map((p) => (
-                <div key={p.id} className="border border-black/40 rounded p-2 text-center break-inside-avoid">
+                <div
+                  key={p.id}
+                  className="border border-black/40 rounded p-2 text-center break-inside-avoid"
+                >
                   {codes.get(p.id) && (
                     <img src={codes.get(p.id)} alt="" className="w-20 h-20 mx-auto" />
                   )}

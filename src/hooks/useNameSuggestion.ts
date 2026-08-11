@@ -45,15 +45,9 @@ export function useNameSuggestion(initial?: Partial<NameFields>) {
       // field does too. Plain English is left exactly as typed.
       const typedTamil = detectScript(value) === 'tamil';
       const nameEn =
-        (isTanglish(value) || typedTamil) && suggestion.nameEn
-          ? suggestion.nameEn
-          : value;
+        (isTanglish(value) || typedTamil) && suggestion.nameEn ? suggestion.nameEn : value;
       // When Tamil was typed here, that IS the Tamil name.
-      const nameTa = tamilEdited.current
-        ? cur.nameTa
-        : typedTamil
-          ? value
-          : suggestion.nameTa;
+      const nameTa = tamilEdited.current ? cur.nameTa : typedTamil ? value : suggestion.nameTa;
       return {
         nameEn,
         nameTa,

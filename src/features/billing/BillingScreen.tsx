@@ -10,7 +10,7 @@ import {
   Sheet,
   SkeletonTiles,
 } from '@/components/ui';
-import { IconCheck, IconMic, IconScan, IconSearch } from '@/components/icons';
+import { IconCheck, IconMic, IconScan, IconSearch, IconTrash } from '@/components/icons';
 import { Kbd } from '@/components/ShortcutsOverlay';
 import { QuantitySheet } from './QuantitySheet';
 import { PaymentSheet } from './PaymentSheet';
@@ -25,6 +25,7 @@ import {
   ACTIVE_DRAFT_ID,
   clearActiveDraft,
   commitSale,
+  discardHeldBill,
   holdCurrentCart,
   listHeldBills,
   peekNextBillNo,
@@ -83,6 +84,7 @@ export const BillingScreen: React.FC<{
   const [heldOpen, setHeldOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [flashId, setFlashId] = useState<string | null>(null);
+  const [confirmClear, setConfirmClear] = useState(false);
 
   const searchRef = useRef<HTMLInputElement | null>(null);
   const gridRef = useRef<HTMLDivElement | null>(null);
@@ -121,7 +123,13 @@ export const BillingScreen: React.FC<{
   useEffect(() => setActiveIndex(0), [search, visibleProducts.length]);
 
   const anySheetOpen =
-    cartOpen || payOpen || scannerOpen || voiceOpen || heldOpen || qtyProduct !== null ||
+    cartOpen ||
+    payOpen ||
+    scannerOpen ||
+    voiceOpen ||
+    heldOpen ||
+    confirmClear ||
+    qtyProduct !== null ||
     unknownBarcode !== null;
 
   const addProduct = useCallback(
@@ -327,7 +335,9 @@ export const BillingScreen: React.FC<{
         <div className="p-4">
           <Banner tone="danger" onDismiss={() => setError(null)}>
             <p className="font-semibold">{error}</p>
-            <p className="text-sm mt-1">{t('billing.cart')} — {lines.length} {t('billing.items')}</p>
+            <p className="text-sm mt-1">
+              {t('billing.cart')} — {lines.length} {t('billing.items')}
+            </p>
           </Banner>
         </div>
       )}
@@ -552,7 +562,13 @@ export const BillingScreen: React.FC<{
               className="py-2 text-sm"
               onClick={async () => {
                 await holdCurrentCart(
-                  { id: ACTIVE_DRAFT_ID, kind: 'active', lines, billDiscountPaise: 0, updatedAt: '' },
+                  {
+                    id: ACTIVE_DRAFT_ID,
+                    kind: 'active',
+                    lines,
+                    billDiscountPaise: 0,
+                    updatedAt: '',
+                  },
                   new Date().toLocaleTimeString(),
                 );
                 setLines([]);
@@ -561,12 +577,10 @@ export const BillingScreen: React.FC<{
             >
               {t('billing.hold')}
             </Button>
+            {/* Confirmed, because it is the one destructive action on the
+                billing path and it also wipes the saved draft. */}
             <button
-              onClick={() => {
-                setLines([]);
-                void clearActiveDraft();
-                setCartOpen(false);
-              }}
+              onClick={() => setConfirmClear(true)}
               className="text-sm text-light-text-secondary dark:text-dark-text-secondary hover:text-red-600 px-2 py-2 rounded focus-ring"
             >
               {t('billing.clear')}
@@ -593,9 +607,7 @@ export const BillingScreen: React.FC<{
       <NewProductSheet
         barcode={unknownBarcode}
         warning={
-          unknownBarcode && looksLikeMarketingQr(unknownBarcode)
-            ? t('scan.marketingQr')
-            : undefined
+          unknownBarcode && looksLikeMarketingQr(unknownBarcode) ? t('scan.marketingQr') : undefined
         }
         onClose={() => setUnknownBarcode(null)}
         onCreated={(product) => {
@@ -614,21 +626,55 @@ export const BillingScreen: React.FC<{
       <Sheet open={heldOpen} onClose={() => setHeldOpen(false)} title={t('billing.heldBills')}>
         <div className="space-y-2">
           {heldBills.map((held) => (
-            <button
+            <div
               key={held.id}
-              onClick={async () => {
-                const resumed = await resumeHeldBill(held.id);
-                if (resumed) setLines(resumed.lines);
-                setHeldOpen(false);
-              }}
-              className="w-full flex items-center justify-between gap-3 p-3 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 focus-ring"
+              className="flex items-stretch gap-2 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 overflow-hidden"
             >
-              <span className="font-medium">{held.label}</span>
-              <span className="text-sm count">
-                {held.lines.length} {t('billing.items')}
-              </span>
-            </button>
+              <button
+                onClick={async () => {
+                  const resumed = await resumeHeldBill(held.id);
+                  if (resumed) setLines(resumed.lines);
+                  setHeldOpen(false);
+                }}
+                className="flex-1 flex items-center justify-between gap-3 p-3 text-left focus-ring"
+              >
+                <span className="font-medium">{held.label}</span>
+                <span className="text-sm count">
+                  {held.lines.length} {t('billing.items')}
+                </span>
+              </button>
+              {/* A customer who walks out leaves a parked bill behind. Without
+                  this the only way to clear one was to serve it. */}
+              <button
+                onClick={() => void discardHeldBill(held.id)}
+                className="px-3 text-light-text-secondary dark:text-dark-text-secondary hover:text-red-600 focus-ring"
+                aria-label={t('draft.discard')}
+              >
+                <IconTrash className="w-4 h-4" />
+              </button>
+            </div>
           ))}
+        </div>
+      </Sheet>
+
+      <Sheet open={confirmClear} onClose={() => setConfirmClear(false)} title={t('billing.clear')}>
+        <p className="mb-4">{t('billing.clearConfirm')}</p>
+        <div className="flex gap-3">
+          <Button variant="ghost" full onClick={() => setConfirmClear(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="danger"
+            full
+            onClick={() => {
+              setLines([]);
+              void clearActiveDraft();
+              setConfirmClear(false);
+              setCartOpen(false);
+            }}
+          >
+            {t('billing.clear')}
+          </Button>
         </div>
       </Sheet>
     </div>

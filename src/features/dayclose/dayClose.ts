@@ -61,7 +61,9 @@ export async function buildDayClose(date = new Date()): Promise<DayCloseSummary>
 
   return {
     date,
-    billCount: sales.length,
+    // Refunds net off the takings but are not bills; counting them made a sale
+    // and its return read as two bills in the day's summary.
+    billCount: sales.filter((s) => !s.returnOfSaleId).length,
     salesTotalPaise,
     byMode,
     creditGivenPaise,
@@ -77,6 +79,8 @@ export function dayCloseText(
   countedCashPaise: Paise | null,
   labels: {
     title: string;
+    /** Pre-formatted by the caller, which knows the UI language. */
+    date: string;
     sales: string;
     bills: string;
     cash: string;
@@ -92,7 +96,10 @@ export function dayCloseText(
   const rupees = (p: Paise) => (p / 100).toFixed(2);
   const out = [
     `*${shopName}*`,
-    `${labels.title} — ${summary.date.toLocaleDateString()}`,
+    // The date arrives already formatted: `toLocaleDateString()` with no
+    // argument follows the DEVICE locale, so a shop running the app in Tamil
+    // was sending itself an English date in the WhatsApp summary.
+    `${labels.title} — ${labels.date}`,
     '',
     `${labels.bills}: ${summary.billCount}`,
     `${labels.sales}: ₹${rupees(summary.salesTotalPaise)}`,

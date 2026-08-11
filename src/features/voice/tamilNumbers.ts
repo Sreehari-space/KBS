@@ -8,15 +8,22 @@
  */
 
 export const TAMIL_NUMBERS: Record<string, number> = {
-  ஒன்னு: 1, ஒன்று: 1, ஒரு: 1,
-  ரெண்டு: 2, இரண்டு: 2,
-  மூணு: 3, மூன்று: 3,
-  நாலு: 4, நான்கு: 4,
-  அஞ்சு: 5, ஐந்து: 5,
+  ஒன்னு: 1,
+  ஒன்று: 1,
+  ஒரு: 1,
+  ரெண்டு: 2,
+  இரண்டு: 2,
+  மூணு: 3,
+  மூன்று: 3,
+  நாலு: 4,
+  நான்கு: 4,
+  அஞ்சு: 5,
+  ஐந்து: 5,
   ஆறு: 6,
   ஏழு: 7,
   எட்டு: 8,
-  ஒன்பது: 9, ஒம்பது: 9,
+  ஒன்பது: 9,
+  ஒம்பது: 9,
   பத்து: 10,
   கால்: 0.25,
   அரை: 0.5,
@@ -24,9 +31,18 @@ export const TAMIL_NUMBERS: Record<string, number> = {
 };
 
 const ENGLISH_NUMBERS: Record<string, number> = {
-  one: 1, two: 2, three: 3, four: 4, five: 5,
-  six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
-  half: 0.5, quarter: 0.25,
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+  five: 5,
+  six: 6,
+  seven: 7,
+  eight: 8,
+  nine: 9,
+  ten: 10,
+  half: 0.5,
+  quarter: 0.25,
 };
 
 const UNIT_WORDS: { words: string[]; unit: string; multiplier: number }[] = [
@@ -82,10 +98,7 @@ export function parseUtterance(transcript: string): ParsedUtterance {
  * matching in both scripts — speech transcripts are noisy, and a fuzzy library
  * would be more confident than the input deserves.
  */
-export function scoreProduct(
-  product: { nameEn: string; nameTa: string },
-  term: string,
-): number {
+export function scoreProduct(product: { nameEn: string; nameTa: string }, term: string): number {
   if (!term) return 0;
   const needle = term.toLowerCase();
   const en = product.nameEn.toLowerCase();

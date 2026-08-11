@@ -26,10 +26,7 @@ interface DrawContext {
 const FONT = (size: number, bold = false) =>
   `${bold ? 'bold ' : ''}${size}px "Noto Sans Tamil", monospace`;
 
-export async function billToCanvas(
-  bill: Bill,
-  opts: { widthMm?: 58 | 80 } = {},
-): Promise<Blob> {
+export async function billToCanvas(bill: Bill, opts: { widthMm?: 58 | 80 } = {}): Promise<Blob> {
   const width = opts.widthMm === 80 ? WIDTH_576 : WIDTH_384;
   const pad = 12;
 

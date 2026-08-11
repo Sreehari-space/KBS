@@ -34,112 +34,110 @@ export const BillPreview: React.FC<{ bill: Bill; widthMm: 58 | 80 }> = ({ bill, 
     // index.css; the shadow lives on this wrapper so it follows the teeth
     // instead of being clipped by them. Both are disabled for @media print.
     <div className="receipt-shadow mx-auto" style={{ width: widthMm === 80 ? 300 : 240 }}>
-    <div
-      className="bill-print receipt-paper bg-white text-black px-3"
-      style={{
-        ['--bill-width' as string]: `${widthMm}mm`,
-        fontFamily: '"Noto Sans Tamil", monospace',
-        fontSize: 12,
-        lineHeight: 1.35,
-      }}
-    >
-      <div className="text-center">
-        <div className="font-bold text-base leading-tight tracking-wide">
-          {bill.header.shopName}
+      <div
+        className="bill-print receipt-paper bg-white text-black px-3"
+        style={{
+          ['--bill-width' as string]: `${widthMm}mm`,
+          fontFamily: '"Noto Sans Tamil", monospace',
+          fontSize: 12,
+          lineHeight: 1.35,
+        }}
+      >
+        <div className="text-center">
+          <div className="font-bold text-base leading-tight tracking-wide">
+            {bill.header.shopName}
+          </div>
+          {bill.header.addressLines.map((line, i) => (
+            <div key={i} className="text-[10px]">
+              {line}
+            </div>
+          ))}
+          {bill.header.phone && <div className="text-[10px]">{bill.header.phone}</div>}
+          {bill.header.gstin && <div className="text-[10px]">GSTIN: {bill.header.gstin}</div>}
         </div>
-        {bill.header.addressLines.map((line, i) => (
-          <div key={i} className="text-[10px]">
+
+        <Dashed />
+
+        <div className="text-[10px]">
+          <div>{bill.meta.billNo}</div>
+          <div>{bill.meta.dateTime}</div>
+          {bill.meta.customerName && (
+            <div>
+              {bill.meta.customerName} {bill.meta.customerPhone}
+            </div>
+          )}
+        </div>
+
+        <Dashed />
+
+        {bill.lines.map((line, i) => (
+          <div key={i} className="mb-0.5">
+            <div className="leading-tight">{line.name}</div>
+            <div className="flex justify-between text-[11px] tnum">
+              <span className="pl-2">{line.qtyLabel}</span>
+              <span>{line.amountLabel}</span>
+            </div>
+          </div>
+        ))}
+
+        <Dashed />
+
+        {bill.totals.map((row, i) => (
+          <div
+            key={i}
+            className={`flex justify-between tnum ${
+              row.emphasis ? 'font-bold text-base border-t border-black mt-1 pt-1' : 'text-[11px]'
+            }`}
+          >
+            <span>{row.label}</span>
+            <span>{row.value}</span>
+          </div>
+        ))}
+
+        {bill.payments.length > 0 && (
+          <>
+            <Dashed />
+            {bill.payments.map((row, i) => (
+              <div key={i} className="flex justify-between text-[11px] tnum">
+                <span>{row.label}</span>
+                <span>{row.value}</span>
+              </div>
+            ))}
+          </>
+        )}
+
+        {/* Customers notice this, and it costs nothing. */}
+        {bill.savings && (
+          <div className="text-center font-semibold text-[11px] mt-1">{bill.savings}</div>
+        )}
+
+        {bill.credit && (
+          <>
+            <Dashed />
+            <div className="text-[11px] tnum">
+              <div>{bill.credit.previousBalance}</div>
+              <div>{bill.credit.thisBill}</div>
+              <div className="font-bold">{bill.credit.newBalance}</div>
+            </div>
+          </>
+        )}
+
+        {qr && (
+          <>
+            <Dashed />
+            <img src={qr} alt="UPI QR" className="mx-auto w-28 h-28" />
+          </>
+        )}
+
+        <Dashed />
+        {bill.footerLines.map((line, i) => (
+          <div key={i} className="text-center text-[11px]">
             {line}
           </div>
         ))}
-        {bill.header.phone && <div className="text-[10px]">{bill.header.phone}</div>}
-        {bill.header.gstin && <div className="text-[10px]">GSTIN: {bill.header.gstin}</div>}
       </div>
-
-      <Dashed />
-
-      <div className="text-[10px]">
-        <div>{bill.meta.billNo}</div>
-        <div>{bill.meta.dateTime}</div>
-        {bill.meta.customerName && (
-          <div>
-            {bill.meta.customerName} {bill.meta.customerPhone}
-          </div>
-        )}
-      </div>
-
-      <Dashed />
-
-      {bill.lines.map((line, i) => (
-        <div key={i} className="mb-0.5">
-          <div className="leading-tight">{line.name}</div>
-          <div className="flex justify-between text-[11px] tnum">
-            <span className="pl-2">{line.qtyLabel}</span>
-            <span>{line.amountLabel}</span>
-          </div>
-        </div>
-      ))}
-
-      <Dashed />
-
-      {bill.totals.map((row, i) => (
-        <div
-          key={i}
-          className={`flex justify-between tnum ${
-            row.emphasis ? 'font-bold text-base border-t border-black mt-1 pt-1' : 'text-[11px]'
-          }`}
-        >
-          <span>{row.label}</span>
-          <span>{row.value}</span>
-        </div>
-      ))}
-
-      {bill.payments.length > 0 && (
-        <>
-          <Dashed />
-          {bill.payments.map((row, i) => (
-            <div key={i} className="flex justify-between text-[11px] tnum">
-              <span>{row.label}</span>
-              <span>{row.value}</span>
-            </div>
-          ))}
-        </>
-      )}
-
-      {/* Customers notice this, and it costs nothing. */}
-      {bill.savings && (
-        <div className="text-center font-semibold text-[11px] mt-1">{bill.savings}</div>
-      )}
-
-      {bill.credit && (
-        <>
-          <Dashed />
-          <div className="text-[11px] tnum">
-            <div>{bill.credit.previousBalance}</div>
-            <div>{bill.credit.thisBill}</div>
-            <div className="font-bold">{bill.credit.newBalance}</div>
-          </div>
-        </>
-      )}
-
-      {qr && (
-        <>
-          <Dashed />
-          <img src={qr} alt="UPI QR" className="mx-auto w-28 h-28" />
-        </>
-      )}
-
-      <Dashed />
-      {bill.footerLines.map((line, i) => (
-        <div key={i} className="text-center text-[11px]">
-          {line}
-        </div>
-      ))}
-    </div>
     </div>
   );
 };
 
-const Dashed: React.FC = () => (
-  <div className="my-1.5 border-t border-dashed border-black/60" />
-);
+const Dashed: React.FC = () => <div className="my-1.5 border-t border-dashed border-black/60" />;

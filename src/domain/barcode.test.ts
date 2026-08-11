@@ -130,7 +130,7 @@ describe('looksLikeMarketingQr', () => {
     expect(looksLikeMarketingQr('96385074')).toBe(false);
   });
 
-  it('does NOT flag the shop\'s own printed labels', () => {
+  it("does NOT flag the shop's own printed labels", () => {
     expect(looksLikeMarketingQr(buildProductQrPayload('prod-42'))).toBe(false);
   });
 

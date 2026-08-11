@@ -9,15 +9,7 @@
  */
 
 import Dexie, { type Table } from 'dexie';
-import type {
-  CartDraft,
-  Customer,
-  Id,
-  LedgerEntry,
-  Product,
-  Sale,
-  Settings,
-} from '@/domain/types';
+import type { CartDraft, Customer, Id, LedgerEntry, Product, Sale, Settings } from '@/domain/types';
 
 export interface StoredImage {
   id: Id;
@@ -68,6 +60,17 @@ export class KbsDatabase extends Dexie {
       drafts: 'id, kind, updatedAt',
       images: 'id',
       counters: 'id',
+    });
+
+    // v2 indexes `returnOfSaleId`. A return must be able to ask "how much of
+    // this bill has already come back?" cheaply — without it, validating a
+    // second partial return meant scanning every sale ever made, so the check
+    // was simply not done and a bill could be refunded more than once.
+    //
+    // Adding an index needs no upgrade function; Dexie rebuilds it in place,
+    // and tables omitted here keep their v1 definition.
+    this.version(2).stores({
+      sales: 'id, billNo, createdAt, customerId, status, returnOfSaleId',
     });
   }
 }
@@ -138,15 +141,35 @@ export async function getStorageStatus(): Promise<StorageStatus> {
  * Detect storage that will be discarded when the browser closes.
  *
  * Billing in a private/incognito window would lose the entire day, so the app
- * shows a blocking warning rather than letting a shopkeeper find out at night.
+ * warns rather than letting a shopkeeper find out at closing time.
+ *
+ * HONEST LIMITATION: no browser exposes "am I in private mode". This is a
+ * heuristic and it can miss. It used to test `quota < 200 MB`, matching the
+ * fixed ~120 MB Chrome once gave incognito; current Chromium sizes the
+ * incognito quota from free disk, so on a roomy phone a private window can
+ * report gigabytes and slip past. The check is now paired with `persisted` —
+ * a private session can never hold a persistence grant — which is a stronger
+ * signal than the quota alone.
+ *
+ * Because detection cannot be relied on, it is not the only defence: the app
+ * also nags about stale backups where the shopkeeper will actually see it.
  */
+// Deliberately conservative. A false alarm tells a shopkeeper in a perfectly
+// normal window that their bills will be lost, which is its own kind of
+// damage — and a cheap phone with a nearly full 16 GB can legitimately report
+// a small quota. Biased towards missing rather than crying wolf.
+const EPHEMERAL_QUOTA_CEILING = 400 * 1024 * 1024;
+
 export async function isStorageEphemeral(): Promise<boolean> {
   try {
     if (!navigator.storage?.estimate) return false;
-    const { quota } = await navigator.storage.estimate();
-    // Incognito sessions report a small fixed quota (typically ~120 MB) while
-    // a normal profile reports gigabytes.
-    return typeof quota === 'number' && quota > 0 && quota < 200 * 1024 * 1024;
+    const [{ quota }, persisted] = await Promise.all([
+      navigator.storage.estimate(),
+      navigator.storage.persisted?.() ?? Promise.resolve(false),
+    ]);
+    if (persisted) return false; // a grant is proof the session is not private
+    if (typeof quota !== 'number' || quota <= 0) return false;
+    return quota < EPHEMERAL_QUOTA_CEILING;
   } catch {
     return false;
   }

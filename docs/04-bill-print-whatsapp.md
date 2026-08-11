@@ -22,8 +22,8 @@ renderer only formats an already-decided structure.
 ```ts
 export interface Bill {
   header: { shopName: string; addressLines: string[]; phone: string; gstin?: string };
-  meta:   { billNo: string; dateTime: string; customerName?: string; customerPhone?: string };
-  lines:  { name: string; qtyLabel: string; rateLabel: string; amountLabel: string }[];
+  meta: { billNo: string; dateTime: string; customerName?: string; customerPhone?: string };
+  lines: { name: string; qtyLabel: string; rateLabel: string; amountLabel: string }[];
   totals: { label: string; value: string; emphasis?: boolean }[];
   payments: { label: string; value: string }[];
   credit?: { previousBalance: string; thisBill: string; newBalance: string };
@@ -108,14 +108,27 @@ Works with any printer — USB thermal, Bluetooth via the OS, or a normal A4 pri
 
 ```css
 @media print {
-  @page { size: 58mm auto; margin: 0; }
-  body * { visibility: hidden; }
-  .bill-print, .bill-print * { visibility: visible; }
+  @page {
+    size: 58mm auto;
+    margin: 0;
+  }
+  body * {
+    visibility: hidden;
+  }
+  .bill-print,
+  .bill-print * {
+    visibility: visible;
+  }
   .bill-print {
-    position: absolute; left: 0; top: 0;
-    width: 58mm; padding: 2mm;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 58mm;
+    padding: 2mm;
     font-family: 'Noto Sans Tamil', monospace;
-    font-size: 9pt; line-height: 1.25; color: #000;
+    font-size: 9pt;
+    line-height: 1.25;
+    color: #000;
   }
 }
 ```
@@ -134,7 +147,9 @@ them directly skips the print dialog entirely — tap "Print", paper comes out. 
 difference between "a website" and "our billing machine".
 
 ```ts
-navigator.bluetooth.requestDevice({ filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }] })
+navigator.bluetooth.requestDevice({
+  filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }],
+});
 // then write ESC/POS byte sequences:
 //   ESC @        initialise
 //   ESC a 1      centre align
@@ -165,7 +180,8 @@ Opens WhatsApp with the bill pre-typed; the shopkeeper taps send. Works on every
 no account, no approval, no internet beyond WhatsApp's own.
 
 Constraints that shape `billToText`:
-- Wrap in a ``` code block ``` so the monospace columns survive WhatsApp's renderer
+
+- Wrap in a `code block` so the monospace columns survive WhatsApp's renderer
 - Keep under ~4000 characters (long bills truncate the item list with a total-only summary)
 - Tamil text passes through fine — WhatsApp handles Unicode correctly
 
@@ -174,13 +190,13 @@ Constraints that shape `billToText`:
 Text bills are functional; image bills look like a real receipt and get forwarded to family.
 
 ```ts
-const blob = await billToCanvas(bill);          // 384px wide = 58mm at 203 dpi
+const blob = await billToCanvas(bill); // 384px wide = 58mm at 203 dpi
 const file = new File([blob], `bill-${bill.meta.billNo}.png`, { type: 'image/png' });
 
 if (navigator.canShare?.({ files: [file] })) {
   await navigator.share({ files: [file], title: `Bill ${bill.meta.billNo}` });
 } else {
-  downloadBlob(blob);                            // desktop fallback
+  downloadBlob(blob); // desktop fallback
 }
 ```
 
@@ -220,6 +236,7 @@ upi://pay?pa=<vpa>&pn=<payeeName>&am=<amount>&cu=INR&tn=Bill%20<billNo>
 ```
 
 Two placements:
+
 - **Payment sheet** — big QR on screen, customer scans and pays
 - **Printed bill footer** — customer can pay later from the paper bill (useful for credit)
 

@@ -46,6 +46,7 @@ export const DayCloseScreen: React.FC = () => {
   const send = () => {
     const text = dayCloseText(summary, shopName, countedPaise, {
       title: t('day.title'),
+      date: formatDate(summary.date.toISOString(), lang),
       sales: t('day.sales'),
       bills: t('day.bills'),
       cash: t('pay.cash'),
@@ -94,9 +95,7 @@ export const DayCloseScreen: React.FC = () => {
         {difference !== null && (
           <div
             className={`flex justify-between font-bold text-lg ${
-              difference === 0
-                ? 'text-brand-secondary'
-                : 'text-amber-600 dark:text-amber-400'
+              difference === 0 ? 'text-brand-secondary' : 'text-amber-600 dark:text-amber-400'
             }`}
           >
             <span>{t('day.difference')}</span>

@@ -3,11 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { Banner, Button, Field, Input, Select, Sheet, Toggle } from '@/components/ui';
 import { IconChevronDown, IconChevronRight } from '@/components/icons';
 import { formatINR, parseRupeeInput } from '@/domain/money';
-import {
-  addBarcodeToProduct,
-  createProduct,
-  listProducts,
-} from '@/data/repositories/productRepo';
+import { addBarcodeToProduct, createProduct, listProducts } from '@/data/repositories/productRepo';
 import { useNameSuggestion } from '@/hooks/useNameSuggestion';
 import { productName, unitLabel, useT } from '@/i18n/useT';
 import type { Product, Unit } from '@/domain/types';
@@ -73,9 +69,7 @@ export const NewProductSheet: React.FC<{
     const all = products ?? [];
     if (!q) return all.slice(0, 8);
     return all
-      .filter(
-        (p) => p.nameEn.toLowerCase().includes(q) || p.nameTa.includes(linkSearch.trim()),
-      )
+      .filter((p) => p.nameEn.toLowerCase().includes(q) || p.nameTa.includes(linkSearch.trim()))
       .slice(0, 8);
   }, [products, linkSearch]);
 
@@ -265,9 +259,7 @@ export const NewProductSheet: React.FC<{
                   className="w-full flex items-center justify-between gap-3 p-3 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 text-left"
                 >
                   <span className="truncate font-medium">{productName(p, lang)}</span>
-                  <span className="tnum text-sm flex-shrink-0">
-                    {formatINR(p.sellPricePaise)}
-                  </span>
+                  <span className="tnum text-sm flex-shrink-0">{formatINR(p.sellPricePaise)}</span>
                 </button>
               ))}
             </div>

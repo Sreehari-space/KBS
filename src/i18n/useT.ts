@@ -49,10 +49,8 @@ export function useT(): { t: TFunction; lang: Language; setLang: (l: Language) =
  * Product names carry both scripts. Tamil is preferred when the UI is in
  * Tamil, but an empty nameTa must never render as a blank row on a bill.
  */
-export const productName = (
-  p: { nameEn: string; nameTa: string },
-  lang: Language,
-): string => (lang === 'ta' && p.nameTa.trim() ? p.nameTa : p.nameEn);
+export const productName = (p: { nameEn: string; nameTa: string }, lang: Language): string =>
+  lang === 'ta' && p.nameTa.trim() ? p.nameTa : p.nameEn;
 
 /** Unit labels are short enough to inline rather than living in the dictionary. */
 export const unitLabel = (unit: string, lang: Language): string => {

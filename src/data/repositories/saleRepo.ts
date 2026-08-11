@@ -240,6 +240,17 @@ export async function holdCurrentCart(draft: CartDraft, label: string): Promise<
   return id;
 }
 
+/**
+ * Throw away a parked bill without serving it.
+ *
+ * Held bills could previously only be removed by resuming them, so a customer
+ * who walked out left a row that could never be cleared — they accumulated
+ * forever behind the "Held bills" button.
+ */
+export async function discardHeldBill(id: Id): Promise<void> {
+  await db.drafts.delete(id);
+}
+
 export async function resumeHeldBill(id: Id): Promise<CartDraft | undefined> {
   return db.transaction('rw', db.drafts, async () => {
     const held = await db.drafts.get(id);

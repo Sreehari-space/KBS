@@ -43,7 +43,10 @@ describe('buildLine', () => {
 
 describe('computeTotals', () => {
   it('sums lines', () => {
-    const lines = [buildLine(product(), 5), buildLine(product({ id: 'p2', sellPricePaise: 1400, unit: 'piece' }), 4)];
+    const lines = [
+      buildLine(product(), 5),
+      buildLine(product({ id: 'p2', sellPricePaise: 1400, unit: 'piece' }), 4),
+    ];
     const t = computeTotals({ lines, billDiscountPaise: 0, gst: noGst, roundOffEnabled: false });
     expect(t.subtotalPaise).toBe(29000 + 5600);
     expect(t.totalPaise).toBe(34600);

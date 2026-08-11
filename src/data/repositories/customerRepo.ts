@@ -3,10 +3,9 @@
 import { db, newId, nowIso } from '../db';
 import type { Customer, Id } from '@/domain/types';
 
-export type NewCustomer = Omit<
-  Customer,
-  'id' | 'createdAt' | 'updatedAt' | 'balancePaise'
-> & { balancePaise?: number };
+export type NewCustomer = Omit<Customer, 'id' | 'createdAt' | 'updatedAt' | 'balancePaise'> & {
+  balancePaise?: number;
+};
 
 export async function listCustomers(): Promise<Customer[]> {
   const all = await db.customers.toArray();
