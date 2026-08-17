@@ -704,7 +704,7 @@ const SaveIndicator: React.FC<{ state: 'idle' | 'saving' | 'saved' }> = ({ state
     >
       {state === 'saved' ? (
         <>
-          <IconCheck className="w-3.5 h-3.5 text-brand-secondary" />
+          <IconCheck className="h-3.5 w-3.5 text-accent" />
           {t('save.saved')}
         </>
       ) : (
