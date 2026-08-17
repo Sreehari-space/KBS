@@ -23,8 +23,8 @@ export default defineConfig({
         scope: '/',
         display: 'standalone',
         orientation: 'any',
-        background_color: '#f1f5f9',
-        theme_color: '#1d4ed8',
+        background_color: '#f4f5f4',
+        theme_color: '#0f766e',
         categories: ['business', 'productivity', 'finance'],
         icons: [
           { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
