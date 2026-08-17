@@ -83,10 +83,10 @@ export const ShelfLabelsScreen: React.FC = () => {
                 onClick={() => toggle(p.id)}
                 role="checkbox"
                 aria-checked={selected.has(p.id)}
-                className={`w-full text-left flex items-center gap-3 p-3 rounded-lg border transition-colors focus-ring ${
+                className={`w-full text-left flex items-center gap-3 p-3 rounded-2xl border transition-colors focus-ring ${
                   selected.has(p.id)
                     ? 'border-brand-primary bg-brand-primary/10'
-                    : 'border-slate-200 dark:border-slate-700 bg-light-surface dark:bg-dark-surface hover:border-brand-primary'
+                    : 'border-light-line dark:border-dark-line bg-light-surface dark:bg-dark-surface hover:border-brand-primary'
                 }`}
               >
                 <Checkbox checked={selected.has(p.id)} />
@@ -123,7 +123,7 @@ export const ShelfLabelsScreen: React.FC = () => {
         )}
       </div>
 
-      <div className="flex-shrink-0 p-4 pb-safe border-t border-slate-200 dark:border-slate-700 no-print">
+      <div className="flex-shrink-0 p-4 pb-safe border-t border-light-line dark:border-dark-line no-print">
         <Button full onClick={() => window.print()} disabled={chosen.length === 0}>
           {t('labels.print')} ({chosen.length})
         </Button>

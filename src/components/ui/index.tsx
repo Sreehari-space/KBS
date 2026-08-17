@@ -28,7 +28,7 @@ const VARIANTS: Record<ButtonVariant, string> = {
   // Neutral, but still a filled shape: a ghost with no fill reads as disabled
   // on a white card, which is where most of them sit.
   ghost:
-    'bg-light-bg dark:bg-white/10 text-light-text dark:text-dark-text hover:bg-light-line dark:hover:bg-white/[0.15]',
+    'bg-light-surface shadow-card dark:bg-white/10 text-light-text dark:text-dark-text hover:bg-light-line dark:hover:bg-white/[0.15]',
   danger: 'bg-red-600 text-white hover:bg-red-700',
 };
 
@@ -106,7 +106,7 @@ export const Input: React.FC<
 > = ({ className = '', ...rest }) => (
   <input
     {...rest}
-    className={`w-full px-4 py-3 rounded-xl bg-light-bg dark:bg-white/[0.06] border border-transparent focus:outline-none focus:bg-light-surface dark:focus:bg-dark-surface focus:border-brand-primary dark:focus:border-brand-on-dark ${className}`}
+    className={`w-full px-4 py-3 rounded-xl bg-light-surface dark:bg-white/[0.06] border border-transparent shadow-card focus:outline-none focus:border-brand-primary dark:focus:border-brand-on-dark ${className}`}
   />
 );
 
@@ -117,7 +117,7 @@ export const Select: React.FC<React.SelectHTMLAttributes<HTMLSelectElement>> = (
 }) => (
   <select
     {...rest}
-    className={`w-full px-4 py-3 rounded-xl bg-light-bg dark:bg-white/[0.06] border border-transparent focus:outline-none focus:border-brand-primary dark:focus:border-brand-on-dark ${className}`}
+    className={`w-full px-4 py-3 rounded-xl bg-light-surface dark:bg-white/[0.06] border border-transparent shadow-card focus:outline-none focus:border-brand-primary dark:focus:border-brand-on-dark ${className}`}
   >
     {children}
   </select>

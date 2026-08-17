@@ -362,7 +362,7 @@ export const BillingScreen: React.FC<{
         </div>
         <button
           onClick={() => setScannerOpen(true)}
-          className="flex-shrink-0 px-4 rounded-md border border-slate-300 dark:border-slate-600 bg-light-surface dark:bg-dark-surface font-medium hover:border-brand-primary hover:text-brand-primary dark:hover:text-brand-on-dark transition-colors flex items-center gap-2 focus-ring"
+          className="flex flex-shrink-0 items-center gap-2 rounded-full bg-light-surface dark:bg-dark-surface px-5 font-medium shadow-card transition-colors hover:text-brand-primary dark:hover:text-brand-on-dark focus-ring"
         >
           <IconScan className="w-5 h-5" />
           {t('billing.scan')}
@@ -370,7 +370,7 @@ export const BillingScreen: React.FC<{
         {isVoiceAvailable() && (
           <button
             onClick={() => setVoiceOpen(true)}
-            className="flex-shrink-0 px-3 rounded-md border border-slate-300 dark:border-slate-600 bg-light-surface dark:bg-dark-surface hover:border-brand-primary hover:text-brand-primary dark:hover:text-brand-on-dark transition-colors flex items-center justify-center text-light-text-secondary dark:text-dark-text-secondary focus-ring"
+            className="flex flex-shrink-0 items-center justify-center rounded-full bg-light-surface dark:bg-dark-surface px-4 text-light-text-secondary shadow-card transition-colors hover:text-brand-primary dark:text-dark-text-secondary dark:hover:text-brand-on-dark focus-ring"
             aria-label={t('voice.title')}
           >
             <IconMic className="w-5 h-5" />
@@ -382,7 +382,7 @@ export const BillingScreen: React.FC<{
         <div className="px-4 pt-2 flex-shrink-0">
           <button
             onClick={() => setHeldOpen(true)}
-            className="w-full text-sm py-2 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 font-medium focus-ring"
+            className="w-full rounded-full bg-amber-50 py-2.5 text-sm font-medium text-amber-900 focus-ring dark:bg-amber-500/15 dark:text-amber-100"
           >
             {t('billing.heldBills')}: {heldBills.length}
           </button>
@@ -428,14 +428,15 @@ export const BillingScreen: React.FC<{
                   key={p.id}
                   onClick={() => addProduct(p)}
                   aria-current={marked ? 'true' : undefined}
-                  className={`flex flex-col text-left p-3 rounded-md border transition-colors bg-light-surface dark:bg-dark-surface hover:border-brand-primary active:bg-slate-100 dark:active:bg-slate-700 focus-ring ${
+                  // Borderless card, as the reference sets them. Density is
+                  // deliberately NOT relaxed to match the reference's airy
+                  // spacing: a shopkeeper hits these hundreds of times a day
+                  // and halving how many fit on screen would make the shop
+                  // slower for the sake of elegance.
+                  className={`surface flex flex-col rounded-2xl p-3 text-left transition-transform active:scale-[0.98] focus-ring ${
                     flashId === p.id ? 'animate-pop' : ''
-                  } ${
-                    marked
-                      ? 'kbd-active'
-                      : out
-                        ? 'border-amber-400 dark:border-amber-600'
-                        : 'border-slate-200 dark:border-slate-700'
+                  } ${marked ? 'kbd-active' : ''} ${
+                    out ? 'ring-1 ring-amber-400 dark:ring-amber-500/60' : ''
                   }`}
                 >
                   {/* min-h reserves exactly two lines at leading-snug. The
@@ -451,7 +452,7 @@ export const BillingScreen: React.FC<{
                     <div className="flex items-baseline justify-between gap-1">
                       <Money
                         paise={p.sellPricePaise}
-                        className="font-bold text-brand-primary dark:text-brand-on-dark"
+                        className="display font-bold text-brand-primary dark:text-brand-on-dark"
                       />
                       <span className="text-[11px] text-light-text-secondary dark:text-dark-text-secondary">
                         /{unitLabel(p.unit, lang)}
@@ -483,13 +484,17 @@ export const BillingScreen: React.FC<{
         )}
       </div>
 
-      {/* Sticky total bar — the running amount stays readable while adding items */}
-      <div className="flex-shrink-0 border-t border-slate-200 dark:border-slate-700 bg-light-surface dark:bg-dark-surface px-4 py-3 pb-safe">
+      {/* The hero. In the reference this gradient sits behind the account
+          balance at the top of the home screen; in a till the equivalent
+          number is the running total, and it belongs at the bottom where the
+          thumb already is. Same idea — the one number that matters gets its
+          own surface — moved to where a shopkeeper actually looks. */}
+      <div className="flex-shrink-0 bg-hero text-white px-4 pt-3 pb-safe rounded-t-3xl">
         {/* The bill number exists BEFORE the sale completes, so the sequence
             reads as a ledger rather than as a database key handed out later. */}
-        <div className="flex items-center justify-between gap-3 mb-1 text-[11px] text-light-text-secondary dark:text-dark-text-secondary">
+        <div className="mb-1 flex items-center justify-between gap-3 text-[11px] text-white/70">
           <span className="count truncate">
-            {nextBillNo ? `${t('billing.nextBill')} ${nextBillNo}` : ' '}
+            {nextBillNo ? `${t('billing.nextBill')} ${nextBillNo}` : ' '}
           </span>
           <SaveIndicator state={saveState} />
         </div>
@@ -497,17 +502,20 @@ export const BillingScreen: React.FC<{
           <button
             onClick={() => setCartOpen(true)}
             disabled={lines.length === 0}
-            className="flex-1 text-left disabled:opacity-50 rounded-md focus-ring"
+            className="flex-1 rounded-xl text-left disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
           >
-            <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary count">
+            <span className="count text-sm text-white/70">
               {lines.length} {lines.length === 1 ? t('billing.item') : t('billing.items')}
             </span>
-            <AnimatedMoney paise={totals.totalPaise} className="block text-2xl font-bold" />
+            <AnimatedMoney
+              paise={totals.totalPaise}
+              className="display block text-[2rem] font-extrabold"
+            />
           </button>
           <Button
             onClick={() => setPayOpen(true)}
             disabled={lines.length === 0 || committing}
-            className="px-8 py-4 text-lg flex items-center gap-2"
+            className="flex items-center gap-2 px-8 py-4 text-lg"
           >
             {t('billing.bill')}
             {keyboardUser && lines.length > 0 && <Kbd>F9</Kbd>}
@@ -626,10 +634,7 @@ export const BillingScreen: React.FC<{
       <Sheet open={heldOpen} onClose={() => setHeldOpen(false)} title={t('billing.heldBills')}>
         <div className="space-y-2">
           {heldBills.map((held) => (
-            <div
-              key={held.id}
-              className="flex items-stretch gap-2 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 overflow-hidden"
-            >
+            <div key={held.id} className="surface flex items-stretch gap-2 overflow-hidden">
               <button
                 onClick={async () => {
                   const resumed = await resumeHeldBill(held.id);

@@ -127,7 +127,7 @@ export const VoiceSheet: React.FC<{
               className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center ${
                 listening
                   ? 'bg-brand-primary/15 text-brand-primary dark:text-brand-on-dark animate-pulse'
-                  : 'bg-slate-100 dark:bg-slate-700 text-light-text-secondary dark:text-dark-text-secondary'
+                  : 'bg-light-surface shadow-card dark:bg-white/10 text-light-text-secondary dark:text-dark-text-secondary'
               }`}
             >
               <IconMic className="w-9 h-9" />
@@ -150,7 +150,7 @@ export const VoiceSheet: React.FC<{
                   onPick(product, qty);
                   onClose();
                 }}
-                className="w-full flex items-center justify-between gap-3 p-3 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700"
+                className="w-full flex items-center justify-between gap-3 p-3 surface"
               >
                 <span className="font-medium truncate">{productName(product, lang)}</span>
                 <span className="tnum text-sm flex-shrink-0">

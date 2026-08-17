@@ -30,7 +30,7 @@ export const BillsScreen: React.FC = () => {
             hint={t('bills.emptyHint')}
             icon={<IconBills className="w-10 h-10" />}
             preview={
-              <div className="max-w-xs mx-auto p-3 rounded-lg border border-slate-300 dark:border-slate-600 text-left">
+              <div className="max-w-xs mx-auto p-3 rounded-2xl border border-light-line dark:border-dark-line text-left">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="font-medium count">{t('bill.no')} 000000-001</p>
@@ -44,10 +44,7 @@ export const BillsScreen: React.FC = () => {
         ) : (
           <div className="space-y-2">
             {sales.map((sale) => (
-              <div
-                key={sale.id}
-                className="p-3 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700"
-              >
+              <div key={sale.id} className="p-3 surface">
                 <div className="flex items-center gap-3">
                   <div className="flex-1 min-w-0">
                     <p className="font-medium count">{sale.billNo}</p>
@@ -173,7 +170,7 @@ const ReturnSheet: React.FC<{
           return (
             <div
               key={index}
-              className="flex items-center gap-3 py-2 border-b border-slate-100 dark:border-slate-700 last:border-0"
+              className="flex items-center gap-3 py-2 border-b border-light-line dark:border-dark-line last:border-0"
             >
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-sm">{name}</p>
@@ -193,7 +190,7 @@ const ReturnSheet: React.FC<{
                       return next;
                     })
                   }
-                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 font-bold"
+                  className="h-9 w-9 rounded-full bg-light-surface font-bold shadow-card dark:bg-white/10"
                 >
                   −
                 </button>
@@ -207,7 +204,7 @@ const ReturnSheet: React.FC<{
                       return next;
                     })
                   }
-                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 font-bold"
+                  className="h-9 w-9 rounded-full bg-light-surface font-bold shadow-card dark:bg-white/10"
                 >
                   +
                 </button>
@@ -224,10 +221,10 @@ const ReturnSheet: React.FC<{
             <button
               key={m}
               onClick={() => setMode(m)}
-              className={`flex-1 py-2 rounded-lg border-2 text-sm font-medium transition-colors focus-ring ${
+              className={`flex-1 py-2 rounded-2xl border-2 text-sm font-medium transition-colors focus-ring ${
                 mode === m
                   ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
-                  : 'border-slate-300 dark:border-slate-600'
+                  : 'border-light-line dark:border-dark-line'
               }`}
             >
               {t(`pay.${m}` as 'pay.cash')}

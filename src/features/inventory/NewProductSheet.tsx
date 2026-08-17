@@ -127,10 +127,10 @@ export const NewProductSheet: React.FC<{
             <button
               key={m}
               onClick={() => setMode(m)}
-              className={`py-2.5 rounded-lg border-2 text-sm font-semibold ${
+              className={`py-2.5 rounded-2xl border-2 text-sm font-semibold ${
                 mode === m
                   ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
-                  : 'border-slate-300 dark:border-slate-600'
+                  : 'border-light-line dark:border-dark-line'
               }`}
             >
               {m === 'new' ? t('inv.createNew') : t('inv.linkExisting')}
@@ -196,7 +196,7 @@ export const NewProductSheet: React.FC<{
             </button>
 
             {showMore && (
-              <div className="space-y-3 pl-1 border-l-2 border-slate-200 dark:border-slate-700">
+              <div className="space-y-3 pl-1 border-l-2 border-light-line dark:border-dark-line">
                 <div className="pl-3 space-y-3">
                   <div className="grid grid-cols-2 gap-3">
                     <Field label={t('inv.unit')}>
@@ -256,7 +256,7 @@ export const NewProductSheet: React.FC<{
                   key={p.id}
                   onClick={() => void link(p)}
                   disabled={saving}
-                  className="w-full flex items-center justify-between gap-3 p-3 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 text-left"
+                  className="w-full flex items-center justify-between gap-3 p-3 surface text-left"
                 >
                   <span className="truncate font-medium">{productName(p, lang)}</span>
                   <span className="tnum text-sm flex-shrink-0">{formatINR(p.sellPricePaise)}</span>

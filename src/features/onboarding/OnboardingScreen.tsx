@@ -91,7 +91,7 @@ export const OnboardingScreen: React.FC<{ onDone: () => void }> = ({ onDone }) =
           </p>
           <button
             onClick={() => setLang(lang === 'ta' ? 'en' : 'ta')}
-            className="px-3 py-1.5 text-sm font-medium rounded-md border border-slate-300 dark:border-slate-600 focus-ring"
+            className="px-3 py-1.5 text-sm font-medium rounded-xl border border-light-line dark:border-dark-line focus-ring"
           >
             {lang === 'ta' ? 'English' : 'தமிழ்'}
           </button>
@@ -102,7 +102,7 @@ export const OnboardingScreen: React.FC<{ onDone: () => void }> = ({ onDone }) =
             <span
               key={n}
               className={`h-1 flex-1 rounded-full transition-colors ${
-                n <= step ? 'bg-brand-primary' : 'bg-slate-300 dark:bg-slate-700'
+                n <= step ? 'bg-brand-primary' : 'bg-light-line dark:bg-white/10'
               }`}
             />
           ))}
@@ -151,10 +151,10 @@ export const OnboardingScreen: React.FC<{ onDone: () => void }> = ({ onDone }) =
                 <button
                   key={String(option.value)}
                   onClick={() => setGst(option.value)}
-                  className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 text-left font-medium transition-colors focus-ring ${
+                  className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 text-left font-medium transition-colors focus-ring ${
                     gst === option.value
                       ? 'border-brand-primary bg-brand-primary/10'
-                      : 'border-slate-300 dark:border-slate-600 bg-light-surface dark:bg-dark-surface'
+                      : 'border-light-line dark:border-dark-line bg-light-surface dark:bg-dark-surface'
                   }`}
                 >
                   <span

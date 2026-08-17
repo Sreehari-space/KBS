@@ -88,10 +88,10 @@ export const PaymentSheet: React.FC<{
             key={mode}
             onClick={() => setState((cur) => selectMode(cur, mode, totalPaise))}
             aria-pressed={isModeSelected(state, mode)}
-            className={`py-3 rounded-lg border-2 text-sm font-medium transition-colors focus-ring ${
+            className={`rounded-full py-3 text-sm font-medium transition-colors focus-ring ${
               isModeSelected(state, mode)
-                ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
-                : 'border-slate-300 dark:border-slate-600 hover:border-brand-primary'
+                ? 'bg-brand-primary text-white'
+                : 'bg-light-surface shadow-card dark:bg-white/10'
             }`}
           >
             {t(`pay.${mode}` as 'pay.cash')}
@@ -116,7 +116,7 @@ export const PaymentSheet: React.FC<{
               <button
                 key={paise}
                 onClick={() => setState((cur) => ({ ...cur, tendered: String(paise / 100) }))}
-                className="py-2 text-sm rounded-md bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600 money focus-ring"
+                className="money rounded-full bg-light-surface py-2 text-sm shadow-card hover:bg-light-line focus-ring dark:bg-white/10 dark:hover:bg-white/[0.15]"
               >
                 ₹{paise / 100}
               </button>
@@ -136,7 +136,7 @@ export const PaymentSheet: React.FC<{
           {state.payments.map((p, i) => (
             <div
               key={i}
-              className="flex justify-between items-center text-sm bg-slate-100 dark:bg-slate-700 rounded-lg px-3 py-2 animate-row-in"
+              className="animate-row-in flex items-center justify-between rounded-2xl bg-light-surface px-4 py-3 text-sm shadow-card dark:bg-white/10"
             >
               <span>{t(`pay.${p.mode}` as 'pay.cash')}</span>
               <span className="flex items-center gap-3">
@@ -177,7 +177,7 @@ export const PaymentSheet: React.FC<{
           credit, or a partial tender — so the busiest sheet in the app never
           opens in a yellow warning state. */}
       {creditPanel && (
-        <div className="mb-5 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/30 p-4 animate-fade-in">
+        <div className="mb-5 rounded-2xl border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/30 p-4 animate-fade-in">
           <p className="font-semibold text-amber-900 dark:text-amber-100">
             {t('pay.remaining')}: <Money paise={remaining} /> &rarr; {t('pay.credit')}
           </p>

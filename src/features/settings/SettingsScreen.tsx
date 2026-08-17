@@ -94,7 +94,7 @@ export const SettingsScreen: React.FC = () => {
             </div>
             {storage && storage.quotaBytes > 0 && (
               <>
-                <div className="mt-1 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                <div className="mt-1 h-1.5 rounded-full bg-light-line dark:bg-white/10 overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-[width] duration-500 ${
                       storage.usedFraction > 0.8 ? 'bg-amber-500' : 'bg-brand-primary'
@@ -298,10 +298,10 @@ export const SettingsScreen: React.FC = () => {
               <button
                 key={l}
                 onClick={() => setLang(l)}
-                className={`flex-1 py-2.5 rounded-lg border-2 font-medium transition-colors focus-ring ${
+                className={`flex-1 py-2.5 rounded-2xl border-2 font-medium transition-colors focus-ring ${
                   lang === l
                     ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
-                    : 'border-slate-300 dark:border-slate-600'
+                    : 'border-light-line dark:border-dark-line'
                 }`}
               >
                 {l === 'ta' ? 'தமிழ்' : 'English'}
@@ -315,10 +315,10 @@ export const SettingsScreen: React.FC = () => {
               <button
                 key={th}
                 onClick={() => void updateSettings('ui', { theme: th })}
-                className={`flex-1 py-2.5 rounded-lg border-2 font-medium transition-colors focus-ring ${
+                className={`flex-1 py-2.5 rounded-2xl border-2 font-medium transition-colors focus-ring ${
                   settings.ui.theme === th
                     ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
-                    : 'border-slate-300 dark:border-slate-600'
+                    : 'border-light-line dark:border-dark-line'
                 }`}
               >
                 {th === 'light' ? t('set.light') : t('set.dark')}
@@ -355,7 +355,7 @@ export const SettingsScreen: React.FC = () => {
                 e.target.value = '';
               }}
             />
-            <span className="block text-center px-4 py-3 rounded-md font-semibold bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 cursor-pointer">
+            <span className="block cursor-pointer rounded-full bg-light-surface px-4 py-3.5 text-center font-semibold shadow-card dark:bg-white/10">
               {t('set.import')}
             </span>
           </label>
@@ -384,12 +384,12 @@ export const SettingsScreen: React.FC = () => {
           reads like a developer left a demo behind. Everything here is real
           and useful, and none of it belongs in the shopkeeper's line of sight
           on an ordinary day. */}
-      <div className="rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700">
+      <div className="surface">
         <button
           type="button"
           onClick={() => setAdvancedOpen((v) => !v)}
           aria-expanded={advancedOpen}
-          className="w-full flex items-center gap-2 p-3 text-left focus-ring rounded-lg"
+          className="w-full flex items-center gap-2 p-3 text-left focus-ring rounded-2xl"
         >
           {advancedOpen ? (
             <IconChevronDown className="w-4 h-4 flex-shrink-0" />
@@ -488,7 +488,7 @@ export const SettingsScreen: React.FC = () => {
 };
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-  <div className="rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 p-3 space-y-3">
+  <div className="surface p-3 space-y-3">
     <h2 className="font-semibold">{title}</h2>
     {children}
   </div>

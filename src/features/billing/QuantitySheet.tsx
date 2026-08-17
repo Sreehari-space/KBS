@@ -96,10 +96,10 @@ export const QuantitySheet: React.FC<{
                 setMode(m);
                 setEntry('');
               }}
-              className={`py-2 rounded-lg border-2 font-medium text-sm ${
+              className={`py-2 rounded-2xl border-2 font-medium text-sm ${
                 mode === m
                   ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
-                  : 'border-slate-300 dark:border-slate-600'
+                  : 'border-light-line dark:border-dark-line'
               }`}
             >
               {m === 'weight' ? t('qty.byWeight') : t('qty.byAmount')}
@@ -108,7 +108,7 @@ export const QuantitySheet: React.FC<{
         </div>
       )}
 
-      <div className="rounded-lg bg-slate-100 dark:bg-slate-700 px-4 py-4 text-center mb-3">
+      <div className="mb-3 rounded-2xl bg-light-surface px-4 py-4 text-center shadow-card dark:bg-white/10">
         <span className="text-3xl font-bold tnum">
           {mode === 'amount' && entry ? '₹' : ''}
           {entry || '0'}
@@ -124,7 +124,7 @@ export const QuantitySheet: React.FC<{
             <button
               key={p.label}
               onClick={() => setEntry(String(p.qty))}
-              className="px-3 py-1.5 text-sm rounded-full bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600"
+              className="rounded-full bg-light-surface px-4 py-1.5 text-sm shadow-card hover:bg-light-line dark:bg-white/10 dark:hover:bg-white/[0.15]"
             >
               {p.label}
             </button>

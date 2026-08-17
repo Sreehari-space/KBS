@@ -77,7 +77,7 @@ export const CustomersScreen: React.FC = () => {
     <div className="flex flex-col h-full">
       <div className="flex-shrink-0 px-4 pt-4 space-y-3">
         {totalOutstanding > 0 && (
-          <div className="rounded-lg bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 px-4 py-3">
+          <div className="rounded-2xl bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 px-4 py-3">
             <p className="text-sm text-amber-800 dark:text-amber-200">{t('ledger.outstanding')}</p>
             <Money
               paise={totalOutstanding}
@@ -126,7 +126,7 @@ export const CustomersScreen: React.FC = () => {
                     openingBalance: '',
                   })
                 }
-                className="w-full text-left flex items-center gap-3 p-3 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 hover:border-brand-primary transition-colors focus-ring"
+                className="w-full text-left flex items-center gap-3 p-3 surface hover:border-brand-primary transition-colors focus-ring"
               >
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{c.name}</p>

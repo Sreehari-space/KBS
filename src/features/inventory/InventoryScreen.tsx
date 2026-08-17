@@ -171,7 +171,7 @@ export const InventoryScreen: React.FC = () => {
               className={`flex-shrink-0 px-3 py-1.5 text-sm rounded-full border transition-colors ${
                 filter === f.id
                   ? 'bg-brand-primary border-brand-primary text-white'
-                  : 'bg-light-surface dark:bg-dark-surface border-slate-300 dark:border-slate-600 hover:border-brand-primary'
+                  : 'bg-light-surface dark:bg-dark-surface border-light-line dark:border-dark-line hover:border-brand-primary'
               }`}
             >
               {f.label}
@@ -221,7 +221,7 @@ export const InventoryScreen: React.FC = () => {
                 <button
                   key={p.id}
                   onClick={() => openEdit(p)}
-                  className="w-full text-left flex items-center gap-3 p-3 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 hover:border-brand-primary transition-colors focus-ring"
+                  className="w-full text-left flex items-center gap-3 p-3 surface hover:border-brand-primary transition-colors focus-ring"
                 >
                   <div className="flex-1 min-w-0">
                     <p className="font-medium truncate">{productName(p, lang)}</p>
@@ -326,7 +326,7 @@ export const InventoryScreen: React.FC = () => {
             </button>
 
             {showMore && (
-              <div className="space-y-3 pl-3 border-l-2 border-slate-200 dark:border-slate-700">
+              <div className="space-y-3 pl-3 border-l-2 border-light-line dark:border-dark-line">
                 <div className="grid grid-cols-2 gap-3">
                   <Field label={t('inv.category')}>
                     <Input

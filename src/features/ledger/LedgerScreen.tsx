@@ -45,10 +45,10 @@ export const LedgerScreen: React.FC = () => {
         {/* Amber means "money is owed". At zero there is nothing to warn
             about, so the panel goes neutral. */}
         <div
-          className={`rounded-lg border px-4 py-3 ${
+          className={`rounded-2xl border px-4 py-3 ${
             total > 0
               ? 'bg-amber-50 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700'
-              : 'bg-light-surface dark:bg-dark-surface border-slate-200 dark:border-slate-700'
+              : 'bg-light-surface dark:bg-dark-surface border-light-line dark:border-dark-line'
           }`}
         >
           <p
@@ -93,7 +93,7 @@ export const LedgerScreen: React.FC = () => {
               <button
                 key={c.id}
                 onClick={() => setSelected(c)}
-                className="w-full text-left flex items-center gap-3 p-3 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 hover:border-brand-primary transition-colors focus-ring"
+                className="w-full text-left flex items-center gap-3 p-3 surface hover:border-brand-primary transition-colors focus-ring"
               >
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{c.name}</p>
@@ -205,7 +205,7 @@ const StatementSheet: React.FC<{
       </div>
 
       {collecting && (
-        <div className="mb-4 rounded-lg border border-slate-200 dark:border-slate-700 p-3 space-y-3">
+        <div className="mb-4 rounded-2xl border border-light-line dark:border-dark-line p-3 space-y-3">
           <Field label={t('ledger.collect')}>
             <Input
               autoFocus
@@ -221,10 +221,10 @@ const StatementSheet: React.FC<{
               <button
                 key={m}
                 onClick={() => setMode(m)}
-                className={`flex-1 py-2 rounded-lg border-2 text-sm font-medium ${
+                className={`flex-1 py-2 rounded-2xl border-2 text-sm font-medium ${
                   mode === m
                     ? 'border-brand-primary bg-brand-primary/10 text-brand-primary dark:text-brand-on-dark'
-                    : 'border-slate-300 dark:border-slate-600'
+                    : 'border-light-line dark:border-dark-line'
                 }`}
               >
                 {t(`pay.${m}` as 'pay.cash')}
@@ -242,7 +242,7 @@ const StatementSheet: React.FC<{
         {rows.map(({ entry, after }) => (
           <div
             key={entry.id}
-            className="flex items-center justify-between gap-3 py-2 border-b border-slate-100 dark:border-slate-700 last:border-0"
+            className="flex items-center justify-between gap-3 py-2 border-b border-light-line dark:border-dark-line last:border-0"
           >
             <div className="min-w-0">
               <p className="text-sm font-medium">{typeLabel[entry.type]}</p>

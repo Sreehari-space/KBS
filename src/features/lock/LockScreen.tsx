@@ -42,7 +42,7 @@ export const LockScreen: React.FC<{ pin: string; onUnlock: () => void }> = ({ pi
                 ? 'border-red-500 bg-red-500'
                 : i < entry.length
                   ? 'border-brand-primary bg-brand-primary'
-                  : 'border-slate-300 dark:border-slate-600'
+                  : 'border-light-line dark:border-dark-line'
             }`}
           />
         ))}

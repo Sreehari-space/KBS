@@ -80,7 +80,7 @@ export const ReportsScreen: React.FC = () => {
             className={`px-4 py-1.5 text-sm rounded-full border transition-colors focus-ring ${
               days === d
                 ? 'bg-brand-primary border-brand-primary text-white'
-                : 'bg-light-surface dark:bg-dark-surface border-slate-300 dark:border-slate-600 hover:border-brand-primary'
+                : 'bg-light-surface dark:bg-dark-surface border-light-line dark:border-dark-line hover:border-brand-primary'
             }`}
           >
             {d}d
@@ -197,7 +197,7 @@ export const ReportsScreen: React.FC = () => {
                   className={`flex-1 rounded-t-sm min-h-[2px] ${
                     amount > 0
                       ? 'bg-brand-primary/80 dark:bg-brand-on-dark/70'
-                      : 'bg-slate-300 dark:bg-slate-600'
+                      : 'bg-light-line dark:bg-white/20'
                   }`}
                   style={{ height: `${Math.max(2, (amount / peakHour) * 100)}%` }}
                   title={`${String(hour).padStart(2, '0')}:00`}
@@ -240,7 +240,7 @@ export const ReportsScreen: React.FC = () => {
                   <span>{formatDate(bucket.date.toISOString(), lang)}</span>
                   <Money paise={bucket.totalPaise} className="font-medium" />
                 </div>
-                <div className="h-1.5 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+                <div className="h-1.5 overflow-hidden rounded-full bg-light-line dark:bg-white/10">
                   <div
                     className="h-full bg-brand-primary rounded-full transition-[width] duration-300"
                     style={{ width: `${(bucket.totalPaise / maxDay) * 100}%` }}
@@ -268,7 +268,7 @@ export const ReportsScreen: React.FC = () => {
           {(drill ?? []).map((s) => (
             <div
               key={s.id}
-              className="flex items-center justify-between gap-3 py-2 border-b border-slate-100 dark:border-slate-700 last:border-0"
+              className="flex items-center justify-between gap-3 py-2 border-b border-light-line dark:border-dark-line last:border-0"
             >
               <div className="min-w-0">
                 <p className="font-medium count">{s.billNo}</p>
@@ -348,7 +348,7 @@ const Stat: React.FC<{
   if (!onClick) return <Card className="p-3">{body}</Card>;
   return (
     <Card className="p-0">
-      <button onClick={onClick} className="w-full text-left p-3 rounded-lg focus-ring">
+      <button onClick={onClick} className="w-full text-left p-3 rounded-2xl focus-ring">
         {body}
       </button>
     </Card>

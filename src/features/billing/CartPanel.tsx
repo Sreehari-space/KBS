@@ -31,7 +31,7 @@ export const CartPanel: React.FC<{
             // all the work — no "which row just changed" state needed.
             <div
               key={`${line.productId}-${index}`}
-              className="flex items-center gap-3 py-2 border-b border-slate-100 dark:border-slate-700 last:border-0 animate-row-in"
+              className="flex items-center gap-3 py-2 border-b border-light-line dark:border-dark-line last:border-0 animate-row-in"
             >
               <div className="flex-1 min-w-0">
                 <p className="font-medium leading-snug">{name}</p>
@@ -44,7 +44,7 @@ export const CartPanel: React.FC<{
               <div className="flex items-center gap-1 flex-shrink-0">
                 <button
                   onClick={() => onChangeQty(index, Math.max(0, line.qty - step))}
-                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center transition-transform active:scale-90 focus-ring"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-light-surface shadow-card transition-transform active:scale-90 hover:bg-light-line dark:bg-white/10 dark:hover:bg-white/[0.15] focus-ring"
                   aria-label="Decrease"
                 >
                   <IconMinus className="w-4 h-4" />
@@ -54,7 +54,7 @@ export const CartPanel: React.FC<{
                 </span>
                 <button
                   onClick={() => onChangeQty(index, line.qty + step)}
-                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center transition-transform active:scale-90 focus-ring"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-light-surface shadow-card transition-transform active:scale-90 hover:bg-light-line dark:bg-white/10 dark:hover:bg-white/[0.15] focus-ring"
                   aria-label="Increase"
                 >
                   <IconPlus className="w-4 h-4" />
@@ -79,7 +79,7 @@ export const CartPanel: React.FC<{
         })}
       </div>
 
-      <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700 space-y-1 text-sm">
+      <div className="mt-4 pt-3 border-t border-light-line dark:border-dark-line space-y-1 text-sm">
         <Row label={t('billing.subtotal')} paise={totals.subtotalPaise} />
         {totals.billDiscountPaise > 0 && (
           <Row label={t('billing.discount')} paise={totals.billDiscountPaise} sign="−" />

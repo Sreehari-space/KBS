@@ -63,7 +63,7 @@ export const DayCloseScreen: React.FC = () => {
 
   return (
     <div className="h-full overflow-y-auto px-4 py-4 space-y-4">
-      <div className="rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 p-3">
+      <div className="surface p-3">
         <h2 className="font-semibold mb-3">
           {t('day.title')} — {formatDate(summary.date.toISOString(), lang)}
         </h2>
@@ -71,7 +71,7 @@ export const DayCloseScreen: React.FC = () => {
         <Row label={t('day.sales')} paise={summary.salesTotalPaise} bold />
       </div>
 
-      <div className="rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 p-3">
+      <div className="surface p-3">
         <Row label={t('pay.cash')} paise={summary.byMode.cash} />
         <Row label={t('pay.upi')} paise={summary.byMode.upi} />
         <Row label={t('pay.card')} paise={summary.byMode.card} />
@@ -79,7 +79,7 @@ export const DayCloseScreen: React.FC = () => {
         <Row label={t('day.creditCollected')} paise={summary.creditCollectedPaise} />
       </div>
 
-      <div className="rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700 p-3 space-y-3">
+      <div className="surface p-3 space-y-3">
         {/* Expected cash is takings PLUS cash collected against old credit —
             not just the day's sales. */}
         <Row label={t('day.expectedCash')} paise={summary.expectedCashPaise} bold />

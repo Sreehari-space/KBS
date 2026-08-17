@@ -36,10 +36,7 @@ export const ReorderScreen: React.FC = () => {
         ) : (
           <div className="space-y-2">
             {(items ?? []).map((p) => (
-              <div
-                key={p.id}
-                className="flex items-center gap-3 p-3 rounded-lg bg-light-surface dark:bg-dark-surface border border-slate-200 dark:border-slate-700"
-              >
+              <div key={p.id} className="flex items-center gap-3 p-3 surface">
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{productName(p, lang)}</p>
                   <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
@@ -56,7 +53,7 @@ export const ReorderScreen: React.FC = () => {
       </div>
 
       {(items ?? []).length > 0 && (
-        <div className="flex-shrink-0 p-4 pb-safe border-t border-slate-200 dark:border-slate-700">
+        <div className="flex-shrink-0 p-4 pb-safe border-t border-light-line dark:border-dark-line">
           <Button
             full
             variant="secondary"
