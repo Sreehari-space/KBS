@@ -83,7 +83,7 @@ export const OnboardingScreen: React.FC<{ onDone: () => void }> = ({ onDone }) =
   const filledItems = items.filter((i) => i.name.trim() && parseRupeeInput(i.price)).length;
 
   return (
-    <div className="h-[100dvh] flex flex-col bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text">
+    <div className="flex h-full flex-col bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text">
       <header className="flex-shrink-0 px-5 pt-6 pb-4 max-w-lg mx-auto w-full">
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs font-semibold text-light-text-secondary dark:text-dark-text-secondary">

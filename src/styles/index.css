@@ -38,6 +38,40 @@
 @tailwind utilities;
 
 @layer base {
+  /* ── The app shell never scrolls; only the region inside it does ─────────
+     Nothing used to constrain the document, and the shell asked for 100dvh.
+     On Android Chrome the dynamic viewport can exceed what is actually on
+     screen, so the DOCUMENT became scrollable — and scrolling it dragged the
+     whole app upward, bottom nav included, leaving a band of bare background
+     under it. That is the "scroll goes past the bottom nav" bug.
+
+     Two independent guards, because either alone can be defeated:
+       1. html/body are pinned to the viewport and cannot scroll at all;
+       2. #root fills them, so the shell's height resolves against something
+          real rather than against `auto`.
+
+     `svh` — the SMALL viewport, the one with the browser chrome showing — is
+     the right unit for a fixed shell: it is the height that is always
+     visible, so the layout never has to react to the address bar sliding
+     away. `dvh` would rebuild the layout every time it moved. */
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  @supports (height: 100svh) {
+    html,
+    body {
+      height: 100svh;
+    }
+  }
+
+  #root {
+    height: 100%;
+  }
+
   html {
     /* Stops iOS Safari zooming the page when an input is focused. */
     -webkit-text-size-adjust: 100%;
@@ -48,7 +82,6 @@
     /* Tamil glyphs are taller than Latin; a roomier line-height keeps
        mixed-script rows from looking cramped. */
     line-height: 1.55;
-    overscroll-behavior-y: none;
   }
 
   /* Counter staff tap fast and repeatedly — text selection and the iOS
@@ -192,6 +225,15 @@
   @page {
     size: var(--bill-width, 58mm) auto;
     margin: 0;
+  }
+  /* The screen shell is pinned to the viewport and cannot scroll. On paper
+     that would guillotine any receipt taller than one screen, so the document
+     is handed back its natural height before the bill is laid out. */
+  html,
+  body,
+  #root {
+    height: auto;
+    overflow: visible;
   }
   body * {
     visibility: hidden;

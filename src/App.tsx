@@ -214,7 +214,7 @@ const Shell: React.FC<{
   const title = [...PRIMARY, ...MORE].find((item) => item.id === screen);
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text">
+    <div className="flex h-full flex-col bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text">
       <header className="no-print flex-shrink-0 bg-light-bg dark:bg-dark-bg">
         <div className="max-w-3xl mx-auto w-full flex items-center justify-between gap-3 px-4 py-2.5">
           <div className="min-w-0">
