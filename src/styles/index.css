@@ -104,12 +104,42 @@
   .focus-ring {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary dark:focus-visible:ring-brand-on-dark focus-visible:ring-offset-2 focus-visible:ring-offset-light-bg dark:focus-visible:ring-offset-dark-bg;
   }
+
+  /* A white card floating on the page. The reference separates cards with the
+     background gap alone — no border, almost no shadow — so this is the one
+     place the surface colour does the work. */
+  .surface {
+    @apply bg-light-surface dark:bg-dark-surface rounded-2xl shadow-card;
+  }
+
+  /* Grouped rows inside a card, divided by a hairline rather than by gaps. */
+  .row-divide {
+    @apply divide-y divide-light-line dark:divide-dark-line;
+  }
+
+  /* The reference sets headlines and balances tight and heavy. Applied by
+     class rather than globally because negative tracking pulls Tamil glyph
+     clusters apart — see `[lang='ta']` below. */
+  .display {
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
 }
 
-/* Keyboard navigation marks the *candidate* row; it is not focus, because
+/* Tamil is never tracked tight. The reference's headline style is built for
+   Latin; applying it to Tamil separates the clusters and reads as broken
+   rather than as confident. Numerals keep the tightening either way, which is
+   what the style was actually for. */
+:lang(ta) .display,
+[lang='ta'] .display {
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+
+/* Keyboard navigation marks the *candidate* tile; it is not focus, because
    focus stays in the search box while the arrow keys move this. */
 .kbd-active {
-  @apply border-brand-primary ring-2 ring-brand-primary/40;
+  @apply ring-2 ring-brand-primary dark:ring-brand-on-dark;
 }
 
 /* ── Reduced motion ───────────────────────────────────────────────────────

@@ -10,25 +10,26 @@ export { Sparkline } from './Sparkline';
 export const Card: React.FC<{ children: React.ReactNode; className?: string }> = ({
   children,
   className = '',
-}) => (
-  <div
-    className={`bg-light-surface dark:bg-dark-surface rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 ${className}`}
-  >
-    {children}
-  </div>
-);
+}) => <div className={`surface ${className}`}>{children}</div>;
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 
+/**
+ * Buttons are pills.
+ *
+ * The reference's signature control is a full-radius pill carrying a bright
+ * mint fill and near-black ink, used once per screen for the one action that
+ * matters. Everything else steps down to a neutral pill so the primary never
+ * has to compete.
+ */
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: 'bg-brand-primary text-white hover:bg-brand-primary-hover active:bg-brand-primary-hover',
-  secondary:
-    'bg-brand-secondary text-white hover:bg-brand-secondary-hover active:bg-brand-secondary-hover',
-  // A border is what makes a ghost button read as a control rather than as
-  // floating text — without it these looked disabled on a white sheet.
+  primary: 'bg-accent text-accent-ink hover:bg-accent-hover active:bg-accent-hover shadow-pill',
+  secondary: 'bg-brand-primary text-white hover:bg-brand-primary-hover',
+  // Neutral, but still a filled shape: a ghost with no fill reads as disabled
+  // on a white card, which is where most of them sit.
   ghost:
-    'bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-light-text dark:text-dark-text hover:bg-slate-200 dark:hover:bg-slate-600',
-  danger: 'bg-red-700 text-white hover:bg-red-800',
+    'bg-light-bg dark:bg-white/10 text-light-text dark:text-dark-text hover:bg-light-line dark:hover:bg-white/[0.15]',
+  danger: 'bg-red-600 text-white hover:bg-red-700',
 };
 
 export const Button: React.FC<
@@ -36,12 +37,46 @@ export const Button: React.FC<
 > = ({ variant = 'primary', full, className = '', children, ...rest }) => (
   <button
     {...rest}
-    className={`px-4 py-3 rounded-md font-semibold transition-[background-color,transform] duration-150 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 focus-ring ${
+    className={`px-5 py-3.5 rounded-full font-semibold transition-[background-color,transform] duration-150 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 focus-ring ${
       VARIANTS[variant]
     } ${full ? 'w-full' : ''} ${className}`}
   >
     {children}
   </button>
+);
+
+/**
+ * A pill chip: filters, segmented choices, and the translucent controls that
+ * sit on the gradient hero.
+ */
+export const Chip: React.FC<
+  React.ButtonHTMLAttributes<HTMLButtonElement> & { selected?: boolean; onHero?: boolean }
+> = ({ selected, onHero, className = '', children, ...rest }) => (
+  <button
+    {...rest}
+    aria-pressed={selected}
+    className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors focus-ring ${
+      onHero
+        ? 'bg-white/15 text-white hover:bg-white/25 backdrop-blur-sm'
+        : selected
+          ? 'bg-brand-primary text-white'
+          : 'bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text hover:bg-light-line dark:hover:bg-white/10'
+    } ${className}`}
+  >
+    {children}
+  </button>
+);
+
+/** An icon in a tinted rounded square, as the reference sets list-row icons. */
+export const IconTile: React.FC<{ children: React.ReactNode; className?: string }> = ({
+  children,
+  className = '',
+}) => (
+  <span
+    className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center bg-brand-primary/10 text-brand-primary dark:bg-brand-on-dark/15 dark:text-brand-on-dark ${className}`}
+  >
+    {children}
+  </span>
 );
 
 export const Field: React.FC<{
@@ -71,7 +106,7 @@ export const Input: React.FC<
 > = ({ className = '', ...rest }) => (
   <input
     {...rest}
-    className={`w-full px-3 py-2.5 rounded-md bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary ${className}`}
+    className={`w-full px-4 py-3 rounded-xl bg-light-bg dark:bg-white/[0.06] border border-transparent focus:outline-none focus:bg-light-surface dark:focus:bg-dark-surface focus:border-brand-primary dark:focus:border-brand-on-dark ${className}`}
   />
 );
 
@@ -82,7 +117,7 @@ export const Select: React.FC<React.SelectHTMLAttributes<HTMLSelectElement>> = (
 }) => (
   <select
     {...rest}
-    className={`w-full px-3 py-2.5 rounded-md bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary ${className}`}
+    className={`w-full px-4 py-3 rounded-xl bg-light-bg dark:bg-white/[0.06] border border-transparent focus:outline-none focus:border-brand-primary dark:focus:border-brand-on-dark ${className}`}
   >
     {children}
   </select>
@@ -103,7 +138,7 @@ export const Toggle: React.FC<{
   >
     <span
       className={`mt-0.5 flex-shrink-0 w-11 h-6 rounded-full transition-colors relative ${
-        checked ? 'bg-brand-primary' : 'bg-slate-300 dark:bg-slate-600'
+        checked ? 'bg-brand-primary' : 'bg-light-line dark:bg-white/20'
       }`}
     >
       <span
@@ -139,7 +174,7 @@ export const Checkbox: React.FC<{ checked: boolean; className?: string }> = ({
     className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
       checked
         ? 'bg-brand-primary border-brand-primary text-white'
-        : 'border-slate-400 dark:border-slate-500'
+        : 'border-light-line dark:border-dark-line'
     } ${className}`}
   >
     {checked && <IconCheck className="w-3.5 h-3.5" />}
@@ -211,26 +246,33 @@ export const Sheet: React.FC<{
         onClick={persistent ? undefined : onClose}
         aria-hidden
       />
+      {/* A big top radius and a grab handle: the reference's sheets read as a
+          sheet of paper pulled up over the page, not as a dialog. */}
       <div
-        className={`relative w-full sm:max-w-lg max-h-[92vh] overflow-y-auto bg-light-surface dark:bg-dark-surface rounded-t-xl sm:rounded-xl shadow-2xl ${
+        className={`relative w-full sm:max-w-lg max-h-[92vh] overflow-y-auto bg-light-bg dark:bg-dark-bg rounded-t-3xl sm:rounded-3xl shadow-2xl ${
           leaving
             ? 'animate-sheet-out sm:animate-dialog-out'
             : 'animate-sheet-in sm:animate-dialog-in'
         }`}
       >
+        <div className="sm:hidden pt-2.5 flex justify-center" aria-hidden>
+          <span className="w-9 h-1 rounded-full bg-light-line dark:bg-dark-line" />
+        </div>
         {title && (
-          <div className="sticky top-0 z-10 bg-light-surface dark:bg-dark-surface px-5 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-            <h2 className="text-lg font-bold">{title}</h2>
+          // Title centred with the dismiss on the right, as the reference
+          // groups its sheet headers.
+          <div className="sticky top-0 z-10 bg-light-bg dark:bg-dark-bg px-5 pt-3 pb-4 flex items-center gap-3">
+            <h2 className="flex-1 text-center text-lg font-bold display truncate">{title}</h2>
             <button
               onClick={onClose}
-              className="p-2 -mr-2 rounded-md text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text dark:hover:text-dark-text focus-ring"
+              className="absolute right-4 p-2 rounded-full text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-line dark:hover:bg-white/10 focus-ring"
               aria-label="Close"
             >
               <IconClose className="w-5 h-5" />
             </button>
           </div>
         )}
-        <div className="p-5 pb-safe">{children}</div>
+        <div className="px-4 pb-safe">{children}</div>
       </div>
     </div>
   );
@@ -241,16 +283,15 @@ export const Banner: React.FC<{
   children: React.ReactNode;
   onDismiss?: () => void;
 }> = ({ tone, children, onDismiss }) => {
+  // Tinted fills rather than bordered boxes, matching the card language.
   const tones = {
-    warning:
-      'bg-amber-50 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-100',
-    danger:
-      'bg-red-50 dark:bg-red-900/30 border-red-300 dark:border-red-700 text-red-900 dark:text-red-100',
-    info: 'bg-blue-50 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-100',
+    warning: 'bg-amber-50 dark:bg-amber-500/15 text-amber-900 dark:text-amber-100',
+    danger: 'bg-red-50 dark:bg-red-500/15 text-red-900 dark:text-red-100',
+    info: 'bg-brand-primary/10 dark:bg-brand-on-dark/15 text-brand-primary-hover dark:text-brand-on-dark',
   };
   return (
     <div
-      className={`border rounded-md px-4 py-3 text-sm flex items-start gap-3 animate-fade-in ${tones[tone]}`}
+      className={`rounded-2xl px-4 py-3 text-sm flex items-start gap-3 animate-fade-in ${tones[tone]}`}
     >
       <div className="flex-1">{children}</div>
       {onDismiss && (
