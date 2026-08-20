@@ -99,6 +99,12 @@ No Redux, no Zustand. Two mechanisms:
 - **Precache** the full app shell — JS, CSS, fonts, icons. Everything needed to boot.
 - **No runtime network caching**, because after D2 there are no runtime network requests.
 - `display: "standalone"`, `orientation: "any"`, `start_url: "/"`, maskable icons.
+- **Icons** are generated from `assets/logo.png` by `scripts/build-icons.py`, never hand-
+  exported. The logo is a 3D render, so the script does three things the eye would miss:
+  it keeps every icon opaque (iOS paints a transparent apple-touch icon black), it writes
+  dithered 255-colour PNGs rather than truecolor (a third of the bytes, and undithered
+  quantisation bands across the gradient), and it holds the maskable artwork inside the
+  0.8w safe circle. Re-run the script after any change to the master; don't edit the PNGs.
 - **Update flow:** a new service worker shows a "புதிய பதிப்பு / Update available" toast and
   activates on tap. Never auto-reload — a forced reload mid-bill would lose the cart.
 - **Install prompt:** capture `beforeinstallprompt` and show an "Install KBS" button in
@@ -138,11 +144,13 @@ need fixing when AI moves behind a key check.
 ```
 kbs/
 ├─ index.html                      # importmap + Tailwind CDN removed
+├─ assets/logo.png                 # icon master, not shipped
+├─ scripts/build-icons.py          # regenerates public/icons/
 ├─ vite.config.ts                  # + PWA plugin, - API_KEY define
 ├─ tailwind.config.js              # NEW — colour tokens moved out of index.html
 ├─ public/
 │  ├─ fonts/NotoSansTamil-*.woff2  # self-hosted, offline-safe
-│  └─ icons/                       # PWA icons incl. maskable
+│  └─ icons/                       # generated — see scripts/build-icons.py
 └─ src/
    ├─ main.tsx
    ├─ App.tsx                      # shell + nav only; no data state
