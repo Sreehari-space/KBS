@@ -46,6 +46,29 @@ export default {
         'dark-text': '#f2f5f4',
         'light-text-secondary': '#5f6e6b',
         'dark-text-secondary': '#9aa8a5',
+
+        // ── First run only: the pastel/ink world ────────────────────────────
+        // Onboarding is the one screen where KBS is not a till, so it gets its
+        // own palette: a colour per step and hand-drawn ink over it. None of
+        // this is used anywhere else — pastel grounds behind a dense cart list
+        // would cost legibility at the counter, which is the whole reason the
+        // treatment stops at the front door.
+        //
+        // Ink on every ground clears 13:1 and the muted ink clears 7:1. What
+        // the numbers also say: a white field on the lime ground is 1.15:1, so
+        // the input boxes are separated by their ink border, never by fill.
+        'paper-pink': '#f7d9d4',
+        'paper-lime': '#e8f4c8',
+        'paper-peach': '#fadcc4',
+        // Dark mode keeps the same three hues rather than dropping the
+        // treatment. A first run at night should still feel like this screen.
+        'paper-pink-dark': '#3a2422',
+        'paper-lime-dark': '#2b3319',
+        'paper-peach-dark': '#3a2a1c',
+        ink: '#141414',
+        'ink-soft': '#4a4340',
+        'ink-cream': '#f4ece3',
+        'ink-cream-soft': '#b6aa9e',
       },
       fontFamily: {
         // Noto Sans Tamil is self-hosted (public/fonts). The system fallbacks
