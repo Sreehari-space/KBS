@@ -205,6 +205,36 @@ start and never a gate. Completion is recorded in `settings.ui.onboardedAt`,
 and the gate only opens once settings have genuinely been read off disk —
 otherwise every cold start would flash the setup flow.
 
+### It is the one screen that is not a till
+
+First run is dressed differently from everything else in the app: a pastel
+ground per question — pink, lime, peach — heavy display type, and a
+hand-drawn ink illustration per step. The step you are on is the colour of the
+whole screen, so progress is felt before the rule at the top is read.
+
+The treatment stops at the front door, and that is the decision, not an
+oversight. The counter needs density and a calm ground; the same pastels
+behind a cart list would cost legibility during a queue. Setup is the only
+moment in the product with no queue behind it.
+
+Four things the treatment had to answer for:
+
+- **Contrast.** Ink clears 13:1 on all three grounds and the muted ink clears
+  7:1. The same arithmetic says a white field on the lime ground is 1.15:1 —
+  so the input boxes are separated by their ink border, never by their fill.
+- **Dark mode.** The three hues get dark counterparts rather than the
+  treatment being dropped, because a first run at night should still feel like
+  this screen. Every stroke and fill in the drawings is `currentColor`, so the
+  ink flips to cream without a second copy of the art.
+- **No knocked-out white.** A white hole in a drawing would read as a white
+  hole on a pastel ground. Each solid mass is one path with
+  `fill-rule="evenodd"`, so what looks like white is the ground showing
+  through, whatever colour that ground happens to be.
+- **Tamil.** The headings step down a size by language rather than wrapping to
+  five lines on a 360px phone, and the primary action refuses to break
+  mid-label — "start billing" is about twice as wide in Tamil, so the footer
+  row wraps and the way out drops to its own line instead.
+
 ---
 
 ---
@@ -231,11 +261,12 @@ Two things let a P0 flow disappear in a UI polish commit:
 
 ## Decision log additions
 
-| #   | Decision                                                                                 | Rationale                                                                                                                                                                                       |
-| --- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D13 | Keyboard shortcuts are **additive and never steal a printable key from a focused field** | The touch path is the one that must never regress. A shortcut that eats a character the operator was typing costs more than it saves.                                                           |
-| D14 | Motion is capped at **260 ms** and disabled wholesale under `prefers-reduced-motion`     | Nothing in this app conveys state through movement alone, so it can all be switched off; on a low-end phone slow animation is worse than none.                                                  |
-| D15 | `useLiveQuery` on the billing path takes **no default value**                            | `undefined` is the loading state. A default of `[]` renders an empty-state for a frame on every mount, which is what made screens feel cheap.                                                   |
-| D16 | Profit is reported **only over lines with a recorded cost price**                        | Treating a missing cost as zero would flatter the shop and make the number useless. Uncosted revenue is shown separately instead.                                                               |
-| D17 | The next bill number shown on the billing screen is a **peek, not an allocation**        | The number must still be handed out inside the commit transaction, or two fast taps could share one.                                                                                            |
-| D18 | Payment-sheet decisions live in a **tested pure module**, not in component state         | A UI-polish commit silently made every credit and split-payment sale unreachable, and no test could see it. Anything that decides whether a shop can put a bill on a khata is not presentation. |
+| #   | Decision                                                                                 | Rationale                                                                                                                                                                                                                 |
+| --- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D13 | Keyboard shortcuts are **additive and never steal a printable key from a focused field** | The touch path is the one that must never regress. A shortcut that eats a character the operator was typing costs more than it saves.                                                                                     |
+| D14 | Motion is capped at **260 ms** and disabled wholesale under `prefers-reduced-motion`     | Nothing in this app conveys state through movement alone, so it can all be switched off; on a low-end phone slow animation is worse than none.                                                                            |
+| D15 | `useLiveQuery` on the billing path takes **no default value**                            | `undefined` is the loading state. A default of `[]` renders an empty-state for a frame on every mount, which is what made screens feel cheap.                                                                             |
+| D16 | Profit is reported **only over lines with a recorded cost price**                        | Treating a missing cost as zero would flatter the shop and make the number useless. Uncosted revenue is shown separately instead.                                                                                         |
+| D17 | The next bill number shown on the billing screen is a **peek, not an allocation**        | The number must still be handed out inside the commit transaction, or two fast taps could share one.                                                                                                                      |
+| D18 | Payment-sheet decisions live in a **tested pure module**, not in component state         | A UI-polish commit silently made every credit and split-payment sale unreachable, and no test could see it. Anything that decides whether a shop can put a bill on a khata is not presentation.                           |
+| D19 | The pastel/ink treatment is **scoped to first run** and never reaches the till           | Setup is the only screen in the product with no queue behind it. Density and a calm ground are what the counter needs, and a pastel ground behind a cart list trades that away for charm nobody at the counter asked for. |
