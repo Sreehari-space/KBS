@@ -98,6 +98,22 @@ export const Field: React.FC<{
   </label>
 );
 
+/**
+ * Full width by default, unless the caller asked for a width of their own.
+ *
+ * Tailwind emits width utilities in size order, so `.w-full` lands *after*
+ * `.w-24` in the stylesheet. Both are single-class selectors, so the later one
+ * wins and a width passed through `className` loses silently — no warning, no
+ * error, just the wrong layout. That is what collapsed the item-name box on
+ * the onboarding screen to 26px wide: its neighbour asked for `w-24`, was given
+ * 100% instead, and ate the whole row.
+ *
+ * Only a bare `w-*` counts. `min-w-0` and `max-w-sm` set different properties
+ * and coexist with the default; a responsive `sm:w-24` is not handled and would
+ * need a wrapper element instead.
+ */
+const fieldWidth = (className: string) => (/(?:^|\s)w-/.test(className) ? '' : 'w-full');
+
 // `ref` is an ordinary prop in React 19, so it travels in `rest` — no
 // forwardRef wrapper needed. The billing screen needs it to focus the search
 // box on "/".
@@ -106,7 +122,7 @@ export const Input: React.FC<
 > = ({ className = '', ...rest }) => (
   <input
     {...rest}
-    className={`w-full px-4 py-3 rounded-xl bg-light-surface dark:bg-white/[0.06] border border-transparent shadow-card focus:outline-none focus:border-brand-primary dark:focus:border-brand-on-dark ${className}`}
+    className={`${fieldWidth(className)} px-4 py-3 rounded-xl bg-light-surface dark:bg-white/[0.06] border border-transparent shadow-card focus:outline-none focus:border-brand-primary dark:focus:border-brand-on-dark ${className}`}
   />
 );
 
@@ -117,7 +133,7 @@ export const Select: React.FC<React.SelectHTMLAttributes<HTMLSelectElement>> = (
 }) => (
   <select
     {...rest}
-    className={`w-full px-4 py-3 rounded-xl bg-light-surface dark:bg-white/[0.06] border border-transparent shadow-card focus:outline-none focus:border-brand-primary dark:focus:border-brand-on-dark ${className}`}
+    className={`${fieldWidth(className)} px-4 py-3 rounded-xl bg-light-surface dark:bg-white/[0.06] border border-transparent shadow-card focus:outline-none focus:border-brand-primary dark:focus:border-brand-on-dark ${className}`}
   >
     {children}
   </select>
