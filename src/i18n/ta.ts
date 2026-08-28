@@ -313,7 +313,7 @@ export const ta: Record<TranslationKey, string> = {
   'net.offline': 'இணையம் இல்லாமல் இயங்குகிறது',
 
   // Onboarding
-  'onb.welcome': 'உங்கள் கல்லாவை அமைக்கலாம்',
+  'onb.welcome': 'உங்கள் கடையை அமைக்கலாம்',
   'onb.welcomeHint': 'மூன்று கேள்விகள், சுமார் நான்கு நிமிடம். எல்லாவற்றையும் பின்னர் மாற்றலாம்.',
   'onb.step': 'படி {n} / 3',
   'onb.shopTitle': 'உங்கள் கடையின் பெயர்',

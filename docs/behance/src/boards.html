@@ -182,13 +182,13 @@
 <section class="board dark" id="bcover">
   <div style="flex: 1">
     <p class="eyebrow" style="margin-bottom: 20px">Kadai Billing System</p>
-    <h1>The till that works offline.</h1>
+    <h1>Billing that works offline.</h1>
     <p class="tag" style="margin-top: 26px; font-size: 17px; line-height: 1.5; max-width: 30ch">
-      Billing, khata and thermal receipts for provision stores in Tamil Nadu.
-      No server, no login, no signal needed.
+      Sales, customer credit and printed receipts for small grocery shops in
+      Tamil Nadu. No server, no login, no signal needed.
     </p>
     <div class="row" style="gap: 10px; margin-top: 30px; flex-wrap: wrap">
-      <span class="badge solid" style="font-size: 13px">Offline-first PWA</span>
+      <span class="badge solid" style="font-size: 13px">Works with no signal</span>
       <span class="badge" style="font-size: 13px">தமிழ் &amp; English</span>
     </div>
   </div>
@@ -202,16 +202,17 @@
   <div class="row between">
     <div style="max-width: 760px">
       <p class="eyebrow">Kadai Billing System · Tamil Nadu · 2026</p>
-      <h1>The till that works when the network doesn&rsquo;t.</h1>
+      <h1>Billing that works when the network doesn&rsquo;t.</h1>
       <p class="sub mt40">
-        An offline-first billing app for provision stores. Every sale, every khata and
-        every receipt is written to the phone first &mdash; and only ever to the phone.
+        A billing app for small grocery shops. Every sale, every rupee of customer
+        credit and every receipt is written to the phone itself &mdash; and only ever
+        to the phone. There is no server anywhere.
       </p>
       <div class="row mt56" style="gap: 12px; flex-wrap: wrap">
-        <span class="badge solid">Offline-first PWA</span>
-        <span class="badge">React 19 &middot; IndexedDB</span>
+        <span class="badge solid">Works with no signal</span>
+        <span class="badge">Installable web app</span>
         <span class="badge">தமிழ் &amp; English</span>
-        <span class="badge">58 mm thermal</span>
+        <span class="badge">Prints over Bluetooth</span>
       </div>
     </div>
     <div style="width: 300px; flex: none">
@@ -232,10 +233,12 @@
     <div style="flex: 1">
       <h2>One hand on the scale. One hand on the phone. A queue behind.</h2>
       <p class="body mt40">
-        A kirana counter is not a desk. Rice is being weighed while the next customer
-        is already reading out their list, the last one is asking to put it on the
-        khata, and the phone doing all of this is a ₹8,000 Android with two bars of
-        signal on a good day.
+        A <em>kirana</em> is the small neighbourhood grocery shop found on every
+        street in India &mdash; rice, lentils, oil and soap, most of it weighed out
+        by hand. Its counter is not a desk. Rice is on the scale while the next
+        customer is already reading out their list, the last one is asking to put it
+        on their tab, and the phone doing all of this cost about ₹8,000 and has two
+        bars of signal on a good day.
       </p>
       <p class="body mt24">
         Nothing in that sentence is a design detail. It is <strong>the entire
@@ -251,7 +254,7 @@
         <div class="card">
           <h3>Money is the interface</h3>
           <p>The running total is the largest thing on the screen and never leaves it.
-            Every amount is an integer number of paise.</p>
+            Nothing about an amount is ever left to a rounding error.</p>
         </div>
         <div class="card">
           <h3>Two scripts, one counter</h3>
@@ -259,7 +262,7 @@
             mid-shift &mdash; never buried in settings.</p>
         </div>
         <div class="card">
-          <h3>A half-built bill is sacred</h3>
+          <h3>A half-finished bill is sacred</h3>
           <p>The cart auto-saves as it is built. A dropped phone or a dead battery
             must not cost the shopkeeper the sale in progress.</p>
         </div>
@@ -267,8 +270,9 @@
     </div>
     <div style="width: 400px; flex: none">
       <div class="dev"><img class="shot" src="data:image/webp;base64,{{SHOT:01-till-empty}}" /></div>
-      <p class="cap">The till at rest. Sixty-seven Tamil Nadu staples ship seeded, so
-        the first bill can be rung up before anything is set up.</p>
+      <p class="cap">The billing screen at rest. Sixty-seven Tamil Nadu staples come
+        pre-loaded, so a shop can ring up its first sale before setting anything
+        up.</p>
     </div>
   </div>
 </section>
@@ -285,20 +289,22 @@
     </div>
     <div>
       <h3>Platform</h3>
-      <p class="body mt24" style="font-size: 18px">Installable PWA. Android phones
-        first, then a keyboard-and-mouse counter, then a 58 mm thermal printer over
-        Bluetooth.</p>
+      <p class="body mt24" style="font-size: 18px">A web app that installs to the
+        home screen like a native one. Android phones first, then a
+        keyboard-and-mouse counter, then a small receipt printer over Bluetooth.</p>
     </div>
     <div>
       <h3>Stack</h3>
-      <p class="body mt24" style="font-size: 18px">React 19, TypeScript, Vite,
-        Tailwind. IndexedDB through Dexie. Workbox for the shell. No backend of any
+      <p class="body mt24" style="font-size: 18px">React and TypeScript. The data
+        lives in the browser&rsquo;s own on-device database, and the app&rsquo;s files
+        are stored on the phone so it opens with no connection. No backend of any
         kind.</p>
     </div>
     <div>
       <h3>What shipped</h3>
-      <p class="body mt24" style="font-size: 18px">Billing, stock, khata ledger,
-        returns, day close, barcode scanning, shelf labels, reports, and backup.</p>
+      <p class="body mt24" style="font-size: 18px">Billing, stock, the customer
+        credit book, returns, end-of-day cash count, barcode scanning, shelf labels,
+        reports and backup.</p>
     </div>
   </div>
   <hr class="rule mt72" />
@@ -321,7 +327,7 @@
     </div>
     <div>
       <p class="money" style="font-size: 66px">0</p>
-      <p class="tag mt24">network requests once<br />the shell is installed</p>
+      <p class="tag mt24">network requests<br />once it is installed</p>
     </div>
   </div>
 </section>
@@ -363,9 +369,10 @@
   <p class="eyebrow">Colour</p>
   <div class="row between">
     <h2>A teal that survives sunlight, and one mint that never repeats.</h2>
-    <p class="tag" style="max-width: 30ch; text-align: right">Every value below was
-      measured, not eyeballed. The ratios are against the surface each colour is
-      actually used on.</p>
+    <p class="tag" style="max-width: 34ch; text-align: right">Every value below was
+      measured, not eyeballed. A contrast ratio is how far a colour stands out from
+      the one behind it; below about 4.5&thinsp;:&thinsp;1, small text gets hard to
+      read.</p>
   </div>
   <div class="grid5 mt72">
     <div class="sw">
@@ -425,15 +432,17 @@
   <div class="grid3 mt72" style="gap: 48px">
     <div>
       <h3>Grouped the Indian way</h3>
-      <p class="body mt24" style="font-size: 18px">Lakh grouping, not thousands. A
-        shopkeeper reading <strong>1,24,560</strong> sees one lakh twenty-four
-        thousand at a glance; the same digits grouped as 124,560 have to be counted.</p>
+      <p class="body mt24" style="font-size: 18px">India groups digits differently:
+        a lakh is a hundred thousand, and the commas fall in different places. A
+        shopkeeper reading <strong>1,24,560</strong> sees the amount at a glance; the
+        same digits written 124,560 have to be counted.</p>
     </div>
     <div>
       <h3>Paise at 82%, dimmed</h3>
-      <p class="body mt24" style="font-size: 18px">The decimals are set smaller and
-        softer everywhere an amount appears. They still have to be there &mdash; a bill
-        without them looks rounded &mdash; but they must not compete with the rupees.</p>
+      <p class="body mt24" style="font-size: 18px">A paisa is one-hundredth of a
+        rupee, the way a cent is of a dollar. The decimals are set smaller and softer
+        everywhere. They must be there &mdash; a bill without them looks rounded off
+        &mdash; but they must not compete with the rupees.</p>
     </div>
     <div>
       <h3>Tabular, always</h3>
@@ -450,11 +459,13 @@
     <div style="flex: 1">
       <h3>And underneath: no floats, ever</h3>
       <p class="body mt24">
-        Money is stored and computed as an <strong>integer number of paise</strong>.
-        Not a rupee float, not a decimal string. ₹0.1 + ₹0.2 is a rounding anecdote in
-        most software; in a shop&rsquo;s ledger it is a discrepancy the owner has to
-        explain at closing time. Totals, tax, discounts, refunds and change all resolve
-        in whole paise before anything is displayed.
+        Every amount is stored and calculated as a <strong>whole number of
+        paise</strong> &mdash; 62 rupees is held as 6,200, never as 62.00. Computers
+        are famously bad at decimals: ask most software for 0.1&nbsp;+&nbsp;0.2 and it
+        answers 0.30000000000000004. That is a curiosity in a spreadsheet and a
+        discrepancy in a shop&rsquo;s books, the kind the owner has to explain at
+        closing time. Totals, tax, discounts, refunds and change are all settled in
+        whole paise before anything reaches the screen.
       </p>
     </div>
   </div>
@@ -480,41 +491,45 @@
       <div class="mt56">
         <div class="drow" style="border-top: 1px solid var(--rule)">
           <span class="k">Letter-spacing</span>
-          <span class="v">The tight tracking that makes Latin headings sit well breaks
-            Tamil glyph clusters. Every display style resets it under
-            <strong>:lang(ta)</strong> and gives the line more leading.</span>
+          <span class="v">Squeezing the letters together makes an English headline
+            sit better and makes a Tamil one fall apart, because Tamil letters combine
+            into single shapes. Every heading detects the language, drops the squeeze
+            and gives the line more room.</span>
         </div>
         <div class="drow">
           <span class="k">No uppercasing</span>
-          <span class="v">Tamil has no case. <strong>uppercase</strong> on a label is a
-            silent no-op in one language and damage in the other, so it is gone from
-            shared components.</span>
+          <span class="v">Tamil has no capital letters. Forcing a label to
+            UPPERCASE does nothing at all in one language and damages the other, so it
+            was removed from every shared component.</span>
         </div>
         <div class="drow">
           <span class="k">Tanglish input</span>
-          <span class="v">Typing <strong>&ldquo;ponni arisi&rdquo;</strong> fills in
-            <span class="ta">பொன்னி அரிசி</span> from an offline lexicon and a phonetic
-            fallback. Nobody switches keyboards mid-queue.</span>
+          <span class="v">Most people type Tamil words using English letters. Typing
+            <strong>&ldquo;ponni arisi&rdquo;</strong> fills in
+            <span class="ta">பொன்னி அரிசி</span> by itself, from a word list held on the
+            device and a sound-alike fallback for anything missing. Nobody switches
+            keyboards with a queue waiting.</span>
         </div>
         <div class="drow">
           <span class="k">Headline sizes</span>
-          <span class="v">Tamil sets a third wider in a taller script, so display sizes
-            step down by language rather than wrapping a heading to five lines on a
-            360&nbsp;px phone.</span>
+          <span class="v">The same sentence in Tamil runs about a third wider in a
+            taller script, so headings step down a size by language instead of wrapping
+            to five lines on a small phone.</span>
         </div>
       </div>
     </div>
     <div style="width: 360px; flex: none">
       <div class="dev"><img class="shot" src="data:image/webp;base64,{{SHOT:ta-till}}" /></div>
-      <p class="cap">The same till, same code path. The receipt, the reports and the
-        printer output are all translated too &mdash; not just the chrome.</p>
+      <p class="cap">The same screen, the same code. The receipt, the reports and what
+        comes out of the printer are all in Tamil too &mdash; not just the buttons
+        around the edge.</p>
     </div>
   </div>
 </section>
 
 <!-- ══════════════════════════════════════════════════════════ 08 TILL ── -->
 <section class="board" id="b08">
-  <p class="eyebrow">The till</p>
+  <p class="eyebrow">The billing screen</p>
   <div class="row" style="gap: 80px">
     <div style="width: 420px; flex: none">
       <div class="dev"><img class="shot" src="data:image/webp;base64,{{SHOT:03-till-cart}}" /></div>
@@ -530,15 +545,16 @@
         </div>
         <div class="drow">
           <span class="k">Quick items</span>
-          <span class="v">The shop&rsquo;s own fastest sellers, chosen during setup and
-            editable later. Price and stock on the face of each tile, so the answer to
-            &ldquo;how much?&rdquo; never needs a tap.</span>
+          <span class="v">The shop&rsquo;s own fastest sellers, named during setup and
+            editable later. Price and stock sit on the face of each tile, so the answer
+            to &ldquo;how much?&rdquo; never costs a tap.</span>
         </div>
         <div class="drow">
           <span class="k">The next bill number</span>
-          <span class="v">Shown before the sale as a <strong>peek</strong>, never an
-            allocation. The real number is handed out inside the commit transaction, or
-            two fast taps could share one.</span>
+          <span class="v">Shown before the sale as a preview, never reserved. The
+            real number is handed out at the instant the sale is saved &mdash;
+            otherwise two fast taps could end up sharing one, and two bills with the
+            same number is a mess nobody can unpick later.</span>
         </div>
         <div class="drow">
           <span class="k">Saved</span>
@@ -572,8 +588,8 @@
     <div>
       <p class="step-no">02 — WEIGH</p>
       <div class="dev"><img class="shot" src="data:image/webp;base64,{{SHOT:02-quantity}}" /></div>
-      <p class="cap">Loose goods ask for a quantity. Packets skip this entirely and go
-        straight in.</p>
+      <p class="cap">Anything sold by weight asks how much. Packets skip this
+        entirely and go straight into the bill.</p>
     </div>
     <div>
       <p class="step-no">03 — CHECK</p>
@@ -584,8 +600,9 @@
     <div>
       <p class="step-no">04 — TAKE</p>
       <div class="dev"><img class="shot" src="data:image/webp;base64,{{SHOT:05-payment-cash}}" /></div>
-      <p class="cap">Cash, UPI, card or khata &mdash; and any split of them. Note
-        denominations, get the change back.</p>
+      <p class="cap">Cash, card, instant bank transfer, or the customer&rsquo;s
+        credit book &mdash; and any split between them. Tap what was handed over, get
+        the change back.</p>
     </div>
     <div>
       <p class="step-no">05 — GIVE</p>
@@ -603,15 +620,14 @@
     <div style="flex: 1">
       <h2>A shop sells rice by the kilo and by the fifty rupees.</h2>
       <p class="body mt40">
-        Half the transactions at a provision counter are not &ldquo;one of
-        something&rdquo;. They are two kilos of idli rice, or a hundred rupees of
-        groundnut oil &mdash; and the customer is as likely to name the money as the
-        weight.
+        Half the sales at a grocery counter are not &ldquo;one of something&rdquo;.
+        They are two kilos of rice, or a hundred rupees of groundnut oil &mdash; and
+        the customer is as likely to name the money as the weight.
       </p>
       <p class="body mt24">
         So the quantity sheet works in <strong>both directions</strong>. By weight, it
         multiplies up to a price. By amount, it divides down to a weight. The keypad is
-        the same either way, and the presets underneath cover the quantities a kirana
+        the same either way, and the shortcuts underneath cover the amounts a grocery
         shop actually sells: 100&nbsp;g, 250&nbsp;g, half a kilo, one, two, five.
       </p>
       <p class="body mt24">
@@ -627,9 +643,9 @@
         </div>
         <div class="card">
           <h3>Stock stays honest</h3>
-          <p>Quantities are decimal-safe and the stock is decremented in the same
-            atomic write that commits the sale &mdash; never in a second step that
-            could fail on its own.</p>
+          <p>The shelf count comes down in the very same save that records the sale
+            &mdash; never in a second step afterwards, which could fail on its own and
+            leave the two disagreeing.</p>
         </div>
       </div>
     </div>
@@ -639,49 +655,53 @@
   </div>
 </section>
 
-<!-- ═════════════════════════════════════════════════════════ 11 KHATA ── -->
+<!-- ═══════════════════════════════════════════════════ 11 CREDIT BOOK ── -->
 <section class="board" id="b11">
-  <p class="eyebrow">Credit</p>
+  <p class="eyebrow">The credit book</p>
   <div class="row between">
     <h2>Credit is not a way of paying. It is the absence of one.</h2>
+    <p class="tag" style="max-width: 32ch; text-align: right">Getting this wrong cost a
+      week. Getting it right made two other features fall out for free.</p>
   </div>
-  <div class="row mt72" style="gap: 56px">
-    <div style="width: 340px; flex: none">
+  <div class="row mt72" style="gap: 48px">
+    <div style="width: 330px; flex: none">
       <div class="dev"><img class="shot" src="data:image/webp;base64,{{SHOT:06-payment-credit}}" /></div>
-      <p class="cap">Choosing khata names the customer and leaves the balance owing.</p>
+      <p class="cap">Choosing credit names the customer and leaves the balance owing.</p>
     </div>
-    <div style="width: 340px; flex: none">
+    <div style="width: 330px; flex: none">
       <div class="dev"><img class="shot" src="data:image/webp;base64,{{SHOT:12-ledger}}" /></div>
-      <p class="cap">The ledger is append-only. Balances are derived, never edited.</p>
+      <p class="cap">What each regular owes, ready for the end of the month.</p>
     </div>
     <div style="flex: 1">
       <h3>The modelling mistake that cost a week</h3>
       <p class="body mt24">
-        Khata &mdash; the running tab a regular customer settles at the end of the
-        month &mdash; was first modelled as a fourth payment method sitting beside cash,
-        UPI and card. It looks the same on screen. It is the opposite underneath: the
-        other three <em>reduce</em> what is outstanding, and this one <em>is</em> what
-        is outstanding.
+        Almost every neighbourhood shop runs a running tab for its regulars, settled at
+        the end of the month &mdash; <em>khata</em> in India. It was first built as a
+        fourth way of paying, sitting in the row beside cash, card and bank transfer. On
+        screen it looks like one. Underneath it is the opposite: the other three
+        <em>reduce</em> what is owed, and this one <em>is</em> what is owed.
       </p>
       <p class="body mt24">
-        Once that was fixed, a sale became a total with a list of payments against it
-        and whatever remains going to a named customer. Split tenders &mdash; ₹200 cash
-        now, the rest on the book &mdash; fell out of the model for free, and so did
-        settling the book later without touching the original bill.
+        Once that was straightened out, a sale became a total, a list of payments
+        against it, and whatever is left over charged to a named customer. Splitting a
+        bill &mdash; ₹200 in cash now, the rest on the book &mdash; then needed no extra
+        work at all, and neither did settling up later without disturbing the original
+        bill.
       </p>
-      <div class="mt40">
-        <div class="drow" style="border-top: 1px solid var(--rule)">
-          <span class="k">Append-only</span>
-          <span class="v">Every credit given and every rupee collected is an entry.
-            Balances are computed from the entries, so no total can drift away from its
-            history.</span>
-        </div>
-        <div class="drow">
-          <span class="k">Immutable sales</span>
-          <span class="v">A committed bill is never edited. A mistake becomes a return
-            with its own number, so the day&rsquo;s takings still add up.</span>
-        </div>
-      </div>
+    </div>
+  </div>
+  <div class="grid2 mt72" style="gap: 48px">
+    <div class="drow" style="border-top: 1px solid var(--rule)">
+      <span class="k">Nothing is erased</span>
+      <span class="v">Every credit given and every rupee collected is a new line in the
+        book. What somebody owes is added up from those lines, so no balance can quietly
+        drift away from its own history.</span>
+    </div>
+    <div class="drow" style="border-top: 1px solid var(--rule)">
+      <span class="k">Bills are never edited</span>
+      <span class="v">A saved bill stays exactly as it was. A mistake becomes a return
+        with its own number, so the day&rsquo;s takings still add up at closing
+        time.</span>
     </div>
   </div>
 </section>
@@ -696,20 +716,22 @@
     <div style="flex: 1">
       <h2>One bill. Four ways out of the phone.</h2>
       <p class="body mt40">
-        The bill on screen is not a picture of a receipt &mdash; it is the receipt, torn
-        edges and all, set in the same 58&nbsp;mm measure the printer will use. What the
-        shopkeeper checks on glass is exactly what the customer gets on paper.
+        The bill on screen is not a picture of a receipt &mdash; it is the receipt,
+        torn edges and all, laid out to the exact width of the paper the printer will
+        use. What the shopkeeper checks on glass is what the customer gets in their
+        hand.
       </p>
       <div class="mt56">
         <div class="drow" style="border-top: 1px solid var(--ink-rule)">
           <span class="k">Paper</span>
-          <span class="v">A 58&nbsp;mm HTML layout for the browser&rsquo;s own print
-            path, for shops with a USB printer on a counter PC.</span>
+          <span class="v">A layout the width of the paper roll, sent through the
+            browser&rsquo;s own print command &mdash; for shops with a printer plugged
+            into a computer at the counter.</span>
         </div>
         <div class="drow">
           <span class="k">WhatsApp</span>
-          <span class="v">Plain text, monospaced and aligned by spaces, because that is
-            what survives being pasted into a chat.</span>
+          <span class="v">Plain text, lined up with spaces rather than a table,
+            because that is what survives being pasted into a chat message.</span>
         </div>
         <div class="drow">
           <span class="k">Image</span>
@@ -718,14 +740,17 @@
         </div>
         <div class="drow">
           <span class="k">Thermal</span>
-          <span class="v">ESC/POS over Web Bluetooth &mdash; sent as a
-            <strong>raster</strong>, because cheap thermal printers have no Tamil font
-            in ROM. Sending characters prints boxes; sending pixels prints Tamil.</span>
+          <span class="v">Straight to a receipt printer over Bluetooth &mdash; and
+            sent as a <strong>picture</strong> rather than as text, because the cheap
+            printers these shops own have no Tamil letters built into them. Send
+            characters and the paper comes out full of empty boxes; send pixels and it
+            prints Tamil.</span>
         </div>
       </div>
       <p class="body mt40">
-        Every renderer reads one model. Adding a channel never means re-deriving totals,
-        and a change to how tax is shown appears in all four at once.
+        All four are drawn from one description of the bill. Adding a new way to send
+        it never means working the totals out a second time, and a change to how tax is
+        shown appears in all four at once.
       </p>
     </div>
   </div>
@@ -756,10 +781,10 @@
       </div>
       <div class="drow">
         <span class="k">Profit, honestly</span>
-        <span class="v">Margin is reported <strong>only over lines with a recorded cost
-          price</strong>. Treating a missing cost as zero would flatter the shop and
-          make the number worthless, so uncosted revenue is shown separately
-          instead.</span>
+        <span class="v">Profit is worked out <strong>only from items whose buying
+          price has been entered</strong>. Treating a missing buying price as zero would
+          flatter the shop and make the figure worthless, so sales without one are shown
+          separately rather than folded in.</span>
       </div>
       <div class="drow">
         <span class="k">Day close</span>
@@ -779,21 +804,24 @@
   <div class="grid3 mt72" style="gap: 48px">
     <div class="card">
       <h3>Everything is local</h3>
-      <p>Sales, stock, customers and settings live in IndexedDB on the phone. The shell
-        is precached, so after installing, the app makes no network requests at all
-        &mdash; there is nothing left to request.</p>
+      <p>Sales, stock, customers and settings live in the browser&rsquo;s own
+        database on the phone. The app&rsquo;s own files are saved there too, so once
+        it is installed it makes no network requests at all &mdash; there is nothing
+        left to ask anyone for.</p>
     </div>
     <div class="card">
       <h3>One transaction, or none</h3>
-      <p>Committing a sale writes the bill, the stock movements, the ledger entry and
-        the bill counter in a single atomic transaction. There is no state in which a
-        sale exists but the stock never moved.</p>
+      <p>Saving a sale writes the bill, the shelf counts, the credit entry and the
+        bill number as one all-or-nothing operation. Either every part of it lands or
+        none of it does. There is no in-between where a sale exists but the stock never
+        moved.</p>
     </div>
     <div class="card">
       <h3>Storage is finite, so say so</h3>
-      <p>A bill is roughly a kilobyte. Five megabytes of quota is about six weeks of a
-        busy shop &mdash; so the app watches its own quota and asks for a backup before
-        it is in trouble, rather than after.</p>
+      <p>A bill takes about a kilobyte. The five megabytes a browser typically allows
+        works out at roughly six weeks for a busy shop &mdash; so the app keeps an eye
+        on how much room is left and asks for a backup before it is in trouble, not
+        after.</p>
     </div>
   </div>
   <hr class="rule mt72" />
@@ -802,21 +830,21 @@
       <h3>Trust is shown, not claimed</h3>
       <p class="body mt24">
         Being offline gets a small amber dot beside the screen name &mdash; it is the
-        expected state, so it does not get a banner. Banners are spent only on things
-        that are genuinely wrong: a browser that will not persist storage, a quota
-        nearly full, a backup that has not been taken in a week. A backup restore is
-        never silent; it says what it is about to replace, first.
+        normal state here, so it does not get a warning banner. Banners are spent only
+        on things that are genuinely wrong: a browser that might throw the data away,
+        space running out, a backup nobody has taken in a week. Restoring a backup is
+        never silent either; it says what it is about to overwrite, first.
       </p>
     </div>
     <div style="flex: 1">
       <h3>The migration nobody sees</h3>
       <p class="body mt24">
-        Shipping a schema change to a device that holds the only copy of a shop&rsquo;s
-        books is the most dangerous thing this app does. Version&nbsp;2 added one index
-        and shipped with a restore path that rebuilds bill counters from the restored
-        bills themselves &mdash; because an earlier build could hand out a bill number
-        twice after a restore, and two bills sharing a number is a discrepancy nobody
-        can unpick at closing time.
+        Changing the shape of the database on a device that holds the only copy of a
+        shop&rsquo;s books is the most dangerous thing this app does. The one such
+        change so far shipped alongside a fix to restoring: the bill numbering is now
+        rebuilt from the restored bills themselves, because an earlier version could
+        hand out the same bill number twice after a restore &mdash; and two bills
+        sharing a number is a mess nobody can unpick at closing time.
       </p>
     </div>
   </div>
@@ -827,9 +855,9 @@
   <p class="eyebrow">Dark</p>
   <div class="row between">
     <h2>Shops open before dawn and close after dark.</h2>
-    <p class="tag" style="max-width: 34ch; text-align: right">Not an inversion. The
-      brand teal is too dark to read as text on a dark surface, so the role is
-      re-cast in a lighter tone that carries the same meaning.</p>
+    <p class="tag" style="max-width: 34ch; text-align: right">Not simply inverted.
+      The brand teal is too dark to read as text on a dark background, so that job is
+      handed to a lighter tone of the same colour.</p>
   </div>
   <div class="row mt72" style="gap: 40px; justify-content: center">
     <div class="dev" style="width: 340px"><img class="shot" src="data:image/webp;base64,{{SHOT:dk-till}}" /></div>
@@ -847,7 +875,7 @@
 <section class="board" id="b16">
   <p class="eyebrow">First run</p>
   <div class="row between">
-    <h2>The one screen in the app that is not a till.</h2>
+    <h2>The one screen that isn&rsquo;t a working counter.</h2>
     <p class="tag" style="max-width: 34ch; text-align: right">A colour per question,
       heavy display type, and ink drawn by hand. It stops at the front door.</p>
   </div>
@@ -860,9 +888,9 @@
     <div style="flex: 1">
       <p class="body">
         A fresh install used to open on an empty billing screen &mdash; technically
-        correct and completely unwelcoming. Three questions later the till carries the
-        shop&rsquo;s name, knows whether it charges GST, and has that shop&rsquo;s
-        fastest sellers waiting on the front screen.
+        correct and completely unwelcoming. Three questions later the app carries the
+        shop&rsquo;s name, knows whether it has to charge sales tax, and has that
+        shop&rsquo;s own fastest sellers waiting on the front screen.
       </p>
       <p class="body mt24">
         Setup is the only moment in the product with <strong>no queue behind it</strong>,
@@ -874,17 +902,18 @@
     <div style="flex: 1">
       <div class="drow" style="border-top: 1px solid var(--rule)">
         <span class="k">Measured, not chosen</span>
-        <span class="v">Ink clears <strong>13:1</strong> on all three grounds. The same
-          arithmetic says a white field on the lime ground is <strong>1.15:1</strong>
-          &mdash; so the input boxes are separated by their ink border, never by their
+        <span class="v">The black stands out from all three backgrounds by a factor
+          of <strong>13</strong>. The same measurement says a white box on the green one
+          stands out by a factor of <strong>1.15</strong> &mdash; almost nothing &mdash;
+          so the input boxes are marked out by their black outline, never by their
           fill.</span>
       </div>
       <div class="drow">
         <span class="k">Dark, not dropped</span>
-        <span class="v">The three hues get dark counterparts, because a first run at
-          night should still feel like this screen. Every stroke in the drawings is
-          <strong>currentColor</strong>, so the ink flips to cream with no second copy
-          of the art.</span>
+        <span class="v">The three colours get dark counterparts rather than the whole
+          treatment being dropped, because setting up at night should still feel like
+          this. Every stroke in the drawings takes its colour from the text around it,
+          so the black flips to cream with no second copy of the artwork.</span>
       </div>
     </div>
   </div>
@@ -904,25 +933,27 @@
       <div class="flagbar"></div>
       <div style="flex: 1">
         <h3>Credit could not be selected at all</h3>
-        <p class="body mt24" style="max-width: none">A polish commit left the credit
-          panel behind a condition that could never be true, so every khata sale and
-          every split payment silently became unreachable. The test suite stayed green
-          because the logic lived in component state where nothing could assert on it.
-          The fix was not the condition &mdash; it was moving every payment decision
-          into a pure, tested module. <strong>Reintroducing the original defect now
-          fails nine tests.</strong></p>
+        <p class="body mt24" style="max-width: none">A tidy-up left the credit panel
+          behind a condition that could never be true, so putting a sale on somebody&rsquo;s
+          tab &mdash; and splitting a bill across two ways of paying &mdash; silently
+          became impossible. Every automated test still passed, because the logic sat
+          inside the screen itself where no test could reach it. The fix was not the
+          condition; it was pulling every payment decision out into its own tested
+          piece. <strong>Putting the original mistake back now fails nine
+          tests.</strong></p>
       </div>
     </div>
     <div class="row" style="gap: 28px">
       <div class="flagbar"></div>
       <div style="flex: 1">
-        <h3>Repeat partial returns refunded more than the sale</h3>
-        <p class="body mt24" style="max-width: none">Returning the same line twice was
-          validated against the original sale each time instead of against everything
-          already returned. Proven with a probe, not by reasoning: <strong>₹50 refunded
-          against a ₹30 sale, and stock going 100 → 102.</strong> Returns are now
-          checked cumulatively, refund the credit portion before the cash, and get
-          their own numbering series.</p>
+        <h3>Returning the same item twice refunded too much</h3>
+        <p class="body mt24" style="max-width: none">Returning the same item twice
+          was checked against the original sale each time, instead of against everything
+          already sent back. Proven by running it rather than by reasoning about it:
+          <strong>₹50 refunded against a ₹30 sale, and a shelf count going 100 →
+          102.</strong> Returns are now checked against the running total of what has
+          already gone back, they wipe out any credit before handing over cash, and they
+          have their own numbering.</p>
       </div>
     </div>
     <div class="row" style="gap: 28px">
@@ -930,33 +961,34 @@
       <div style="flex: 1">
         <h3>Two bills could share one number after a restore</h3>
         <p class="body mt24" style="max-width: none">Restoring a backup brought the
-          bills back but not the counters that hand out their numbers, so the next sale
-          reused one. In a shop&rsquo;s books that is not a bug, it is a discrepancy
-          nobody can unpick. Restore now rebuilds the counters from the restored bills
-          and recalculates every customer balance afterwards.</p>
+          bills back but not the count of how many had been issued, so the next sale
+          reused a number. In a shop&rsquo;s books that is not a bug, it is a mess
+          nobody can unpick. Restoring now works the numbering out from the restored
+          bills themselves, and adds up every customer&rsquo;s balance again
+          afterwards.</p>
       </div>
     </div>
     <div class="row" style="gap: 28px">
       <div class="flagbar"></div>
       <div style="flex: 1">
         <h3>Controls that were invisible &mdash; twice</h3>
-        <p class="body mt24" style="max-width: none">A search field filled with the
-          page colour, on the page colour. Then, after the palette changed, every
-          neutral fill inside a sheet &mdash; because sheets sit on the page colour, not
-          on the card colour. The same class of mistake, found the same way both times:
-          by looking, not by reading the diff.</p>
+        <p class="body mt24" style="max-width: none">A search box painted the same
+          colour as the page it sat on. Then, after the palette changed, every grey
+          control inside a pop-up panel &mdash; because those panels sit on the page
+          colour rather than the card colour. The same mistake twice, and found the same
+          way both times: by looking at the screen, not by reading the change.</p>
       </div>
     </div>
     <div class="row" style="gap: 28px">
       <div class="flagbar"></div>
       <div style="flex: 1">
         <h3>A 26-pixel field on the very first screen</h3>
-        <p class="body mt24" style="max-width: none">The item-name box during setup was
-          too narrow to show a placeholder or aim a thumb at, because a shared input
-          hardcoded a full width that beat the width its neighbour asked for. Automated
-          checks passed &mdash; a 26&nbsp;px field still accepts keystrokes. It was
-          reachable by code and unusable by a person, and only measuring it caught the
-          difference.</p>
+        <p class="body mt24" style="max-width: none">During setup, the box for typing
+          an item&rsquo;s name was too narrow to show its own label or aim a thumb at,
+          because a shared component insisted on a full-width setting that overrode the
+          width its neighbour had asked for. Automated checks passed happily &mdash; a
+          26-pixel box still accepts typing. It was reachable by a script and unusable
+          by a person, and only measuring it caught the difference.</p>
       </div>
     </div>
   </div>
@@ -971,9 +1003,9 @@
     <div>
       <h3>What the design work actually was</h3>
       <p class="body mt24" style="font-size: 18px">Less drawing screens than deciding
-        what the counter would tolerate: how big a number has to be, how few taps a
-        weight can take, which warnings are worth interrupting for, and what happens to
-        a half-finished bill when a phone dies.</p>
+        what a busy counter would put up with: how big a number has to be, how few taps
+        a weight can take, which warnings are worth interrupting somebody for, and what
+        happens to a half-finished bill when the phone dies.</p>
     </div>
     <div>
       <h3>What it taught</h3>
@@ -984,16 +1016,16 @@
     </div>
     <div>
       <h3>Still open</h3>
-      <p class="body mt24" style="font-size: 18px">Backup is on-device and manual; an
-        automatic off-device copy has to land before this holds a real shop&rsquo;s only
-        books. And the keyboard-first path has not yet been watched in the hands of an
-        operator who did not design it.</p>
+      <p class="body mt24" style="font-size: 18px">Backups are still manual and stay
+        on the phone; an automatic copy kept somewhere else has to land before this holds
+        a real shop&rsquo;s only books. And the keyboard shortcuts have not yet been
+        watched in the hands of somebody who did not design them.</p>
     </div>
   </div>
   <hr class="rule mt96" />
   <div class="row between mt40">
     <p class="tag">KBS &mdash; Kadai Billing System &middot; Offline billing for
-      Tamil Nadu provision stores &middot; 2026</p>
+      neighbourhood grocery shops in Tamil Nadu &middot; 2026</p>
     <p class="tag">Designed and built as one piece of work</p>
   </div>
 </section>

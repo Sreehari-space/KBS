@@ -165,7 +165,7 @@ export const en = {
   'inv.linked': 'Barcode added to',
   'inv.empty': 'No items yet',
   'inv.emptyHint':
-    'Add what you sell, or just scan a packet at the till — the app asks for the name and price once, then remembers it.',
+    'Add what you sell, or just scan a packet at the counter — the app asks for the name and price once, then remembers it.',
   'inv.autoTamil': 'Tamil name filled automatically — tap to edit',
   'inv.autoTamilCheck': 'Sound-alike only. Please check the Tamil name.',
 
@@ -187,7 +187,7 @@ export const en = {
   'ledger.statement': 'Statement',
   'ledger.noDues': 'No pending credit',
   'ledger.noDuesHint':
-    'Nobody owes the shop anything right now. Credit given at the till shows up here.',
+    'Nobody owes the shop anything right now. Credit given at the counter shows up here.',
   'ledger.daysAgo': 'days ago',
 
   // Settings
@@ -305,7 +305,7 @@ export const en = {
   'net.offline': 'Working offline',
 
   // Onboarding
-  'onb.welcome': 'Set up your till',
+  'onb.welcome': 'Set up your shop',
   'onb.welcomeHint': 'Three questions, about four minutes. You can change all of it later.',
   'onb.step': 'Step {n} of 3',
   'onb.shopTitle': "Your shop's name",

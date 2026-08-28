@@ -10,3 +10,7 @@ dist-ssr/
 !.vscode/extensions.json
 .idea/
 dev-dist/
+
+# Case-study intermediates — regenerate with docs/behance/src/capture.mjs
+.caps/
+docs/behance/src/bassets.json
