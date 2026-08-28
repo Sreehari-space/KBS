@@ -33,10 +33,66 @@ const L = {
   },
 };
 
+// The device chrome the app itself doesn't own. When this PWA is installed,
+// Android draws its own status bar over it edge-to-edge — real chrome, not a
+// product screen — so it belongs on every capture for the same reason a
+// mockup gets a device frame. The clock is the standard fixed demo time
+// every platform's own screenshots use, precisely so nobody reads it as data.
+const STATUS_BAR_PX = 40;
+
+async function injectStatusBar(page) {
+  await page.evaluate((h) => {
+    document.getElementById('__statusbar')?.remove();
+    const root = document.querySelector('#root > div');
+    if (!root) return;
+    const cs = getComputedStyle(root);
+    const bar = document.createElement('div');
+    bar.id = '__statusbar';
+    bar.style.cssText = `flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;height:${h}px;padding:0 26px;background:${cs.backgroundColor};color:${cs.color};font:600 16px/1 'Archivo',-apple-system,sans-serif;letter-spacing:-0.01em;`;
+    bar.innerHTML = `
+      <span>9:41</span>
+      <span style="display:flex;align-items:center;gap:7px">
+        <svg width="19" height="12" viewBox="0 0 19 12" fill="none">
+          <rect x="0" y="7" width="3.4" height="5" rx="0.8" fill="currentColor"/>
+          <rect x="5.2" y="5" width="3.4" height="7" rx="0.8" fill="currentColor"/>
+          <rect x="10.4" y="3" width="3.4" height="9" rx="0.8" fill="currentColor"/>
+          <rect x="15.6" y="0" width="3.4" height="12" rx="0.8" fill="currentColor"/>
+        </svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+          <path d="M8 9.6a1.05 1.05 0 100 2.1 1.05 1.05 0 000-2.1z" fill="currentColor"/>
+          <path d="M4.7 6.9a4.7 4.7 0 016.6 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M1.8 4.1a8.7 8.7 0 0112.4 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <svg width="26" height="13" viewBox="0 0 26 13" fill="none">
+          <rect x="0.75" y="0.75" width="21.5" height="11.5" rx="2.8" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.1"/>
+          <rect x="2.4" y="2.4" width="18.2" height="8.2" rx="1.5" fill="currentColor"/>
+          <rect x="23" y="4.2" width="2" height="4.6" rx="1" fill="currentColor" fill-opacity="0.45"/>
+        </svg>
+      </span>`;
+    root.insertBefore(bar, root.firstChild);
+  }, STATUS_BAR_PX);
+}
+
+// A full-height sheet is genuinely drawn over the nav in this app — that's
+// real product behaviour, not something to fake away. What the capture does
+// instead is give the sheet's own overlay the nav's real height back as
+// padding, so the sheet stops short of the bottom edge and the nav — still
+// the actual nav, still showing whatever screen is really behind it — reads
+// through the same dimmed backdrop the rest of the page already sits behind.
+async function revealNavBehindSheet(page) {
+  await page.evaluate(() => {
+    const dialog = document.querySelector('[role="dialog"]');
+    const nav = document.querySelector('nav');
+    if (!dialog || !nav) return;
+    dialog.style.paddingBottom = `${nav.getBoundingClientRect().height}px`;
+    dialog.style.boxSizing = 'border-box';
+  });
+}
+
 async function open({ lang, dark }) {
   const browser = await chromium.launch({ executablePath: EXE });
   const ctx = await browser.newContext({
-    viewport: { width: 390, height: 844 },
+    viewport: { width: 390, height: 844 + STATUS_BAR_PX },
     deviceScaleFactor: 3,
     colorScheme: dark ? 'dark' : 'light',
   });
@@ -54,6 +110,8 @@ async function open({ lang, dark }) {
   };
   const shot = async (n) => {
     await force();
+    await revealNavBehindSheet(page);
+    await injectStatusBar(page);
     await page.screenshot({ path: path.join(OUT, n + '.png') });
     console.log('  ', n);
   };

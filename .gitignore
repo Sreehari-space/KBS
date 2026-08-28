@@ -14,3 +14,4 @@ dev-dist/
 # Case-study intermediates — regenerate with docs/behance/src/capture.mjs
 .caps/
 docs/behance/src/bassets.json
+docs/behance/src/_boards.full.html
