@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.packaging/
+*.tar.gz
+.env
+.dev.vars
+*.local
+tests/output/
+
+*.local.mjs

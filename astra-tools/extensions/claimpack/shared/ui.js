@@ -1,0 +1,9 @@
+import {allowExport,recordExport} from './license.js';
+export const $=(selector,root=document)=>root.querySelector(selector);
+export function status(message,error=false){const el=$('#global-status');el.textContent=message;el.classList.toggle('error',error);}
+export const size=n=>n<1024? n+' B':n<1048576?(n/1024).toFixed(1)+' KB':(n/1048576).toFixed(1)+' MB';
+export function download(blob,name){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);}
+export async function exportGuard(product,callback){if(!await allowExport(product)){status('Today’s 3 free exports are used. Come back tomorrow or activate a licence.',true);$('#licence-panel').open=true;return false;}await callback();await recordExport(product);return true;}
+export function setupDrop(zone,input,onFiles){zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('dragging');});zone.addEventListener('dragleave',()=>zone.classList.remove('dragging'));zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('dragging');onFiles([...e.dataTransfer.files]);});input.addEventListener('change',()=>onFiles([...input.files]));}
+export async function imageFromFile(file){if(!['image/jpeg','image/png','image/webp'].includes(file.type))throw Error('Choose JPG, PNG or WebP images.');const bitmap=await createImageBitmap(file,{imageOrientation:'from-image'});if(bitmap.width*bitmap.height>40000000){bitmap.close();throw Error('Images must be 40 megapixels or smaller.');}return bitmap;}
+export function blobFromCanvas(canvas,type='image/png',quality=.9){return new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('Image export failed.')),type,quality));}

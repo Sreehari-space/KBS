@@ -1,0 +1,5 @@
+
+(()=>{if(globalThis.__astraFollow)return;globalThis.__astraFollow=true;let button,last='';
+function details(){const subject=document.querySelector('h2.hP');if(!subject)return null;const headers=[...document.querySelectorAll('[data-message-id]')];return{url:location.href,title:subject.textContent.trim().slice(0,180),fingerprint:headers.map(x=>x.getAttribute('data-message-id')).filter(Boolean).join('|').slice(0,4000)};}
+function tick(){const d=details();if(!d){button?.remove();button=null;last='';return;}if(!button){button=document.createElement('button');button.textContent='Track follow-up';button.dataset.astra='followup';button.style.cssText='position:fixed;bottom:24px;right:24px;z-index:2147483646;padding:12px 18px;background:#244e34;color:white;border:2px solid white;border-radius:8px;font:14px system-ui;cursor:pointer';button.onclick=()=>{const current=details();if(current)chrome.runtime.sendMessage({type:'track-current',...current}).catch(()=>{});};document.body.append(button);}const key=d.url+'|'+d.fingerprint;if(d.fingerprint&&key!==last){last=key;chrome.runtime.sendMessage({type:'activity',...d}).catch(()=>{});}}
+setInterval(tick,2500);tick();})();

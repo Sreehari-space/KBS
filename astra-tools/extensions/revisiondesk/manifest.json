@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "RevisionDesk — Astra Tools",
+  "version": "1.1.0",
+  "description": "Capture client requests, track agreed revision rounds and issue itemised proposals with recorded client responses.",
+  "minimum_chrome_version": "123",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "contextMenus"
+  ],
+  "externally_connectable": {
+    "matches": [
+      "https://astra-tools.villanpotter.chatgpt.site/*"
+    ]
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Open RevisionDesk",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "options_page": "tool.html?tool=revisiondesk",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'"
+  }
+}

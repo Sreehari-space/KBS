@@ -106,3 +106,10 @@ Start at **[docs/README.md](docs/README.md)** for the index and the decision log
   See the end of [doc 06](docs/06-roadmap.md) for what to add before real money depends on it.
 - **Not built by choice:** expiry/batch tracking (that's a medical-shop feature and needs a
   batch-level data model), AI features, and Google Drive API sync. Reasons in doc 06.
+
+
+## Additional project: Astra Tools
+
+[Astra Tools](astra-tools/README.md) is included as a separate project under astra-tools/. It contains nine browser extensions and the RevisionDesk hosted workspace. It does not change the KBS application.
+
+Public website: https://astra-tools.villanpotter.chatgpt.site

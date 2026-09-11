@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "ClaimPack — Astra Tools",
+  "version": "1.1.0",
+  "description": "Collect receipts, add your expenses and export one tidy claim document.",
+  "minimum_chrome_version": "116",
+  "permissions": [
+    "storage"
+  ],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Open ClaimPack",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "options_page": "tool.html?tool=claimpack",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'"
+  }
+}

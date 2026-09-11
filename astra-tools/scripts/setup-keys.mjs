@@ -1,0 +1,5 @@
+import {webcrypto} from 'node:crypto';import {existsSync,readFileSync,writeFileSync} from 'node:fs';
+if(existsSync('.dev.vars')){console.log('Existing local signing key retained.');process.exit(0);}
+if(existsSync('public/shared/config.js'))throw Error('A public verification key already exists. Restore the original .dev.vars signing key; do not silently replace it.');
+const pair=await webcrypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']);const privateKey=await webcrypto.subtle.exportKey('jwk',pair.privateKey),publicKey=await webcrypto.subtle.exportKey('jwk',pair.publicKey);writeFileSync('.dev.vars',JSON.stringify({LICENSE_PRIVATE_JWK:JSON.stringify(privateKey),CHECKOUT_ENABLED:'false',RAZORPAY_KEY_ID:'',RAZORPAY_KEY_SECRET:''},null,2));
+writeFileSync('public/shared/config.js','export const PUBLIC_JWK = '+JSON.stringify(publicKey)+';\nexport const STORE_ORIGIN = '+JSON.stringify(process.argv[2]||'http://127.0.0.1:4173')+';\n');console.log('Signing keys created. Private key stays in ignored .dev.vars; public key bundled with extensions.');
