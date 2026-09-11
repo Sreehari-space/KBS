@@ -21,3 +21,7 @@ The existing .openai/hosting.json identifies the live Astra Tools site; reuse it
 This import excludes private .dev.vars, credentials, local SQLite data, temporary files and source Git history. Never commit private signing or payment keys. Keep the current public verification key unchanged for the live deployment.
 
 Pricing remains as in the deployed preview; checkout is disabled. The proposed switch to all-free tools and online promotion is paused.
+
+
+## ListMatch
+Free browser-based CSV comparison: https://astra-tools.villanpotter.chatgpt.site/listmatch.html . Compare two exports by key and value columns, flag duplicate or missing IDs, and export results locally. The storefront also links to KBS at https://kbs-alpha.vercel.app .
